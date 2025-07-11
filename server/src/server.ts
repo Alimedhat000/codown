@@ -30,7 +30,7 @@ app.use(express.static(path.join(path.resolve(), 'public')));
 // Routes
 app.use('/api/v1', router);
 
-// Error middleware
+// Error middlewaree
 app.use(errorMiddleware);
 
 app.listen(process.env.PORT, () => {
