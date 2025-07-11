@@ -1,0 +1,8 @@
+{
+  "client/**/*.{js,jsx,ts,tsx}": [
+    "pnpm --filter client lint:fix"
+  ],
+  "server/**/*.{js,ts}": [
+    "pnpm --filter server lint:fix"
+  ]
+}

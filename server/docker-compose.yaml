@@ -1,0 +1,44 @@
+services:
+  server:
+    container_name: server
+    build:
+      context: .
+      target: ${NODE_ENV}
+    env_file:
+      - .env
+    environment:
+      - FORCE_COLOR=1 # Forces color output in the terminal
+    stdin_open: true
+    ports:
+      - ${PORT}:${PORT}
+      - 5555:5555 # Prisma Studio
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./public:/usr/src/app/public
+      - ./prisma:/usr/src/app/prisma
+      - ./logs:/usr/src/app/logs
+  db:
+    image: postgres
+    container_name: database
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    expose:
+      - ${POSTGRES_PORT}
+    command: ['postgres', '-c', 'log_min_messages=warning']
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-h', 'db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  db-data:
