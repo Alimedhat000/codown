@@ -37,6 +37,7 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "pm2": "^5.4.3",
+    "winston": "^3.17.0",
     "zod": "^3.24.1",
     "zod-validation-error": "^3.4.0"
   },
