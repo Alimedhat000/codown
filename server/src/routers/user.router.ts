@@ -1,10 +1,11 @@
 import express from 'express';
 
-import { helloWorld } from '@/controllers/user.controller';
-// import { validate } from '@/middlewares/validation.middleware';
-// import { createUserSchema } from '@/validations/create-user.schema';
+import { loginUser, registerUser } from '@/controllers/user.controller';
+import { validate } from '@/middlewares/validation.middleware';
+import { LoginUserSchema } from '@/validations/login.schema';
+import { RegisterUserSchema } from '@/validations/register.schema';
 
-export const userRouter = express.Router();
+export const authRouter = express.Router();
 
-userRouter.get('/me', helloWorld);
-// userRouter.post('/', validate({ body: createUserSchema }), createUser);
+authRouter.post('/register', validate({ body: RegisterUserSchema }), registerUser);
+authRouter.post('/login', validate({ body: LoginUserSchema }), loginUser);

@@ -8,12 +8,13 @@ dotenv.config({ path: path.join(path.resolve(), '.env') });
 
 const envVarsSchema = z.object({
   PORT: z.string(),
-  NODE_ENV: z.enum(['development', 'production']),
+  NODE_ENV: z.enum(['development', 'production', 'test']),
   POSTGRES_USER: z.string(),
   POSTGRES_PASSWORD: z.string(),
   POSTGRES_DB: z.string(),
   POSTGRES_PORT: z.string(),
   DATABASE_URL: z.string(),
+  JWT_SECRET: z.string(),
 });
 
 const parseEnvResult = envVarsSchema.safeParse(process.env);

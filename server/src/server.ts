@@ -10,7 +10,7 @@ import path from 'path';
 import { errorMiddleware } from './middlewares/error.middleware';
 import { router } from './routers';
 
-const app = express();
+export const app = express();
 
 // Helmet => HTTP Security Headers.
 app.use(helmet());
@@ -28,7 +28,7 @@ app.use(morgan('dev'));
 app.use(express.static(path.join(path.resolve(), 'public')));
 
 // Routes
-app.use('/api/v1', router);
+app.use('/api', router);
 
 // Error middlewaree
 app.use(errorMiddleware);

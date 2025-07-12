@@ -17,6 +17,8 @@
     "typecheck": "run-p typecheck:*",
     "typecheck:client": "pnpm --filter client typecheck",
     "typecheck:server": "pnpm --filter server typecheck",
+    "test": "run-p test:*",
+    "test:server": "pnpm --filter server test",
     "format": "pnpm --filter server lint:fix",
     "prepare": "husky"
   },
