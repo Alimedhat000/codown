@@ -1,14 +1,30 @@
-name: Lint and Type Check
+name: Lint, Type Check and Test
 
 on:
   push:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
+  workflow_dispatch:
 
 jobs:
   lint-and-typecheck:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: codown_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     defaults:
       run:
@@ -46,8 +62,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Initialize Enviroment
+        run: cp server/.env.example server/.env
+
       - name: Install dependencies
         run: pnpm install  --no-frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter server db:generate
+
+      - name: Apply Prisma migrations
+        run: pnpm --filter server db:migrate:prod
 
       - name: Run linting
         run: pnpm lint
