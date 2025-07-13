@@ -100,17 +100,13 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
     secure: process.env.NODE_ENV === 'production',
   });
 
-  res.cookie('accessToken', accessToken, {
-    httpOnly: true,
-    maxAge: 15 * 60 * 1000, // 15mins
-    sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'production',
-  });
-
   res.status(StatusCodes.OK).json({
-    id: user.id,
-    username: user.username,
-    email: user.email,
+    accessToken,
+    user: {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    },
   });
 });
 
@@ -133,18 +129,25 @@ export const logoutUser = asyncErrorWrapper(async (req: AuthenticatedRequest, re
   res.status(StatusCodes.OK).json({ message: 'Logged out successfully' });
 });
 
-export const refreshToken = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
-  const userId = req.user?.userId;
-  const refereshToken = req.cookies.refreshToken;
+export const refreshToken = asyncErrorWrapper(async (req: Request, res: Response) => {
+  const refreshToken = req.cookies.refreshToken;
 
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-
-  if (!user || !user.refreshToken) {
-    res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Refresh token not found' });
+  if (!refreshToken) {
+    res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Missing refresh token' });
     return;
   }
 
-  if (user.refreshToken !== refereshToken) {
+  let payload;
+  try {
+    payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as jwt.JwtPayload;
+  } catch {
+    res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid refresh token' });
+    return;
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+
+  if (!user || user.refreshToken !== refreshToken) {
     res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid refresh token' });
     return;
   }
@@ -154,19 +157,23 @@ export const refreshToken = asyncErrorWrapper(async (req: AuthenticatedRequest, 
       userId: user.id,
       username: user.username,
     },
-    process.env.JWT_ACCESS_SECRET,
-    {
-      expiresIn: '15m',
-    }
+    process.env.JWT_ACCESS_SECRET!,
+    { expiresIn: '15m' }
   );
 
   res.cookie('accessToken', newAccessToken, {
     httpOnly: true,
-    maxAge: 15 * 60 * 1000, // 15mins
+    maxAge: 15 * 60 * 1000,
     sameSite: 'strict',
     secure: process.env.NODE_ENV === 'production',
   });
 
-  res.status(StatusCodes.OK).json({ message: 'Token refreshed successfully' });
-  return;
+  res.status(StatusCodes.OK).json({
+    accessToken: newAccessToken,
+    user: {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    },
+  });
 });

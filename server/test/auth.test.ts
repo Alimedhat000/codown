@@ -58,9 +58,12 @@ describe('Auth Routes', () => {
     expect(res.status).toBe(StatusCodes.OK);
     expect(res.headers['set-cookie']).toBeDefined(); // cookies contain tokens
     expect(res.body).toMatchObject({
-      id: expect.any(String),
-      username: 'tester',
-      email: 'test@test.dev',
+      accessToken: expect.any(String),
+      user: {
+        id: expect.any(String),
+        username: 'tester',
+        email: 'test@test.dev',
+      },
     });
   });
 
@@ -128,10 +131,45 @@ describe('Auth Routes', () => {
       password: 'secure123',
     });
 
+    const token = loginRes.body.accessToken;
     const cookieHeader = extractCookies(loginRes.headers['set-cookie']);
 
-    const logoutRes = await request(app).post('/api/auth/logout').set('Cookie', cookieHeader);
+    const logoutRes = await request(app)
+      .post('/api/auth/logout')
+      .set('Cookie', cookieHeader)
+      .set('Authorization', `Bearer ${token}`);
 
     expect(logoutRes.status).toBe(StatusCodes.OK);
+  });
+
+  it('should return 401 when accessing protected route without token', async () => {
+    const res = await request(app).get('/api/user');
+    expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
+  });
+
+  it('should access protected route with valid token', async () => {
+    await request(app).post('/api/auth/register').send({
+      email: 'me@test.dev',
+      username: 'meUser',
+      password: 'secure123',
+    });
+
+    const loginRes = await request(app).post('/api/auth/login').send({
+      email: 'me@test.dev',
+      password: 'secure123',
+    });
+
+    const token = loginRes.body.token || loginRes.body.accessToken;
+
+    const res = await request(app).get('/api/user').set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.OK);
+    expect(res.body.email).toBe('me@test.dev');
+  });
+
+  it('should reject refresh with invalid refresh token', async () => {
+    const res = await request(app).post('/api/auth/refresh').set('Cookie', 'refreshToken=invalid.token.here');
+
+    expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
   });
 });

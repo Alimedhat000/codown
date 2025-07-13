@@ -1,18 +1,30 @@
-import { LoginUser } from "@/api/auth";
+import { api } from "@/api/axios";
+import { useAuth } from "@/context/auth";
 import { LoginSchema, type LoginSchemaType } from "@/validations/authSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginSchemaType>({ resolver: zodResolver(LoginSchema) });
 
-  const onSubmit = (data: LoginSchemaType) => {
-    LoginUser(data);
-    console.log(data);
+  const { login } = useAuth();
+
+  const onSubmit = async (data: LoginSchemaType) => {
+    try {
+      const res = await api.post("/auth/login", data);
+      const { accessToken, user } = res.data;
+      login(accessToken, user);
+      navigate("/");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
