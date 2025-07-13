@@ -14,7 +14,8 @@ const envVarsSchema = z.object({
   POSTGRES_DB: z.string(),
   POSTGRES_PORT: z.string(),
   DATABASE_URL: z.string(),
-  JWT_SECRET: z.string(),
+  JWT_ACCESS_SECRET: z.string(),
+  JWT_REFRESH_SECRET: z.string(),
 });
 
 const parseEnvResult = envVarsSchema.safeParse(process.env);

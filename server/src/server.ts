@@ -1,14 +1,15 @@
-import './config/env.config';
+import '@/config/env.config';
 
 import chalk from 'chalk';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import path from 'path';
 
-import { errorMiddleware } from './middlewares/error.middleware';
-import { morganFile, morganWinston } from './middlewares/logging.middleware';
-import { router } from './routers';
+import { errorMiddleware } from '@/middlewares/error.middleware';
+import { morganFile, morganWinston } from '@/middlewares/logging.middleware';
+import { router } from '@/routers';
 
 export const app = express();
 
@@ -20,6 +21,9 @@ app.use(express.json());
 
 // Cors middleware
 app.use(cors());
+
+// Cookie parser
+app.use(cookieParser());
 
 // Logger middleware
 app.use(morganFile);
