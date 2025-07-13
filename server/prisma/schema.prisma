@@ -8,15 +8,29 @@ generator client {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  username     String   @unique
+  id           String     @id @default(uuid())
+  email        String     @unique
+  username     String     @unique
   password     String
   fullName     String?
   refreshToken String?
-  isActive     Boolean  @default(true)
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  Document     Document[]
+
+  @@map("users")
+}
+
+model Document {
+  id           String   @id @default(uuid())
+  title        String
+  content      String
+  isPublic     Boolean  @default(false)
+  versionCount Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  @@map("users")
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
 }
