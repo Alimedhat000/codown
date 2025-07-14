@@ -5,7 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import { prisma } from '@/lib/prisma';
 
 export const createDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
-  const { title, content, isPublic } = req.body;
+  const { title, content = '', isPublic = false } = req.body;
 
   const newDoc = await prisma.document.create({
     data: {
@@ -31,13 +31,13 @@ export const getDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: R
   res.status(StatusCodes.OK).json(doc);
 });
 
-export const getDocs = async (req: AuthenticatedRequest, res: Response) => {
+export const getDocs = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
   const docs = await prisma.document.findMany({
     where: { authorId: req.user.userId },
     orderBy: { updatedAt: 'desc' },
   });
   res.status(StatusCodes.OK).json(docs);
-};
+});
 
 export const updateDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
   const { title, content, isPublic } = req.body;

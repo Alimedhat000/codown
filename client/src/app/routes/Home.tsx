@@ -30,10 +30,15 @@ function Home() {
       ) : (
         <p>Loading...</p>
       )}
-
+      <br />
+      <br />
       <Link to="/login">Login</Link>
       <br />
+      <br />
       <Link to="/register">Register</Link>
+      <br />
+      <br />
+      <Link to="/dashboard/docs">Dashboard</Link>
     </div>
   );
 }
