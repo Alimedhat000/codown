@@ -24,7 +24,7 @@ function Home() {
     <div>
       <h2>I am:</h2>
       {user ? (
-        <pre>{JSON.stringify(user, null, 2)}</pre>
+        <pre className="text-green-300">{JSON.stringify(user, null, 2)}</pre>
       ) : error ? (
         <p style={{ color: "red" }}>{error}</p>
       ) : (
@@ -32,13 +32,11 @@ function Home() {
       )}
       <br />
       <br />
-      <Link to="/login">Login</Link>
-      <br />
-      <br />
-      <Link to="/register">Register</Link>
-      <br />
-      <br />
-      <Link to="/dashboard/docs">Dashboard</Link>
+      <div className="flex justify-center gap-8">
+        <Link to="/login">Login</Link>
+        <Link to="/register">Register</Link>
+        <Link to="/dashboard/docs">Dashboard</Link>
+      </div>
     </div>
   );
 }

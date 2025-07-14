@@ -2,9 +2,14 @@ import { useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { api } from "@/api/axios";
 import { Link } from "react-router";
+import MarkDownEditor from "@/components/Editor/MarkDownEditor";
 
 export default function DocumentPage() {
   const { id } = useParams();
+  const [doc, setDoc] = useState<{ title: string; content: string } | null>(
+    null
+  );
+
   const [editedDoc, setEditedDoc] = useState<{
     title: string;
     content: string;
@@ -17,6 +22,7 @@ export default function DocumentPage() {
 
   useEffect(() => {
     api.get(`/document/${id}`).then((res) => {
+      setDoc(res.data);
       setEditedDoc(res.data);
       setLoading(false);
     });
@@ -26,6 +32,7 @@ export default function DocumentPage() {
     try {
       setSaving(true);
       await api.put(`/document/${id}`, editedDoc);
+      setDoc(editedDoc);
     } catch (err) {
       console.error("Failed to save document:", err);
     } finally {
@@ -38,7 +45,7 @@ export default function DocumentPage() {
   return (
     <>
       <Link to="/dashboard/docs">← Back to Dashboard</Link>
-
+      {doc ? null : null}
       <div style={{ marginTop: "1rem" }}>
         <input
           type="text"
@@ -56,6 +63,8 @@ export default function DocumentPage() {
           rows={15}
           style={{ width: "100%", fontFamily: "monospace", fontSize: "1rem" }}
         />
+
+        <MarkDownEditor />
         <button
           onClick={handleSave}
           disabled={saving}
