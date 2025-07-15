@@ -2,7 +2,6 @@ import { useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { api } from "@/api/axios";
 import { Link } from "react-router";
-import MarkDownEditor from "@/components/Editor/MarkDownEditor";
 
 export default function DocumentPage() {
   const { id } = useParams();
@@ -64,7 +63,6 @@ export default function DocumentPage() {
           style={{ width: "100%", fontFamily: "monospace", fontSize: "1rem" }}
         />
 
-        <MarkDownEditor />
         <button
           onClick={handleSave}
           disabled={saving}
