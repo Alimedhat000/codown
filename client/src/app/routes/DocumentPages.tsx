@@ -1,7 +1,18 @@
 import { useParams } from "react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api } from "@/api/axios";
 import { Link } from "react-router";
+import Editor from "@/components/editor";
+
+import { useRemirror } from "@remirror/react";
+import {
+  BoldExtension,
+  ItalicExtension,
+  CalloutExtension,
+  MarkdownExtension,
+} from "remirror/extensions";
+
+import ReactMarkdown from "react-markdown";
 
 export default function DocumentPage() {
   const { id } = useParams();
@@ -39,6 +50,21 @@ export default function DocumentPage() {
     }
   };
 
+  const { manager, state } = useRemirror({
+    extensions: useCallback(
+      () => [
+        new BoldExtension({}),
+        new ItalicExtension(),
+        new CalloutExtension({ defaultType: "warn" }),
+        new MarkdownExtension({ copyAsMarkdown: true }),
+      ],
+      []
+    ),
+    content: editedDoc.content || "**Start editing...**",
+    selection: "start",
+    stringHandler: "markdown",
+  });
+
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -54,15 +80,15 @@ export default function DocumentPage() {
           }
           style={{ fontSize: "1.5rem", width: "100%", marginBottom: "1rem" }}
         />
-        <textarea
-          value={editedDoc.content}
-          onChange={(e) =>
-            setEditedDoc({ ...editedDoc, content: e.target.value })
-          }
-          rows={15}
-          style={{ width: "100%", fontFamily: "monospace", fontSize: "1rem" }}
+        <Editor
+          manager={manager}
+          initialContent={state}
+          onChange={(html) => {
+            setEditedDoc((prev) => ({ ...prev, content: html }));
+          }}
         />
-
+        Preview MD using react MD
+        <ReactMarkdown>{editedDoc.content}</ReactMarkdown>
         <button
           onClick={handleSave}
           disabled={saving}
