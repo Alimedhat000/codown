@@ -2,12 +2,7 @@ import { useParams } from "react-router";
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/api/axios";
 import { Link } from "react-router";
-import Editor from "@/components/editor";
-
-import { useRemirror } from "@remirror/react";
-
-import ReactMarkdown from "react-markdown";
-import { getExtensions } from "@/components/extensions";
+import MarkDownEditor from "@/components/editor";
 
 export default function DocumentPage() {
   const { id } = useParams();
@@ -45,13 +40,6 @@ export default function DocumentPage() {
     }
   }, [id, editedDoc]);
 
-  const { manager, state } = useRemirror({
-    extensions: useCallback(() => getExtensions(), []),
-    content: editedDoc.content || "**Start editing...**",
-    selection: "start",
-    stringHandler: "markdown",
-  });
-
   useEffect(() => {
     const interval = setInterval(() => {
       handleSave();
@@ -75,15 +63,7 @@ export default function DocumentPage() {
           }
           style={{ fontSize: "1.5rem", width: "100%", marginBottom: "1rem" }}
         />
-        <Editor
-          manager={manager}
-          initialContent={state}
-          onChange={(html) => {
-            setEditedDoc((prev) => ({ ...prev, content: html }));
-          }}
-        />
-        Preview MD using react MD
-        <ReactMarkdown>{editedDoc.content}</ReactMarkdown>
+        <MarkDownEditor />
         <button
           onClick={handleSave}
           disabled={saving}
