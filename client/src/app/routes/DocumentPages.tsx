@@ -5,14 +5,9 @@ import { Link } from "react-router";
 import Editor from "@/components/editor";
 
 import { useRemirror } from "@remirror/react";
-import {
-  BoldExtension,
-  ItalicExtension,
-  CalloutExtension,
-  MarkdownExtension,
-} from "remirror/extensions";
 
 import ReactMarkdown from "react-markdown";
+import { getExtensions } from "@/components/extensions";
 
 export default function DocumentPage() {
   const { id } = useParams();
@@ -38,7 +33,7 @@ export default function DocumentPage() {
     });
   }, [id]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     try {
       setSaving(true);
       await api.put(`/document/${id}`, editedDoc);
@@ -48,22 +43,22 @@ export default function DocumentPage() {
     } finally {
       setSaving(false);
     }
-  };
+  }, [id, editedDoc]);
 
   const { manager, state } = useRemirror({
-    extensions: useCallback(
-      () => [
-        new BoldExtension({}),
-        new ItalicExtension(),
-        new CalloutExtension({ defaultType: "warn" }),
-        new MarkdownExtension({ copyAsMarkdown: true }),
-      ],
-      []
-    ),
+    extensions: useCallback(() => getExtensions(), []),
     content: editedDoc.content || "**Start editing...**",
     selection: "start",
     stringHandler: "markdown",
   });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleSave();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [editedDoc, handleSave]);
 
   if (loading) return <div>Loading...</div>;
 
