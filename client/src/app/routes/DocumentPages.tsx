@@ -1,8 +1,8 @@
 import { useParams } from "react-router";
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/api/axios";
-import { Link } from "react-router";
 import MarkDownEditor from "@/components/editor";
+import NavBarHeader from "@/components/DocumentPage/NavBarHeader";
 
 export default function DocumentPage() {
   const { id } = useParams();
@@ -40,19 +40,19 @@ export default function DocumentPage() {
     }
   }, [id, editedDoc]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      handleSave();
-    }, 5000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     handleSave();
+  //   }, 5000);
 
-    return () => clearInterval(interval);
-  }, [editedDoc, handleSave]);
+  //   return () => clearInterval(interval);
+  // }, [editedDoc, handleSave]);
 
   if (loading) return <div>Loading...</div>;
 
   return (
-    <>
-      <Link to="/dashboard/docs">← Back to Dashboard</Link>
+    <div className="bg-background  text-text-primary h-screen ">
+      <NavBarHeader />
       {doc ? null : null}
       <div style={{ marginTop: "1rem" }}>
         <input
@@ -72,6 +72,6 @@ export default function DocumentPage() {
           {saving ? "Saving..." : "Save"}
         </button>
       </div>
-    </>
+    </div>
   );
 }
