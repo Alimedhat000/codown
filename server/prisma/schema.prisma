@@ -31,6 +31,22 @@ model Document {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  author   User   @relation(fields: [authorId], references: [id])
-  authorId String
+  author           User              @relation(fields: [authorId], references: [id])
+  authorId         String
+  YjsDocumentState YjsDocumentState?
+
+  @@map("documents")
+}
+
+model YjsDocumentState {
+  id         String   @id @default(uuid())
+  documentId String   @unique
+  state      Bytes // Binary Yjs document state
+  version    Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("yjs_document_states")
 }
