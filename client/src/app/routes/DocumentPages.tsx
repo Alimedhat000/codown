@@ -1,10 +1,11 @@
 import { useParams } from "react-router";
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/api/axios";
-import MarkDownEditor from "@/components/editor";
+import Editor from "@/components/DocumentPage/Editor";
 import NavBarHeader from "@/components/DocumentPage/NavBarHeader";
 
 export default function DocumentPage() {
+  // This should be moved to a custom hook
   const { id } = useParams();
   const [doc, setDoc] = useState<{ title: string; content: string } | null>(
     null
@@ -65,7 +66,7 @@ export default function DocumentPage() {
           }
           style={{ fontSize: "1.5rem", width: "100%", marginBottom: "1rem" }}
         /> */}
-        <MarkDownEditor mode={mode} />
+        <Editor mode={mode} />
         <button
           onClick={handleSave}
           disabled={saving}
