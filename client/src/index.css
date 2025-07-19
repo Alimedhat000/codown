@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin 'tailwind-scrollbar';
 
 @font-face {
   font-family: "Inter";
@@ -95,4 +97,30 @@
   --color-syntax-function: #dcdcaa;
 
   --font-inter: "Inter", sans-serif;
+}
+
+.prose code::before,
+.prose code::after {
+  content: "";
+}
+
+/* Required by react-split */
+.split {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.split > div {
+  overflow: auto;
+}
+
+.gutter {
+  background-color: #2d2d2d; /* dark split bar */
+  background-clip: padding-box;
+}
+
+.gutter.gutter-horizontal {
+  cursor: col-resize;
+  width: 8px;
 }

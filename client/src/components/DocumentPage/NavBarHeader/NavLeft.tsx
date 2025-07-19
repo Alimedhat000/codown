@@ -1,10 +1,13 @@
 import { Link } from "react-router";
 import ModeSelector from "./ModeSelector";
-import { useState } from "react";
 
-export function NavLeft() {
-  const [mode, setMode] = useState<"edit" | "both" | "view">("edit");
-
+export function NavLeft({
+  mode,
+  setMode,
+}: {
+  mode: "edit" | "both" | "view";
+  setMode: (mode: "edit" | "both" | "view") => void;
+}) {
   return (
     <div className="flex items-center justify-center gap-2">
       <Link

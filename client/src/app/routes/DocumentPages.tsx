@@ -10,6 +10,8 @@ export default function DocumentPage() {
     null
   );
 
+  const [mode, setMode] = useState<EditorMode>("edit");
+
   const [editedDoc, setEditedDoc] = useState<{
     title: string;
     content: string;
@@ -51,19 +53,19 @@ export default function DocumentPage() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="bg-background  text-text-primary h-screen ">
-      <NavBarHeader />
+    <div className="bg-background  text-text-primary h-full ">
+      <NavBarHeader mode={mode} setMode={setMode} />
       {doc ? null : null}
       <div style={{ marginTop: "1rem" }}>
-        <input
+        {/* <input
           type="text"
           value={editedDoc.title}
           onChange={(e) =>
             setEditedDoc({ ...editedDoc, title: e.target.value })
           }
           style={{ fontSize: "1.5rem", width: "100%", marginBottom: "1rem" }}
-        />
-        <MarkDownEditor />
+        /> */}
+        <MarkDownEditor mode={mode} />
         <button
           onClick={handleSave}
           disabled={saving}
