@@ -1,7 +1,9 @@
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { FiShare2, FiChevronDown, FiMoreVertical } from "react-icons/fi";
 import { LuUsers } from "react-icons/lu";
 
 export function NavRight() {
+  const isSmallScreen = useMediaQuery("(max-width: 768px)");
   return (
     <div className="flex items-center gap-2">
       {/* Contributors Count and Dropdown */}
@@ -17,13 +19,13 @@ export function NavRight() {
       <img
         src="https://placehold.co/10"
         alt="user"
-        className="w-6 h-6 rounded-full"
+        className="w-6 h-6 rounded-full hidden md:block"
       />
 
       {/* Share Button */}
       <button className="flex items-center bg-primary hover:bg-blue-700 text-white text-xs px-3 py-1 rounded">
         <FiShare2 className="w-4 h-4 mr-1" />
-        Share
+        {isSmallScreen ? "" : "Share"}
       </button>
 
       {/* More Options */}

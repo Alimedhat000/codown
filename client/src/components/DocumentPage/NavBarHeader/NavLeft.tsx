@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import ModeSelector from "./ModeSelector";
+import MobileModeSelector from "./MobileModeSelector";
 
 export function NavLeft({
   mode,
@@ -22,6 +23,7 @@ export function NavLeft({
         <span className="">My Workspace</span>
       </Link>
       <ModeSelector mode={mode} onChange={setMode} />
+      <MobileModeSelector mode={mode} onChange={setMode} />
     </div>
   );
 }

@@ -124,3 +124,23 @@
   cursor: col-resize;
   width: 8px;
 }
+
+.cm-gutterElement:has(> span[title="Fold line"]) {
+  display: none;
+}
+
+.cm-gutterElement:has(> span[title="Unfold line"]) {
+  display: none;
+}
+
+.cm-lineNumbers .cm-gutterElement {
+  color: #94a3b8;
+  border-radius: 8px;
+
+  user-select: none;
+}
+
+.cm-lineNumbers .cm-gutterElement:hover {
+  background-color: #918dec;
+  color: #fff;
+}

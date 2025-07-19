@@ -1,41 +1,42 @@
-import { useState } from "react";
-
 import "highlight.js/styles/github-dark.css";
 import CodeEditor from "./CodeEditor";
 import MarkdownPreview from "./MarkdownPreview";
+// import StatusBar from "./StatusBar";
 
-export function Editor({ mode }: { mode: EditorMode }) {
-  const [content, setContent] = useState(`## Table of Contents
-
-<!-- toc -->
-
-## Math Test
-
-Inline math: $a^2 + b^2 = c^2$
-
-Block math:
-
-$$
-\\sum_{i=1}^n i = \\frac{n(n+1)}{2}
-$$
-
-A code block:
-
-\`\`\`ts
-console.log("Hello world");
-const ali = 22;
-\`\`\`
-`);
-
+export function Editor({
+  mode,
+  doc,
+  setDoc,
+}: {
+  mode: EditorMode;
+  doc: DocumentData;
+  setDoc: (doc: DocumentData) => void;
+}) {
   return (
-    <div className="flex flex-col gap-4 h-screen n  text-white">
-      <div className="flex flex-1 gap-4 overflow-hidden">
+    <div className="flex flex-col h-full w-full bg-background text-white">
+      <div className={`flex flex-1 gap-0 md:gap-4 overflow-auto `}>
         {(mode === "edit" || mode === "both") && (
-          <CodeEditor content={content} setContent={setContent} />
+          <div
+            className={`flex-1 min-w-0 h-full overflow-hidden  last:border-r-0 p-2 md:p-4 ${
+              mode === "both" ? "rounded-l-lg" : "rounded-lg"
+            }`}
+          >
+            {/* <StatusBar content={doc.content} className="fixed bottom-0" /> */}
+
+            <div className="overflow-auto h-full">
+              <CodeEditor doc={doc} setDoc={setDoc} />
+            </div>
+          </div>
         )}
 
         {(mode === "view" || mode === "both") && (
-          <MarkdownPreview content={content} />
+          <div
+            className={`flex-1 min-w-0 h-full  bg-neutral-800 p-2 md:p-4 ${
+              mode === "both" ? "rounded-r-lg" : "rounded-lg"
+            }`}
+          >
+            <MarkdownPreview content={doc.content} />
+          </div>
         )}
       </div>
     </div>
