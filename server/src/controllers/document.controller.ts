@@ -48,21 +48,39 @@ export const getDocs = asyncErrorWrapper(async (req: AuthenticatedRequest, res: 
 export const updateDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
   const { title, content, isPublic } = req.body;
 
-  const doc = await prisma.document.update({
-    where: { id: req.params.id },
-    data: {
-      title,
-      content,
-      isPublic,
+  const doc = await prisma.document.findFirst({
+    where: {
+      id: { startsWith: req.params.id },
     },
   });
 
-  res.status(StatusCodes.OK).json(doc);
+  if (!doc || doc.authorId !== req.user?.userId) {
+    res.status(StatusCodes.NOT_FOUND).json({ error: 'Document not found' });
+    return;
+  }
+
+  const updatedDoc = await prisma.document.update({
+    where: { id: doc.id },
+    data: { title, content, isPublic },
+  });
+
+  res.status(StatusCodes.OK).json(updatedDoc);
 });
 
 export const deleteDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
+  const doc = await prisma.document.findFirst({
+    where: {
+      id: { startsWith: req.params.id },
+    },
+  });
+
+  if (!doc || doc.authorId !== req.user?.userId) {
+    res.status(StatusCodes.NOT_FOUND).json({ error: 'Document not found' });
+    return;
+  }
+
   await prisma.document.delete({
-    where: { id: req.params.id },
+    where: { id: doc.id },
   });
 
   res.status(StatusCodes.NO_CONTENT).send();
