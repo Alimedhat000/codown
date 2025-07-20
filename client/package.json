@@ -19,10 +19,10 @@
     "@codemirror/language-data": "^6.5.1",
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.38.1",
+    "@hocuspocus/provider": "^3.2.0",
     "@hookform/resolvers": "^5.1.1",
     "@lezer/highlight": "^1.2.1",
     "@tailwindcss/vite": "^4.1.11",
-    "@uiw/react-codemirror": "^4.24.1",
     "axios": "^1.10.0",
     "clsx": "^2.1.1",
     "codemirror": "^6.0.2",
@@ -47,6 +47,8 @@
     "tailwindcss": "^4.1.11",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.0.0",
+    "y-codemirror.next": "^0.3.5",
+    "yjs": "^13.6.27",
     "zod": "^3.25.76"
   },
   "devDependencies": {

@@ -12,7 +12,7 @@ import { errorMiddleware } from '@/middlewares/error.middleware';
 import { morganFile, morganWinston } from '@/middlewares/logging.middleware';
 import { router } from '@/routers';
 
-import { setupYjsWebSocketServer } from './sockets/yjs-server';
+import socketServer from './sockets/ws-server';
 
 export const app = express();
 
@@ -48,8 +48,9 @@ app.use(errorMiddleware);
 
 const server = http.createServer(app);
 
-setupYjsWebSocketServer(server);
-
+socketServer.listen(5002, () => {
+  console.log(chalk.green('Hocus Pocus server is running on ws://localhost:5002'));
+});
 server.listen(process.env.PORT, () => {
   console.log(chalk.cyan(`Server is running on http://localhost:${process.env.PORT}`));
 });

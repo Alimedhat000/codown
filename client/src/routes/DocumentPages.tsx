@@ -27,7 +27,7 @@ export default function DocumentPage() {
       <NavBarHeader mode={mode} setMode={setMode} />
       {doc ? null : null}
       <div className=" flex-1 mt-12 overflow-hidden">
-        <Editor mode={mode} doc={editedDoc} setDoc={setEditedDoc} />
+        <Editor mode={mode} doc={editedDoc} setDoc={setEditedDoc} docId={id} />
       </div>
     </div>
   );

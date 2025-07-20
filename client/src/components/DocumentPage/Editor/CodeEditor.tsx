@@ -1,22 +1,47 @@
-import CodeMirror from "@uiw/react-codemirror";
+import * as Y from "yjs";
+import { EditorView, basicSetup } from "codemirror";
+import { EditorState } from "@codemirror/state";
+import { yCollab } from "y-codemirror.next";
 import { editorExtensions } from "./EditorExtensions";
 import { MyTheme } from "./EditorTheme";
+import { useEffect, useRef } from "react";
 
 export default function CodeEditor({
-  doc,
-  setDoc,
+  ytext,
+  provider,
 }: {
-  doc: DocumentData;
-  setDoc: (doc: DocumentData) => void;
+  ytext: Y.Text | null;
+  provider: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }) {
-  return (
-    <CodeMirror
-      value={doc.content}
-      height="100%"
-      theme={MyTheme}
-      extensions={editorExtensions}
-      onChange={(val) => setDoc({ content: val, title: doc.title })}
-      className="w-full h-full flex-1 overflow-auto"
-    />
-  );
+  const editorRef = useRef<HTMLDivElement>(null);
+  const viewRef = useRef<EditorView | null>(null);
+  useEffect(() => {
+    if (!editorRef.current || !ytext || !provider) return;
+
+    // Clean up previous editor if remounting
+    if (viewRef.current) {
+      viewRef.current.destroy();
+    }
+
+    // Create the collaboration extension
+    const yCollabExtension = yCollab(ytext, provider.awareness);
+
+    const state = EditorState.create({
+      doc: ytext.toString() ? ytext.toString() : "\n\n\n\n\n\n\n\n",
+      extensions: [basicSetup, ...editorExtensions, yCollabExtension, MyTheme],
+    });
+
+    const view = new EditorView({
+      state,
+      parent: editorRef.current,
+    });
+
+    viewRef.current = view;
+
+    return () => {
+      view.destroy();
+    };
+  }, [ytext, provider]);
+
+  return <div ref={editorRef} className="w-full h-full" />;
 }
