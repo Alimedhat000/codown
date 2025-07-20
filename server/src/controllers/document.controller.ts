@@ -19,8 +19,14 @@ export const createDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
 });
 
 export const getDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
-  const doc = await prisma.document.findUnique({
-    where: { id: req.params.id },
+  console.log(req.params.id);
+
+  const doc = await prisma.document.findFirst({
+    where: {
+      id: {
+        startsWith: req.params.id,
+      },
+    },
   });
 
   if (!doc || doc.authorId !== req.user?.userId) {

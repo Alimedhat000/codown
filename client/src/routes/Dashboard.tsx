@@ -70,7 +70,7 @@ export default function Dashboard() {
       ) : (
         <ul>
           {documents.map((doc) => (
-            <Link key={doc.id} to={`/dashboard/docs/${doc.id}`}>
+            <Link key={doc.id} to={`/dashboard/docs/${doc.id.slice(0, 8)}`}>
               <li>
                 <strong>{doc.title}</strong> -{" "}
                 {new Date(doc.createdAt).toLocaleString()}
