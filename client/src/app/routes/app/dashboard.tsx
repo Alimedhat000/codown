@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
-import { api } from '@/api/axios';
+import { paths } from '@/config/paths';
+import { api } from '@/lib/api';
 
 type Document = {
   id: string;
@@ -71,7 +72,10 @@ export default function Dashboard() {
       ) : (
         <ul>
           {documents.map((doc) => (
-            <Link key={doc.id} to={`/dashboard/docs/${doc.id.slice(0, 8)}`}>
+            <Link
+              key={doc.id}
+              to={paths.app.document.getHref(doc.id.slice(0, 8))}
+            >
               <li>
                 <strong>{doc.title}</strong> -{' '}
                 {new Date(doc.createdAt).toLocaleString()}

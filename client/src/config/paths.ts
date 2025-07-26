@@ -2,7 +2,7 @@
 // Todo: move all the app paths to app/**
 
 export const paths = {
-  home: {
+  landing: {
     path: '/',
     getHref: () => '/',
   },
@@ -23,10 +23,14 @@ export const paths = {
     },
   },
   app: {
-    dashboard: { path: '/dashboard/docs', getHref: () => '/dashboard/docs' },
+    home: { path: '/app', getHref: () => '/app' },
+    dashboard: {
+      path: 'dashboard/docs',
+      getHref: () => '/app/dashboard/docs',
+    },
     document: {
-      path: '/dashboard/docs/:id',
-      getHref: (id: string) => `/dashboard/docs/${id}`,
+      path: 'dashboard/docs/:id',
+      getHref: (id: string) => `/app/dashboard/docs/${id}`,
     },
   },
 } as const;

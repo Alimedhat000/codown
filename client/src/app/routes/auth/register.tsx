@@ -2,11 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
-import { RegisterUser } from '@/api/auth';
-import {
-  RegisterSchema,
-  type RegisterSchemaType,
-} from '@/validations/authSchemas';
+import { paths } from '@/config/paths';
+import { RegisterUser } from '@/lib/auth';
+import { RegisterSchema, type RegisterSchemaType } from '@/lib/auth';
 
 export default function Register() {
   const {
@@ -20,7 +18,9 @@ export default function Register() {
   const onSubmit = async (data: RegisterSchemaType) => {
     const success = await RegisterUser(data);
     if (success) {
-      navigate('/login');
+      navigate(paths.auth.login.getHref(), {
+        replace: true,
+      });
     }
   };
 

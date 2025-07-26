@@ -1,14 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
-import { api } from '@/api/axios';
+import { paths } from '@/config/paths';
 import { useAuth } from '@/context/auth';
-import { LoginSchema, type LoginSchemaType } from '@/validations/authSchemas';
-
+import { api } from '@/lib/api';
+import { LoginSchema, type LoginSchemaType } from '@/lib/auth';
 export default function Login() {
   const navigate = useNavigate();
-
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirectTo');
   const {
     register,
     handleSubmit,
@@ -22,7 +23,9 @@ export default function Login() {
       const res = await api.post('/auth/login', data);
       const { accessToken, user } = res.data;
       login(accessToken, user);
-      navigate('/');
+      navigate(`${redirectTo ? `${redirectTo}` : paths.app.home.getHref()}`, {
+        replace: true,
+      });
     } catch (err) {
       console.log(err);
     }

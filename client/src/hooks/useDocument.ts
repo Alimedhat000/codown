@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 
-import { api } from '@/api/axios';
+import { api } from '@/lib/api';
 
 type DocumentData = { title: string; content: string };
 

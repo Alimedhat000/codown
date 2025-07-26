@@ -1,10 +1,11 @@
 import 'highlight.js/styles/github-dark.css';
 import { useEffect } from 'react';
 
+import { useCollab } from '@/hooks/useCollab';
+
 import CodeEditor from './CodeEditor';
 import MarkdownPreview from './MarkdownPreview';
 
-import { useCollab } from '@/hooks/useCollab';
 // import StatusBar from "./StatusBar";
 
 export function Editor({

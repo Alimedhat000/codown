@@ -1,5 +1,7 @@
 import { Link } from 'react-router';
 
+import { paths } from '@/config/paths';
+
 import MobileModeSelector from './MobileModeSelector';
 import ModeSelector from './ModeSelector';
 
@@ -13,7 +15,7 @@ export function NavLeft({
   return (
     <div className="flex items-center justify-center gap-2">
       <Link
-        to="/dashboard/docs"
+        to={paths.app.dashboard.getHref()}
         className="flex items-center gap-2 p-1 max-h-22 rounded hover:bg-surface-variant"
       >
         <img

@@ -1,11 +1,12 @@
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 
-import { api } from '@/api/axios';
+import { paths } from '@/config/paths';
 import { useAuth } from '@/context/auth';
+import { api } from '@/lib/api';
 
 function Home() {
-  const { user, isAuthenticated, loading, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
 
   const { handleSubmit } = useForm();
@@ -24,23 +25,16 @@ function Home() {
 
   return (
     <div>
-      <h2>{user ? `Hi there ${user.username}!` : <p>Please Sign In</p>}</h2>
+      <h2>Hi there {user?.username}!</h2>
       <br />
       <br />
       <div className="flex justify-center gap-8">
-        {isAuthenticated ? (
-          <>
-            <Link to="/dashboard/docs">Dashboard</Link>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <button type="submit">Log Out</button>
-            </form>
-          </>
-        ) : (
-          <>
-            <Link to="/register">Register</Link>
-            <Link to="/login">Login</Link>
-          </>
-        )}
+        <div>
+          <Link to={paths.app.dashboard.getHref()}>Dashboard</Link>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <button type="submit">Log Out</button>
+          </form>
+        </div>
       </div>
     </div>
   );
