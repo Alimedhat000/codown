@@ -1,5 +1,9 @@
 {
-    "github-actions.workflows.pinned.workflows": [
-        ".github/workflows/lint-type-check.yml"
-    ]
+  "github-actions.workflows.pinned.workflows": [
+    ".github/workflows/lint-type-check.yml"
+  ],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
 }

@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
-import { AuthContext, type User } from "./AuthContext";
-import { api } from "@/api/axios";
-import { setAccessToken as storeToken, clearAccessToken } from "@/utils/token";
+import { useState, useEffect } from 'react';
+
+import { api } from '@/lib/api';
+import { type User } from '@/types/api';
+import { setAccessToken as storeToken, clearAccessToken } from '@/utils/token';
+
+import { AuthContext } from './AuthContext';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -11,27 +14,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = (token: string, user: User) => {
     setAccessToken(token);
     setUser(user);
-    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     storeToken(token);
   };
 
   const logout = () => {
     setAccessToken(null);
     setUser(null);
-    localStorage.setItem("wasLoggedOut", "true");
-    delete api.defaults.headers.common["Authorization"];
+    localStorage.setItem('wasLoggedOut', 'true');
+    delete api.defaults.headers.common['Authorization'];
     clearAccessToken();
   };
 
   useEffect(() => {
     const refresh = async () => {
-      if (localStorage.getItem("wasLoggedOut") === "true") {
-        localStorage.removeItem("wasLoggedOut");
+      if (localStorage.getItem('wasLoggedOut') === 'true') {
+        localStorage.removeItem('wasLoggedOut');
         setLoading(false);
         return;
       }
       try {
-        const res = await api.post("/auth/refresh");
+        const res = await api.post('/auth/refresh');
         const { accessToken, user } = res.data;
         login(accessToken, user);
       } catch {

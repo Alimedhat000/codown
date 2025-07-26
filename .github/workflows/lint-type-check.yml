@@ -63,7 +63,9 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Initialize Enviroment
-        run: cp server/.env.example server/.env
+        run: |
+          cp server/.env.example server/.env
+          cp client/.env.example client/.env
 
       - name: Install dependencies
         run: pnpm install  --no-frozen-lockfile

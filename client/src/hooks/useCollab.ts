@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import * as Y from "yjs";
-import { HocuspocusProvider } from "@hocuspocus/provider";
+import { HocuspocusProvider } from '@hocuspocus/provider';
+import { useEffect, useRef, useState } from 'react';
+import * as Y from 'yjs';
 
 export function useCollab(docId: string | undefined) {
-  const [text, setText] = useState("");
+  const [text, setText] = useState('');
   const ydocRef = useRef<Y.Doc | null>(null);
   const ytextRef = useRef<Y.Text | null>(null);
   const providerRef = useRef<HocuspocusProvider | null>(null);
@@ -13,12 +13,12 @@ export function useCollab(docId: string | undefined) {
 
     const ydoc = new Y.Doc();
     const provider = new HocuspocusProvider({
-      url: "ws://localhost:5002", // Hocuspocus server URL
+      url: 'ws://localhost:5002', // Hocuspocus server URL
       name: docId, // Room/document ID
       document: ydoc,
     });
 
-    const ytext = ydoc.getText("content");
+    const ytext = ydoc.getText('content');
 
     ydocRef.current = ydoc;
     ytextRef.current = ytext;

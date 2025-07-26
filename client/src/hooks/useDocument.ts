@@ -1,13 +1,14 @@
-import { useEffect, useState, useCallback } from "react";
-import { api } from "@/api/axios";
+import { useEffect, useState, useCallback } from 'react';
+
+import { api } from '@/lib/api';
 
 type DocumentData = { title: string; content: string };
 
 export function useDocument(id?: string) {
   const [doc, setDoc] = useState<DocumentData | null>(null);
   const [editedDoc, setEditedDoc] = useState<DocumentData>({
-    title: "",
-    content: "",
+    title: '',
+    content: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -29,7 +30,7 @@ export function useDocument(id?: string) {
       console.log(editedDoc);
       setDoc(editedDoc);
     } catch (err) {
-      console.error("Failed to save document:", err);
+      console.error('Failed to save document:', err);
     } finally {
       setSaving(false);
     }

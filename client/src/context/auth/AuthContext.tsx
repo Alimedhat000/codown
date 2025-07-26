@@ -1,10 +1,6 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
-export type User = {
-  id: string;
-  username: string;
-  email: string;
-};
+import { type User } from '@/types/api';
 
 export interface AuthContextType {
   user: User | null;
@@ -16,5 +12,5 @@ export interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
+  undefined,
 );
