@@ -12,15 +12,9 @@ type layoutProps = {
   title: string;
   children: React.ReactNode;
   error: string | null;
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
-export const AuthLayout = ({
-  children,
-  title,
-  error,
-  setError,
-}: layoutProps) => {
+export const AuthLayout = ({ children, title, error }: layoutProps) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
@@ -50,11 +44,7 @@ export const AuthLayout = ({
 
         <div className="flex flex-col pt-20 flex-1 min-h-full w-full items-center  bg-surface">
           {error && (
-            <Alert
-              variant="error"
-              className="-mt-10 mb-10"
-              onDismiss={() => setError(null)}
-            >
+            <Alert variant="error" className="-mt-10 mb-10">
               {error}
             </Alert>
           )}

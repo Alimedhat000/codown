@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { AuthLayout } from '@/components/layouts/authLayout';
+import { AuthLayout } from '@/components/layouts/AuthLayout';
 import RegisterForm from '@/components/ui/auth/register-form';
 import { paths } from '@/config/paths';
 import { RegisterUser } from '@/lib/auth';
@@ -15,6 +15,7 @@ export default function Register() {
   const onSubmit = async (data: RegisterSchemaType) => {
     setIsLoading(true);
     try {
+      setError(null);
       const success = await RegisterUser(data);
       if (success) {
         navigate(paths.auth.login.getHref(), {
@@ -51,7 +52,7 @@ export default function Register() {
   };
 
   return (
-    <AuthLayout title="Create Account" error={error} setError={setError}>
+    <AuthLayout title="Create Account" error={error}>
       <RegisterForm onSubmit={onSubmit} isLoading={isLoading} />
     </AuthLayout>
   );

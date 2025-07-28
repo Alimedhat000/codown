@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 
-import { AuthLayout } from '@/components/layouts/authLayout';
+import { AuthLayout } from '@/components/layouts/AuthLayout';
 import LoginForm from '@/components/ui/auth/login-form';
 import { paths } from '@/config/paths';
 import { useAuth } from '@/context/auth';
@@ -20,6 +20,7 @@ export default function Login() {
   const onSubmit = async (data: LoginSchemaType) => {
     setIsLoading(true);
     try {
+      setError(null);
       const res = await api.post('/auth/login', data);
       const { accessToken, user } = res.data;
       login(accessToken, user);
@@ -65,7 +66,7 @@ export default function Login() {
   };
 
   return (
-    <AuthLayout title="Log In" error={error} setError={setError}>
+    <AuthLayout title="Log In" error={error}>
       <LoginForm onSubmit={onSubmit} isLoading={isLoading} />
     </AuthLayout>
   );
