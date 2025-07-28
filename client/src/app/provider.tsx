@@ -1,7 +1,7 @@
 import React from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 
-import { Spinner } from '@/components/ui/spinner';
+import { Spinner } from '@/components/ui/Spinner';
 import { AuthProvider } from '@/context/auth';
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
