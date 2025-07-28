@@ -34,10 +34,10 @@ export default function LoginForm({
   };
 
   return (
-    <div>
+    <div className="max-w-100 mx-auto">
       <form
         onSubmit={handleSubmit(handleFormSubmit)}
-        className="flex flex-col gap-8 w-full px-10"
+        className="flex flex-col gap-8  px-10"
       >
         <Input
           type="email"

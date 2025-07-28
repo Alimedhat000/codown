@@ -4,7 +4,7 @@
 
 @font-face {
   font-family: 'Inter';
-  src: url('../public/fonts/Inter-Italic.ttf') format('truetype');
+  src: url('/fonts/Inter-Italic.ttf') format('truetype');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
@@ -12,7 +12,7 @@
 
 @font-face {
   font-family: 'Inter';
-  src: url('../public/fonts/Inter.ttf') format('truetype');
+  src: url('/fonts/Inter.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -42,6 +42,7 @@
   --color-muted-foreground-white: #d4d4d8;
 
   --color-accent: #512ea8; /* badges, inputs */
+  --color-accent-border: #6745ba; /* badges, inputs */
   --color-accent-foreground: #ffffff;
 
   --color-destructive: #ff4d4f; /* error */

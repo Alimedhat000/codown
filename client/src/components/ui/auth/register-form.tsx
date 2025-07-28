@@ -34,7 +34,7 @@ export default function RegisterForm({
   };
 
   return (
-    <div>
+    <div className="max-w-100 mx-auto">
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
         <Input
           type="email"
