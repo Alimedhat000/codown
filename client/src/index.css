@@ -1,70 +1,74 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "@tailwindcss/typography";
 @plugin 'tailwind-scrollbar';
 
 @font-face {
-  font-family: "Inter";
-  src: url("/fonts/Inter-Italic.ttf") format("truetype");
+  font-family: 'Inter';
+  src: url('../public/fonts/Inter-Italic.ttf') format('truetype');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Inter";
-  src: url("/fonts/Inter.ttf") format("truetype");
+  font-family: 'Inter';
+  src: url('../public/fonts/Inter.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
-/* Custom dark theme styles */
 @theme {
-  /* --color-baltic-sea-50: #f4f4f4;
-  --color-baltic-sea-100: #e9e9ea;
-  --color-baltic-sea-200: #c8c8ca;
-  --color-baltic-sea-300: #a6a6ab;
-  --color-baltic-sea-400: #64646b;
-  --color-baltic-sea-500: #21212c;
-  --color-baltic-sea-600: #1e1e28;
-  --color-baltic-sea-700: #14141a;
-  --color-baltic-sea-800: #0f0f14;
-  --color-baltic-sea-900: #0a0a0d;
+  --color-background: #18181b; /* page background */
+  --color-foreground: #f4f5f2; /* primary text */
 
-  --color-mischka-50: #fdfdfd;
-  --color-mischka-100: #fbfafb;
-  --color-mischka-200: #f4f3f5;
-  --color-mischka-300: #edebef;
-  --color-mischka-400: #e0dde3;
-  --color-mischka-500: #d2ced7;
-  --color-mischka-600: #bdb9c2;
-  --color-mischka-700: #7e7c81;
-  --color-mischka-800: #5f5d61;
-  --color-mischka-900: #3f3e41;
+  --color-surface: #27272a; /* cards, modals, navs */
+  --color-surface-foreground: #ffffff;
 
-  --color-astronaut-50: #f5f5f8;
-  --color-astronaut-100: #ebebf1;
-  --color-astronaut-200: #cdccdb;
-  --color-astronaut-300: #afaec5;
-  --color-astronaut-400: #74719a;
-  --color-astronaut-500: #38346f;
-  --color-astronaut-600: #322f64;
-  --color-astronaut-700: #221f43;
-  --color-astronaut-800: #191732;
-  --color-astronaut-900: #111021;
+  --color-header: #303036;
+  --color-header-foreground: #ffffff;
 
-  --color-blue-violet-50: #f6f6fb;
-  --color-blue-violet-100: #eeeef8;
-  --color-blue-violet-200: #d4d4ed;
-  --color-blue-violet-300: #b9bae1;
-  --color-blue-violet-400: #8586cb;
-  --color-blue-violet-500: #5152b5;
-  --color-blue-violet-600: #494aa3;
-  --color-blue-violet-700: #31316d;
-  --color-blue-violet-800: #242551;
-  --color-blue-violet-900: #181936; */
+  --color-popover: #222131;
+  --color-popover-foreground: #ffffff;
 
-  /* Extended palette */
+  --color-primary: #2d235e; /* buttons, links */
+  --color-primary-foreground: #f4f5f2;
+
+  --color-secondary: #222131; /* subtle buttons */
+  --color-secondary-foreground: #e3e3e3;
+
+  --color-muted: #1c1c21; /* darker background */
+  --color-muted-foreground: #71717a; /* low-importance text */
+  --color-muted-foreground-white: #d4d4d8;
+
+  --color-accent: #512ea8; /* badges, inputs */
+  --color-accent-foreground: #ffffff;
+
+  --color-destructive: #ff4d4f; /* error */
+  --color-destructive-border: #ff8a8c;
+  --color-destructive-foreground: #ffffff;
+
+  --color-success: #2cc882; /* confirmations */
+  --color-success-foreground: #ffffff;
+
+  --color-border: #493f89;
+  --color-input: #222222;
+  --color-ring: #5b21b6;
+
+  --color-error: #f44336;
+
+  --radius: 0.5rem;
+
+  --font-display: 'Inter';
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+    @apply font-display;
+  }
+}
+/* @theme {
   --color-background: #27272a;
   --color-surface: #2d2e36;
   --color-surface-variant: #373840;
@@ -75,7 +79,6 @@
 
   --color-success: #4caf50;
   --color-warning: #ff9800;
-  --color-error: #f44336;
   --color-info: #2196f3;
 
   --color-border: #404148;
@@ -89,34 +92,23 @@
   --color-code-bg: #1e1f22;
   --color-code-border: #383940;
 
-  /* Syntax highlighting */
-  --color-syntax-keyword: #569cd6;
+ --color-syntax-keyword: #569cd6;
   --color-syntax-string: #ce9178;
   --color-syntax-comment: #6a9955;
   --color-syntax-number: #b5cea8;
   --color-syntax-function: #dcdcaa;
 
-  --font-inter: "Inter", sans-serif;
-}
+  --font-inter: 'Inter', sans-serif; 
+} 
+*/
 
-.prose code::before,
+/* .prose code::before,
 .prose code::after {
-  content: "";
-}
-
-/* Required by react-split */
-.split {
-  display: flex;
-  height: 100%;
-  width: 100%;
-}
-
-.split > div {
-  overflow: auto;
+  content: '';
 }
 
 .gutter {
-  background-color: #2d2d2d; /* dark split bar */
+  background-color: #2d2d2d;
   background-clip: padding-box;
 }
 
@@ -125,11 +117,11 @@
   width: 8px;
 }
 
-.cm-gutterElement:has(> span[title="Fold line"]) {
+.cm-gutterElement:has(> span[title='Fold line']) {
   display: none;
 }
 
-.cm-gutterElement:has(> span[title="Unfold line"]) {
+.cm-gutterElement:has(> span[title='Unfold line']) {
   display: none;
 }
 
@@ -143,4 +135,4 @@
 .cm-lineNumbers .cm-gutterElement:hover {
   background-color: #918dec;
   color: #fff;
-}
+} */
