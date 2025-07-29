@@ -28,7 +28,8 @@
   --color-header: #303036;
   --color-header-foreground: #ffffff;
 
-  --color-popover: #222131;
+  --color-popover: #27272a;
+  --color-popover-border: #3f3f42;
   --color-popover-foreground: #ffffff;
 
   --color-primary: #2d235e; /* buttons, links */
