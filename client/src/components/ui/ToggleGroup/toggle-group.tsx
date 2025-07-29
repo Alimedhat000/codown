@@ -14,7 +14,7 @@ const ToggleGroupItem = React.forwardRef<
   <ToggleGroupPrimitive.Item
     ref={ref}
     className={cn(
-      'bg-surface text-surface-foreground data-[state=on]:bg-surface-border flex size-[35px] items-center justify-center rounded-md transition-colors focus:outline-none',
+      'bg-surface text-surface-foreground data-[state=on]:bg-surface-border flex size-[28px] items-center justify-center rounded-md transition-colors focus:outline-none',
       inset,
       className,
     )}

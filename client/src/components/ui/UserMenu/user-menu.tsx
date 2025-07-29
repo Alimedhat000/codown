@@ -1,5 +1,6 @@
 // import { DropdownMenuContent } from '@radix-ui/react-dropdown-menu';
 
+import { useState } from 'react';
 import { LuChevronDown as ChevronIcon } from 'react-icons/lu';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
@@ -21,8 +22,10 @@ export type UserMenuProps = {
 };
 
 export function UserMenu({ username, avatarUrl, logout }: UserMenuProps) {
+  const [IsOpen, setIsOpen] = useState(false);
+
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={setIsOpen}>
       {/* Avatar Image */}
       <DropdownMenuTrigger asChild>
         <button
@@ -36,7 +39,7 @@ export function UserMenu({ username, avatarUrl, logout }: UserMenuProps) {
               {username.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <ChevronIcon />
+          <ChevronIcon className={IsOpen ? ' rotate-180' : ''} />
         </button>
       </DropdownMenuTrigger>
 

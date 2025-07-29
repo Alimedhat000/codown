@@ -3,8 +3,6 @@ import * as React from 'react';
 
 import { cn } from '@/utils/cn';
 
-import { Skeleton } from '../Skeleton';
-
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
@@ -38,13 +36,6 @@ const AvatarImage = React.forwardRef<
 
   return (
     <>
-      {isLoading && (
-        <Skeleton
-          className={cn(
-            'absolute inset-0 h-full w-full rounded-full select-none focus:outline-none focus:ring-0',
-          )}
-        />
-      )}
       <AvatarPrimitive.Image
         ref={ref}
         className={cn(
