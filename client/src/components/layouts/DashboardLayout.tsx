@@ -20,8 +20,8 @@ export const DashboardLayout = ({ children, title }: layoutProps) => {
       <Head title={title} />
       <div className="flex flex-col min-h-screen">
         <Header username={user?.username} logout={logout} />
-        <div className="flex flex-col pt-20 flex-1 min-h-full w-full items-center  bg-surface">
-          <div className="w-1/2">{children}</div>
+        <div className="pt-10 px-8 flex-1 min-h-full w-full items-center  bg-surface">
+          {children}
         </div>
       </div>
     </>
