@@ -11,8 +11,8 @@ export default function Header({
   user,
   logout,
 }: {
-  user: User;
-  logout: () => void;
+  user?: User;
+  logout?: () => void;
 }) {
   return (
     <header className="flex items-center justify-between px-4 py-3 bg-header shadow">
@@ -24,7 +24,7 @@ export default function Header({
         <span className="font-extrabold text-foreground">Co-Down</span>
       </Link>
 
-      {user && (
+      {user && logout && (
         <UserMenu
           user={{ name: user.username, avatarUrl: user.avatarUrl }}
           logout={logout}
