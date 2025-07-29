@@ -1,6 +1,7 @@
 @import 'tailwindcss';
-@plugin "@tailwindcss/typography";
+@plugin '@tailwindcss/typography';
 @plugin 'tailwind-scrollbar';
+@import 'tw-animate-css';
 
 @font-face {
   font-family: 'Inter';
