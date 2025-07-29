@@ -23,6 +23,7 @@
   --color-foreground: #f4f5f2; /* primary text */
 
   --color-surface: #27272a; /* cards, modals, navs */
+  --color-surface-border: #3f3f42;
   --color-surface-foreground: #ffffff;
 
   --color-header: #303036;
