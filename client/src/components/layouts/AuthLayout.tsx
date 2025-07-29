@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import { LuCodeXml } from 'react-icons/lu';
-import { Link, useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { paths } from '@/config/paths';
 import { useAuth } from '@/context/auth';
 
 import { Alert } from '../ui/Alert';
+import Header from '../ui/Header/header';
 import { Head } from '../ui/seo';
 
 type layoutProps = {
@@ -32,16 +32,7 @@ export const AuthLayout = ({ children, title, error }: layoutProps) => {
     <>
       <Head title={title} />
       <div className="flex flex-col min-h-screen">
-        <header className="px-4 py-3 bg-header shadow">
-          <Link
-            to={paths.landing.getHref()}
-            className="flex gap-2 items-center text-2xl"
-          >
-            <LuCodeXml className="text-[#4e44ff] text-3xl" />
-            <span className="font-extrabold text-foreground">Co-Down</span>
-          </Link>
-        </header>
-
+        <Header />
         <div className="flex flex-col pt-20 flex-1 min-h-full w-full items-center  bg-surface">
           {error && (
             <Alert variant="error" className="-mt-10 mb-10">
