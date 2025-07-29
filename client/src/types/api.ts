@@ -4,3 +4,10 @@ export type User = {
   email: string;
   avatarUrl?: string;
 };
+
+export type Document = {
+  id: string;
+  title: string;
+  createdAt: string;
+  pinned?: boolean;
+};
