@@ -3,15 +3,16 @@ import { LuCodeXml as CodeIcon } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import { paths } from '@/config/paths';
-import { User } from '@/types/api';
 
 import { UserMenu } from '../UserMenu'; // Adjust path
 
 export default function Header({
-  user,
+  username,
   logout,
+  avatarUrl,
 }: {
-  user?: User;
+  username?: string;
+  avatarUrl?: string;
   logout?: () => void;
 }) {
   return (
@@ -24,11 +25,8 @@ export default function Header({
         <span className="font-extrabold text-foreground">Co-Down</span>
       </Link>
 
-      {user && logout && (
-        <UserMenu
-          user={{ name: user.username, avatarUrl: user.avatarUrl }}
-          logout={logout}
-        />
+      {username && logout && (
+        <UserMenu username={username} avatarUrl={avatarUrl} logout={logout} />
       )}
     </header>
   );

@@ -4,7 +4,6 @@ const createEnv = () => {
   const envSchema = z.object({
     API_URL: z.string().url(),
   });
-  console.log(import.meta.env);
 
   const envVars = Object.entries(import.meta.env).reduce<
     Record<string, string>

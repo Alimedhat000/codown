@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
+import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { paths } from '@/config/paths';
 import { api } from '@/lib/api';
 
@@ -48,7 +49,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <DashboardLayout title="Dashboard">
       <h1>Your Documents</h1>
 
       <form onSubmit={handleCreate} style={{ marginBottom: '1rem' }}>
@@ -84,6 +85,6 @@ export default function Dashboard() {
           ))}
         </ul>
       )}
-    </div>
+    </DashboardLayout>
   );
 }
