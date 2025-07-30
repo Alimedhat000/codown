@@ -346,7 +346,13 @@ function SimpleModal({
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalPortal>
-        <ModalOverlay className={overlayClassName} />
+        <ModalOverlay
+          className={overlayClassName}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        />
         <ModalContent
           size={size}
           position={position}
