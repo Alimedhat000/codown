@@ -40,6 +40,8 @@ export function DocumentCardDropdown({
 }: DocumentCardDropdownProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false); // <-- added state
+
   const navigate = useNavigate();
 
   const { copySuccess, handleViewDocument, handleCopyLink } =
@@ -47,7 +49,7 @@ export function DocumentCardDropdown({
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger
           className={cn('hover:bg-muted rounded-sm p-1', triggerClassname)}
         >
@@ -82,6 +84,7 @@ export function DocumentCardDropdown({
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
+              setDropdownOpen(false);
               setShowRenameModal(true);
             }}
           >
@@ -111,6 +114,7 @@ export function DocumentCardDropdown({
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
+              setDropdownOpen(false);
               setShowDeleteModal(true);
             }}
           >

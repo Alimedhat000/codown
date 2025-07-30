@@ -19,8 +19,7 @@ export function DocumentList({
   onDocumentUpdated,
   onDocumentDeleted,
 }: Props) {
-  const gridClass =
-    'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2';
+  const gridClass = 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2';
   const containerClass = view === 'grid' ? gridClass : 'space-y-2';
 
   return (
