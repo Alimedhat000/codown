@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 
 import { paths } from '@/config/paths';
 
-import { UserMenu } from '../UserMenu'; // Adjust path
+import { UserMenu } from './user-menu'; // Adjust path
 
 export default function Header({
   username,
