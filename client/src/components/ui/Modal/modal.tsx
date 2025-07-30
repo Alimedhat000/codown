@@ -52,7 +52,7 @@ function ModalOverlay({ className, ...props }: ModalOverlayProps) {
   return (
     <Dialog.Overlay
       className={cn(
-        'fixed inset-0 bg-black/50 backdrop-blur-sm z-40',
+        'fixed inset-0 bg-black/50 backdrop-blur-sm z-100',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
         className,
@@ -157,7 +157,7 @@ function ModalContent({
   return (
     <Dialog.Content
       className={cn(
-        'fixed z-50 w-full',
+        'fixed z-110 w-full',
         sizeClasses[size],
         positionClasses[position],
         'rounded-xl bg-white dark:bg-surface shadow-lg border border-surface-border',
@@ -334,8 +334,8 @@ function SimpleModal({
   description,
   children,
   size = 'md',
-  position = 'center',
-  slideFrom,
+  position = 'top',
+  slideFrom = 'top',
   animationType = 'slide',
   showClose = true,
   overlayClassName,
@@ -353,6 +353,10 @@ function SimpleModal({
           slideFrom={slideFrom}
           animationType={animationType}
           className={contentClassName}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
         >
           {(title || description || showClose) && (
             <ModalHeader className={headerClassName}>

@@ -9,18 +9,19 @@ export default function Dashboard() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchDocs = async () => {
-      try {
-        const res = await api.get('/document');
-        setDocuments(res.data);
-      } catch (err) {
-        console.error('Failed to fetch documents', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchDocs = async () => {
+    try {
+      const res = await api.get('/document');
+      console.log(res);
+      setDocuments(res.data);
+    } catch (err) {
+      console.error('Failed to fetch documents', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchDocs();
   }, []);
 

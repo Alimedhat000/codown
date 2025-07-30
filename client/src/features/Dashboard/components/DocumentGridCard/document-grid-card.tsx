@@ -7,13 +7,24 @@ import { DocumentCardDropdown } from '../DocumentCardDropdown';
 
 type DocumentGridCardProps = {
   document: Document;
+  onDocumentUpdated: (updatedDocument: Document) => void;
+  onDocumentDeleted: (documentId: string) => void;
 };
 
-export function DocumentGridCard({ document }: DocumentGridCardProps) {
+export function DocumentGridCard({
+  document,
+  onDocumentUpdated,
+  onDocumentDeleted,
+}: DocumentGridCardProps) {
   return (
     <div className="bg-surface ring ring-surface-border hover:ring-muted-foreground group relative rounded-xl p-4 shadow hover:ring">
       {/* Dropdown Menu */}
-      <DocumentCardDropdown triggerClassname="absolute top-2 right-2 p-1 hover:bg-muted rounded-sm opacity-0 group-hover:opacity-100 transition-opacity" />
+      <DocumentCardDropdown
+        document={document}
+        triggerClassname="absolute top-2 right-2 p-1 hover:bg-muted rounded-sm opacity-0 group-hover:opacity-100 transition-opacity"
+        onDocumentUpdated={onDocumentUpdated}
+        onDocumentDeleted={onDocumentDeleted}
+      />
 
       {/* Content */}
       <div className="flex flex-col gap-2">
@@ -34,7 +45,7 @@ export function DocumentGridCard({ document }: DocumentGridCardProps) {
           {document.title || 'Untitled'}
         </div>
         <div className="text-muted-foreground text-xs">
-          {dateFormat(new Date(document.createdAt))}
+          {dateFormat(new Date(document.updatedAt))}
         </div>
       </div>
     </div>

@@ -9,9 +9,16 @@ import { DocumentRow } from '../DocumentRow';
 type Props = {
   documents: Document[];
   view: 'grid' | 'row';
+  onDocumentUpdated: (updatedDocument: Document) => void;
+  onDocumentDeleted: (documentId: string) => void;
 };
 
-export function DocumentList({ documents, view }: Props) {
+export function DocumentList({
+  documents,
+  view,
+  onDocumentUpdated,
+  onDocumentDeleted,
+}: Props) {
   const gridClass =
     'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2';
   const containerClass = view === 'grid' ? gridClass : 'space-y-2';
@@ -27,7 +34,11 @@ export function DocumentList({ documents, view }: Props) {
             to={paths.app.document.getHref(doc.id.slice(0, 8))}
             className="block"
           >
-            <Component document={doc} />
+            <Component
+              document={doc}
+              onDocumentUpdated={onDocumentUpdated}
+              onDocumentDeleted={onDocumentDeleted}
+            />
           </Link>
         );
       })}

@@ -37,6 +37,18 @@ export default function DashboardMain({
   const pinned = documents.filter((doc) => doc.pinned);
   const others = documents.filter((doc) => !doc.pinned);
 
+  const handleDocumentUpdated = (updatedDocument: Document) => {
+    setDocuments((prev) =>
+      prev.map((doc) =>
+        doc.id === updatedDocument.id ? updatedDocument : doc,
+      ),
+    );
+  };
+
+  const handleDocumentDeleted = (documentId: string) => {
+    setDocuments((prev) => prev.filter((doc) => doc.id !== documentId));
+  };
+
   return (
     <>
       <div className="mb-6 flex items-center justify-between">
@@ -61,7 +73,12 @@ export default function DashboardMain({
               icon={<PinIcon size={20} />}
               count={pinned.length}
             >
-              <DocumentList documents={pinned} view={view} />
+              <DocumentList
+                documents={pinned}
+                view={view}
+                onDocumentUpdated={handleDocumentUpdated}
+                onDocumentDeleted={handleDocumentDeleted}
+              />
             </DocumentSection>
           )}
           <DocumentSection
@@ -69,7 +86,12 @@ export default function DashboardMain({
             icon={<FileIcon size={20} />}
             count={others.length}
           >
-            <DocumentList documents={others} view={view} />
+            <DocumentList
+              documents={others}
+              view={view}
+              onDocumentUpdated={handleDocumentUpdated}
+              onDocumentDeleted={handleDocumentDeleted}
+            />
           </DocumentSection>
         </>
       )}
