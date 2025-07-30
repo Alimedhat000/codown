@@ -37,7 +37,7 @@ export function DocumentCardDropdown({
           <span>Open in View mode</span>
         </DropdownMenuItem>
 
-        <DropdownMenuItem className={DropdownMenuItemClassname}>
+        <DropdownMenuItem disabled className={DropdownMenuItemClassname}>
           <PinIcon />
           <span>Pin</span>
         </DropdownMenuItem>

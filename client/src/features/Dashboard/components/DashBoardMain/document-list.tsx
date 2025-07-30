@@ -19,7 +19,6 @@ export function DocumentList({ documents, view }: Props) {
   return (
     <div className={containerClass}>
       {documents.map((doc) => {
-        const updatedAt = new Date(doc.createdAt).toLocaleDateString();
         const Component = view === 'grid' ? DocumentGridCard : DocumentRow;
 
         return (
@@ -28,11 +27,7 @@ export function DocumentList({ documents, view }: Props) {
             to={paths.app.document.getHref(doc.id.slice(0, 8))}
             className="block"
           >
-            <Component
-              title={doc.title || 'Untitled'}
-              updatedAt={updatedAt}
-              isPinned={view === 'grid' ? doc.pinned : undefined}
-            />
+            <Component document={doc} />
           </Link>
         );
       })}
