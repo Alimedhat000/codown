@@ -29,6 +29,8 @@ It’s a personal project to explore real-time synchronization using WebSockets 
 
 ## Getting Started
 
+
+
 ### 1. Clone the Repository
 
 ```bash
@@ -36,12 +38,14 @@ git clone https://github.com/Alimedhat000/codown.git
 cd codown
 ```
 
-2. Install Dependencies
+### 2. Install Dependencies
 ```bash
 pnpm install
 ```
 
-3. Setup Environment Variables
+### 3. Make sure you install Postgre and have a db up and running 
+
+### 4. Setup Environment Variables
 Create a .env file based on the example provided:
 
 ```bash
@@ -50,7 +54,7 @@ cp .env.example .env
 
 Update the environment variables as needed (e.g., database URL).
 
-4. Start Development Server
+### 5. Start Development Server
 ```bash
 pnpm dev
 ```
