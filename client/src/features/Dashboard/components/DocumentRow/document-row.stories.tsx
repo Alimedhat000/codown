@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { DocumentRow } from './document-row';
 
 const meta: Meta<typeof DocumentRow> = {
-  title: 'Components/DocumentRow',
+  title: 'Dashboard/DocumentRow',
   component: DocumentRow,
   //   tags: ['autodocs'],
 };

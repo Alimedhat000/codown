@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { DocumentGridCard } from './document-grid-card';
 
 const meta: Meta<typeof DocumentGridCard> = {
-  title: 'Components/DocumentGridCard',
+  title: 'Dashboard/DocumentGridCard',
   component: DocumentGridCard,
   //   tags: ['autodocs'],
 };
