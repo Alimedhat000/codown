@@ -14,6 +14,16 @@ type Story = StoryObj<typeof DocumentRow>;
 
 export const Default: Story = {
   render: () => (
-    <DocumentRow title={'A Great Row Document'} updatedAt="A day ago" />
+    <DocumentRow
+      document={{
+        id: 'doc1abcdefgh',
+        title: 'Project Plan',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        pinned: true,
+      }}
+      onDocumentDeleted={() => {}}
+      onDocumentUpdated={() => {}}
+    />
   ),
 };

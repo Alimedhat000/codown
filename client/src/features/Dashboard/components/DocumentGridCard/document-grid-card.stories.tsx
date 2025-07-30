@@ -14,6 +14,16 @@ type Story = StoryObj<typeof DocumentGridCard>;
 
 export const Default: Story = {
   render: () => (
-    <DocumentGridCard title={'A Great Row Document'} updatedAt="A day ago" />
+    <DocumentGridCard
+      document={{
+        id: 'doc1abcdefgh',
+        title: 'Project Plan',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        pinned: true,
+      }}
+      onDocumentDeleted={() => {}}
+      onDocumentUpdated={() => {}}
+    />
   ),
 };
