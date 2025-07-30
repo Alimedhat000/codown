@@ -95,6 +95,7 @@
     "eslint-plugin-storybook": "^9.0.18",
     "globals": "^16.3.0",
     "playwright": "^1.54.1",
+    "plop": "^4.0.1",
     "prettier": "^3.6.2",
     "storybook": "^9.0.18",
     "tailwind-scrollbar": "^4.0.2",
