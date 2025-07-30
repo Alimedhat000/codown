@@ -2,24 +2,25 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = function (plop) {
-  // console.log('Plop function called');
-
   // read all folder names inside src/features
   const featuresDir = path.join(__dirname, '../../src/features');
   let features = [];
 
-  // console.log('Looking for features directory at:', featuresDir);
+  const componentDir = path.join(__dirname, '../../src/components');
+  let components = [];
 
   // Check if features directory exists before reading it
   if (fs.existsSync(featuresDir)) {
-    // console.log('Features directory exists');
     features = fs.readdirSync(featuresDir).filter((item) => {
       const itemPath = path.join(featuresDir, item);
       return fs.statSync(itemPath).isDirectory();
     });
-    // console.log('Found features:', features);
-  } else {
-    // console.log('Features directory does not exist');
+  }
+  if (fs.existsSync(componentDir)) {
+    components = fs.readdirSync(componentDir).filter((item) => {
+      const itemPath = path.join(componentDir, item);
+      return fs.statSync(itemPath).isDirectory();
+    });
   }
 
   return {
@@ -41,38 +42,33 @@ module.exports = function (plop) {
         type: 'list',
         name: 'feature',
         message: 'Which feature does this component belong to?',
-        choices: ['components', ...features],
+        choices: ['Components', ...features],
         when: () => features.length > 0,
       },
       {
-        type: 'input',
+        type: 'list',
         name: 'folder',
         message: 'Folder in components (leave empty for root)',
-        when: ({ feature }) => !feature || feature === 'components',
-        default: '',
+        when: ({ feature }) => !feature || feature === 'Components',
+        choices: ['Root', ...components],
       },
     ],
     actions: (answers) => {
-      // console.log('Actions called with answers:', answers);
-
       let compGeneratePath;
 
-      if (!answers.feature || answers.feature === 'components') {
-        compGeneratePath = answers.folder
-          ? 'src/components/{{folder}}'
-          : 'src/components';
+      if (!answers.feature || answers.feature === 'Components') {
+        compGeneratePath =
+          answers.folder != 'Root'
+            ? 'src/components/{{folder}}'
+            : 'src/components';
       } else {
         compGeneratePath = 'src/features/{{feature}}/components';
       }
 
       const titlePath =
-        !answers.feature || answers.feature === 'components'
+        !answers.feature || answers.feature === 'Components'
           ? 'Components'
           : plop.getHelper('pascalCase')(answers.feature);
-
-      // ✅ DEBUG log
-      // console.log('Resolved titlePath:', titlePath);
-      // console.log('Component generation path:', compGeneratePath);
 
       return [
         {

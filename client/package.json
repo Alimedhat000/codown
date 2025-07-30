@@ -11,6 +11,7 @@
     "lint:ci": "eslint --ignore-pattern src/shared --max-warnings 0 . ",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
+    "generate": "plop",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
