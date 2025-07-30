@@ -1,6 +1,7 @@
 @import 'tailwindcss';
-@plugin "@tailwindcss/typography";
+@plugin '@tailwindcss/typography';
 @plugin 'tailwind-scrollbar';
+@import 'tw-animate-css';
 
 @font-face {
   font-family: 'Inter';
@@ -23,12 +24,14 @@
   --color-foreground: #f4f5f2; /* primary text */
 
   --color-surface: #27272a; /* cards, modals, navs */
+  --color-surface-border: #3f3f42;
   --color-surface-foreground: #ffffff;
 
   --color-header: #303036;
   --color-header-foreground: #ffffff;
 
-  --color-popover: #222131;
+  --color-popover: #27272a;
+  --color-popover-border: #3f3f42;
   --color-popover-foreground: #ffffff;
 
   --color-primary: #2d235e; /* buttons, links */
