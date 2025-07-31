@@ -7,20 +7,42 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
   DropdownMenuTrigger,
+  DropdownMenuSubTrigger,
 } from '@/components/ui/Dropdown';
 
-export const MoreOptionsDropdown: React.FC = () => {
+type Props = {
+  className?: string;
+};
+
+export const MoreOptionsDropdown = ({ className }: Props) => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm">
-          <MoreIcon className="h-4 w-4 text-muted-foreground" />
+      <DropdownMenuTrigger asChild className={className}>
+        <Button variant="ghost" size="icon">
+          <MoreIcon className="h-4 w-4 " />
         </Button>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent>
-        <DropdownMenuItem>Export</DropdownMenuItem>
-        <DropdownMenuItem>Duplicate</DropdownMenuItem>
+        <DropdownMenuItem>Rename</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>Export to</DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem disabled>As PDF</DropdownMenuItem>
+            <DropdownMenuItem disabled>Google Drive</DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>Download</DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem disabled>Markdown</DropdownMenuItem>
+            <DropdownMenuItem disabled>HTML</DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem>Delete</DropdownMenuItem>
       </DropdownMenuContent>

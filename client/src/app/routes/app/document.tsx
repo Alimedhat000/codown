@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
 import ContentLayout from '@/components/layouts/ContentLayout';
+import { DocumentHeader } from '@/features/DocumentPage/components/DocumentHeader';
 import Editor from '@/features/DocumentPage/Editor';
-import NavBarHeader from '@/features/DocumentPage/NavBarHeader';
+// import NavBarHeader from '@/features/DocumentPage/NavBarHeader';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useDocument } from '@/hooks/useDocument';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -28,9 +29,12 @@ export default function DocumentPage() {
     <>
       <ContentLayout title={doc?.title || 'Document'}>
         <div className="bg-background text-text-primary h-screen">
-          <NavBarHeader mode={mode} setMode={setMode} />
-          {doc ? null : null}
-          <div className=" flex-1 mt-12 overflow-hidden">
+          <DocumentHeader
+            mode={mode}
+            setMode={setMode}
+            documentTitle={doc?.title}
+          />
+          <div className=" flex-1 overflow-hidden">
             <Editor
               mode={mode}
               doc={editedDoc}

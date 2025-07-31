@@ -1,19 +1,17 @@
 import React from 'react';
+import { LuUndo2 as BackIcon } from 'react-icons/lu';
 import { Link } from 'react-router';
 
-import { Avatar, AvatarFallback } from '@/components/ui/Avatar';
 import { paths } from '@/config/paths';
 
 export const WorkspaceInfo: React.FC = () => {
   return (
     <Link
       to={paths.app.dashboard.getHref()}
-      className="flex items-center gap-2 p-2 rounded-md hover:bg-surface"
+      className="flex items-center gap-2 p-2 text-nowrap rounded-md hover:bg-surface"
     >
-      <Avatar className="h-8 w-8 border border-muted-foreground ">
-        <AvatarFallback>AM</AvatarFallback>
-      </Avatar>
-      <span className="font-medium">My WorkSpace</span>
+      <BackIcon className="h-5 w-5" />
+      <span className="font-medium -mb-1 md:block hidden">Dashboard</span>
     </Link>
   );
 };

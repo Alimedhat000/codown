@@ -5,6 +5,9 @@ import { ShareButton } from './share-button';
 const meta: Meta = {
   title: 'DocumentPage/ShareButton',
   component: ShareButton,
+  parameters: {
+    layout: 'centered',
+  },
 };
 export default meta;
 

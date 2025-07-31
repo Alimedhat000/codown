@@ -20,7 +20,7 @@ interface DocumentToolbarProps {
   onCreateDocument?: (title: string) => Promise<void>;
 }
 
-export const DocumentToolbar: React.FC<DocumentToolbarProps> = ({
+export const DocumentToolbar = ({
   mode,
   setMode,
   username,
@@ -29,18 +29,41 @@ export const DocumentToolbar: React.FC<DocumentToolbarProps> = ({
   documentTitle,
   collaborators,
   onCreateDocument,
-}) => {
+}: DocumentToolbarProps) => {
   return (
-    <div className="flex items-center gap-3">
-      <ViewModeSelector mode={mode} setMode={setMode} />
-      <CreateDocumentButton onCreateDocument={onCreateDocument} />
-      <DocumentTitle title={documentTitle} />
-      <CollaboratorsDropdown collaborators={collaborators} />
-      <ShareButton />
-      <MoreOptionsDropdown />
-      {username && logout && (
-        <UserMenu username={username} avatarUrl={avatarUrl} logout={logout} />
-      )}
+    <div className="w-full flex flex-wrap md:flex-nowrap items-center gap-3">
+      <div className="order-2 md:order-1 flex items-center">
+        <ViewModeSelector mode={mode} setMode={setMode} />
+      </div>
+
+      <div className="hidden md:flex order-2 items-center">
+        <CreateDocumentButton onCreateDocument={onCreateDocument} />
+      </div>
+
+      <div className="order-1 md:order-3 flex-grow">
+        <DocumentTitle
+          title={documentTitle}
+          className="text-left md:text-center"
+        />
+      </div>
+
+      <div className="order-3 md:order-4 flex items-center gap-2">
+        <CollaboratorsDropdown collaborators={collaborators} />
+        {username && logout && (
+          <UserMenu
+            username={username}
+            avatarUrl={avatarUrl}
+            logout={logout}
+            showChevron={false}
+            className="hidden md:block"
+          />
+        )}
+      </div>
+
+      <div className="order-4 md:order-5 flex items-center gap-2">
+        <ShareButton />
+        <MoreOptionsDropdown />
+      </div>
     </div>
   );
 };

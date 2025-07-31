@@ -1,12 +1,12 @@
 import { cva } from 'class-variance-authority';
 
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none',
   {
     variants: {
       variant: {
         default:
-          'bg-accent text-primary-foreground shadow hover:bg-accent/90 border border-accent-border',
+          'bg-accent focus-visible:ring-1 focus-visible:ring-ring text-primary-foreground shadow hover:bg-accent/90 border border-accent-border',
         destructive:
           'bg-destructive text-destructive-foreground shadow-sm  hover:bg-destructive/90 border border-destructive-border',
         outline:

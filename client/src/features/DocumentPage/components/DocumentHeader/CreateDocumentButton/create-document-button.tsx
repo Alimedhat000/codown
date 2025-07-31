@@ -8,11 +8,13 @@ import type { CreateDocumentForm } from '@/types/api';
 
 interface CreateDocumentButtonProps {
   onCreateDocument?: (title: string) => Promise<void>;
+  className?: string;
 }
 
-export const CreateDocumentButton: React.FC<CreateDocumentButtonProps> = ({
+export const CreateDocumentButton = ({
   onCreateDocument,
-}) => {
+  className,
+}: CreateDocumentButtonProps) => {
   const [open, setOpen] = useState(false);
 
   const handleSubmit = async (data: CreateDocumentForm) => {
@@ -28,8 +30,8 @@ export const CreateDocumentButton: React.FC<CreateDocumentButtonProps> = ({
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
-      <ModalTrigger asChild>
-        <Button variant="ghost" size="sm">
+      <ModalTrigger asChild className={className}>
+        <Button variant="ghost" size="icon">
           <AddIcon className="h-4 w-4" />
         </Button>
       </ModalTrigger>
