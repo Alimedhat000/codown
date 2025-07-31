@@ -3,12 +3,12 @@ import { useEffect } from 'react';
 
 import { useCollab } from '@/hooks/useCollab';
 
-import CodeEditor from './CodeEditor';
-import MarkdownPreview from './MarkdownPreview';
+import { MarkdownEditor } from './MarkdownEditor';
+import { MarkdownPreview } from './MarkdownPreview';
 
 // import StatusBar from "./StatusBar";
 
-export function Editor({
+export function DocumentMain({
   docId,
   mode,
   doc,
@@ -47,7 +47,7 @@ export function Editor({
             {/* <StatusBar content={doc.content} className="fixed bottom-0" /> */}
 
             <div className="overflow-auto h-full">
-              <CodeEditor ytext={ytext} provider={provider} />
+              <MarkdownEditor ytext={ytext} provider={provider} />
             </div>
           </div>
         )}

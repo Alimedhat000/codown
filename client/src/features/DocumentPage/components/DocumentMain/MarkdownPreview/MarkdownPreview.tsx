@@ -9,7 +9,7 @@ import remarkMath from 'remark-math';
 
 import { rehypeCopyHeadingLinks } from '@/lib/rehypeCopyButton';
 
-export default function MarkdownPreview({ content }: { content: string }) {
+export function MarkdownPreview({ content }: { content: string }) {
   return (
     <div
       className="w-full h-full flex-1 overflow-auto p-6 bg-background

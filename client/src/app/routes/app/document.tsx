@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 
 import ContentLayout from '@/components/layouts/ContentLayout';
 import { DocumentHeader } from '@/features/DocumentPage/components/DocumentHeader';
-import Editor from '@/features/DocumentPage/Editor';
+import { DocumentMain } from '@/features/DocumentPage/components/DocumentMain';
 // import NavBarHeader from '@/features/DocumentPage/NavBarHeader';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useDocument } from '@/hooks/useDocument';
@@ -35,7 +35,7 @@ export default function DocumentPage() {
             documentTitle={doc?.title}
           />
           <div className=" flex-1 overflow-hidden">
-            <Editor
+            <DocumentMain
               mode={mode}
               doc={editedDoc}
               setDoc={setEditedDoc}

@@ -7,7 +7,7 @@ import * as Y from 'yjs';
 import { editorExtensions } from './EditorExtensions';
 import { MyTheme } from './EditorTheme';
 
-export default function CodeEditor({
+export function MarkdownEditor({
   ytext,
   provider,
 }: {
