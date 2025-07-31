@@ -25,12 +25,12 @@ export const paths = {
   app: {
     home: { path: '/app', getHref: () => '/app' },
     dashboard: {
-      path: 'dashboard/docs',
-      getHref: () => '/app/dashboard/docs',
+      path: '',
+      getHref: () => '/app',
     },
     document: {
-      path: 'dashboard/docs/:id',
-      getHref: (id: string) => `/app/dashboard/docs/${id}`,
+      path: 'doc/:id',
+      getHref: (id: string) => `/app/doc/${id}`,
     },
   },
 } as const;

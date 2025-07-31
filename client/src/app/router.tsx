@@ -37,13 +37,6 @@ const createAppRouter = () =>
       ErrorBoundary: AppRootErrorBoundary,
       children: [
         {
-          path: '',
-          lazy: () =>
-            import('./routes/app/home').then((mod) => ({
-              Component: mod.default,
-            })),
-        },
-        {
           path: paths.app.dashboard.path,
           lazy: () =>
             import('./routes/app/dashboard').then((mod) => ({
