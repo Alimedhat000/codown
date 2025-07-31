@@ -35,7 +35,7 @@ export const ViewModeSelector: React.FC<ViewModeSelectorProps> = ({
       </ToggleGroupItem>
       <ToggleGroupItem
         value="both"
-        className="hidden mb:flex"
+        className="hidden md:flex"
         aria-label="Split view (edit and preview)"
       >
         <SplitIcon className="h-4 w-4" />
