@@ -12,3 +12,7 @@ export type Document = {
   updatedAt: string;
   pinned?: boolean;
 };
+
+export type CreateDocumentForm = {
+  title: string;
+};

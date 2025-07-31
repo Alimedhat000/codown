@@ -13,6 +13,7 @@ type layoutProps = {
 export const DashboardLayout = ({ children, title }: layoutProps) => {
   const { user, loading, logout } = useAuth();
 
+  // Todo add a loading Component
   if (loading) return <p>Loading...</p>;
 
   return (
