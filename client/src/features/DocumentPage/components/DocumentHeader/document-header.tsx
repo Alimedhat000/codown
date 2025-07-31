@@ -25,7 +25,7 @@ export const DocumentHeader: React.FC<DocumentHeaderProps> = ({
   onCreateDocument,
 }) => {
   return (
-    <div className="flex items-center gap-4 w-full px-4 py-2 border-b border-border">
+    <div className="flex items-center gap-4 bg-surface w-full md:px-4 md:py-2 px-2 py-1 border-b border-border">
       <WorkspaceInfo />
       <DocumentToolbar
         mode={mode}

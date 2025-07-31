@@ -28,7 +28,7 @@ export default function DocumentPage() {
   return (
     <>
       <ContentLayout title={doc?.title || 'Document'}>
-        <div className="bg-background text-text-primary h-screen">
+        <div className="bg-surface text-text-primary h-screen">
           <DocumentHeader
             mode={mode}
             setMode={setMode}

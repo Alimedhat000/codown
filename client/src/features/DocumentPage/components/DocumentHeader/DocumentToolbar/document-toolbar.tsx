@@ -40,7 +40,7 @@ export const DocumentToolbar = ({
         <CreateDocumentButton onCreateDocument={onCreateDocument} />
       </div>
 
-      <div className="order-1 md:order-3 flex-grow">
+      <div className="order-1 md:order-3 flex md:justify-center flex-grow">
         <DocumentTitle
           title={documentTitle}
           className="text-left md:text-center"

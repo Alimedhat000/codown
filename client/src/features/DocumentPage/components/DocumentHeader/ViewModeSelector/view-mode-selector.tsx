@@ -33,7 +33,11 @@ export const ViewModeSelector: React.FC<ViewModeSelectorProps> = ({
       <ToggleGroupItem value="edit" aria-label="Edit only view">
         <PenIcon className="h-4 w-4" />
       </ToggleGroupItem>
-      <ToggleGroupItem value="both" aria-label="Split view (edit and preview)">
+      <ToggleGroupItem
+        value="both"
+        className="hidden mb:flex"
+        aria-label="Split view (edit and preview)"
+      >
         <SplitIcon className="h-4 w-4" />
       </ToggleGroupItem>
       <ToggleGroupItem value="view" aria-label="Preview only view">

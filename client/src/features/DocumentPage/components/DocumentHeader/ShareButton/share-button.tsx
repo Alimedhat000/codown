@@ -17,9 +17,9 @@ export const ShareButton = ({ className }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className={className}>
-        <Button size="sm">
+        <Button size="sm" className="md:space-x-2">
+          <ShareIcon className="block" />
           <span className="md:block hidden">Share</span>
-          <ShareIcon className="md:hidden block" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80 space-y-2 p-4">

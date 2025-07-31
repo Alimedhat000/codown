@@ -36,7 +36,7 @@ export function DocumentMain({
   }
 
   return (
-    <div className="flex flex-col h-full w-full bg-background text-white">
+    <div className="flex flex-col h-full w-full bg-surface text-white">
       <div className={`flex flex-1 gap-0 md:gap-4 overflow-auto `}>
         {(mode === 'edit' || mode === 'both') && (
           <div
