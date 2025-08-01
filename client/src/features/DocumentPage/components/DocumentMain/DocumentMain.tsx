@@ -1,5 +1,7 @@
 import 'highlight.js/styles/github-dark.css';
 import { useEffect } from 'react';
+import { LuGripVertical } from 'react-icons/lu';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import { Spinner } from '@/components/ui/Spinner';
 import { useCollab } from '@/hooks/useCollab';
@@ -44,15 +46,32 @@ export function DocumentMain({
         className,
       )}
     >
-      <div className={`flex h-full `}>
+      <PanelGroup direction="horizontal" className="h-full w-full">
         {(mode === 'edit' || mode === 'both') && (
-          <MarkdownEditor ytext={ytext} provider={provider} />
+          <>
+            <Panel defaultSize={50} minSize={35} className="flex h-full">
+              <MarkdownEditor ytext={ytext} provider={provider} />
+            </Panel>
+            {mode === 'both' && (
+              <PanelResizeHandle className="w-4 flex items-center justify-center bg-border hover:bg-border-hover active:bg-border-hover cursor-col-resize transition">
+                <LuGripVertical className="w-4 h-4 text-foreground" />
+              </PanelResizeHandle>
+            )}
+          </>
         )}
 
-        {(mode === 'view' || mode === 'both') && (
-          <MarkdownPreview content={text} />
+        {mode === 'both' && (
+          <Panel defaultSize={50} minSize={15}>
+            <MarkdownPreview content={text} />
+          </Panel>
         )}
-      </div>
+
+        {mode === 'view' && (
+          <Panel defaultSize={100} minSize={35}>
+            <MarkdownPreview content={text} />
+          </Panel>
+        )}
+      </PanelGroup>
     </div>
   );
 }
