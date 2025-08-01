@@ -19,14 +19,14 @@ export function MarkdownToolbar({
   return (
     <div
       className={cn(
-        'flex items-center gap-2 px-2 py-1 bg-header text-white border-b border-t border-border overflow-x-auto scrollbar-hide',
+        'flex items-center gap-2 px-2 py-0.5 bg-header text-white border-b border-t border-border overflow-x-auto scrollbar-hide',
         className,
       )}
     >
       {toolbarButtons.map((btn, idx) => {
         if (btn.type === 'divider') {
           return (
-            <div key={idx} className="mx-2 border-l border-zinc-600 h-4" />
+            <div key={idx} className="mx-1 border-l border-zinc-600 h-4" />
           );
         }
 

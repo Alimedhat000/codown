@@ -13,9 +13,9 @@ export function ToolbarButton({
     <button
       onClick={onClick}
       title={title}
-      className="hover:bg-surface/90 p-1 rounded-sm"
+      className="hover:bg-surface/90 p-1.5 text-foreground rounded-sm"
     >
-      <Icon />
+      <Icon strokeWidth={1.5} />
     </button>
   );
 }

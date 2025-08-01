@@ -78,6 +78,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.11
         version: 4.1.11(vite@7.0.6(@types/node@22.16.5)(jiti@2.5.1)(lightningcss@1.30.1)(yaml@2.8.0))
+      '@types/typo-js':
+        specifier: ^1.2.2
+        version: 1.2.2
       axios:
         specifier: ^1.10.0
         version: 1.11.0
@@ -159,6 +162,9 @@ importers:
       tailwindcss:
         specifier: ^4.1.11
         version: 4.1.11
+      typo-js:
+        specifier: ^1.3.0
+        version: 1.3.0
       unified:
         specifier: ^11.0.5
         version: 11.0.5
@@ -2051,6 +2057,9 @@ packages:
 
   '@types/triple-beam@1.3.5':
     resolution: {integrity: sha512-6WaYesThRMCl19iryMYP7/x2OVgCtbIVflDGFpWnb9irXI3UjYE4AzmYuiUKY1AJstGijoY+MgUszMgRxIYTYw==}
+
+  '@types/typo-js@1.2.2':
+    resolution: {integrity: sha512-AgN5IwO3EPXv2d+UE9VdoOcueCBa4ZcHHwUvx2/IXlfRvkW4Yt3g+eRHzJbkySfj9pyILRT6Zk7V6Vr4LD5Kvg==}
 
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
@@ -5458,6 +5467,9 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typo-js@1.3.0:
+    resolution: {integrity: sha512-ERVoYp5PG7jpj7+kzKmFZfp5+IYMOOQM3etNnlYu06Z2CL5UmC9ekT8Z/JVYpR7e7sXB4bOFq1fz/budv++Z0g==}
+
   uglify-js@3.19.3:
     resolution: {integrity: sha512-v3Xu+yuwBXisp6QYTcH4UbH+xYJXqnq2m/LtQVWKWzYc1iehYnLixoQDN9FH6/j9/oybfd6W9Ghwkl8+UMKTKQ==}
     engines: {node: '>=0.8.0'}
@@ -7525,6 +7537,8 @@ snapshots:
       '@types/node': 22.16.5
 
   '@types/triple-beam@1.3.5': {}
+
+  '@types/typo-js@1.2.2': {}
 
   '@types/unist@2.0.11': {}
 
@@ -11546,6 +11560,8 @@ snapshots:
       - supports-color
 
   typescript@5.8.3: {}
+
+  typo-js@1.3.0: {}
 
   uglify-js@3.19.3:
     optional: true
