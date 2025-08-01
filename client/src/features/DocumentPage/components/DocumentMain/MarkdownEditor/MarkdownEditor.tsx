@@ -80,7 +80,7 @@ export function MarkdownEditor({
     <div className="relative w-full flex-1 py-10 ">
       <MarkdownToolbar
         view={viewRef.current}
-        className="absolute top-0 left-0 w-full z-10"
+        className="absolute top-0 left-0 w-full z-9"
       />
 
       <div
@@ -89,7 +89,7 @@ export function MarkdownEditor({
       />
       <MarkdownStatusBar
         view={viewRef.current}
-        className="absolute bottom-0 left-0 w-full z-11"
+        className="absolute bottom-0 left-0 w-full z-9"
         useTabs={useTabs}
         setUseTabs={setUseTabs}
         spellcheck={spellcheck}

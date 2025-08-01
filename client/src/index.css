@@ -129,7 +129,7 @@
 .prose code::after {
   content: '';
 }
-
+*/
 .gutter {
   background-color: #2d2d2d;
   background-clip: padding-box;
@@ -156,6 +156,5 @@
 }
 
 .cm-lineNumbers .cm-gutterElement:hover {
-  background-color: #918dec;
   color: #fff;
-} */
+}
