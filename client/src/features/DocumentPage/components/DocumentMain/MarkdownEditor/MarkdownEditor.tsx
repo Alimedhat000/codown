@@ -6,6 +6,7 @@ import * as Y from 'yjs';
 
 import { editorExtensions } from './EditorExtensions';
 import { MyTheme } from './EditorTheme';
+import { MarkdownToolbar } from './MarkdownToolbar';
 
 export function MarkdownEditor({
   ytext,
@@ -44,5 +45,11 @@ export function MarkdownEditor({
     };
   }, [ytext, provider]);
 
-  return <div ref={editorRef} className="w-full h-full" />;
+  return (
+    <>
+      <MarkdownToolbar view={viewRef.current} />
+
+      <div ref={editorRef} className="w-full h-full" />
+    </>
+  );
 }

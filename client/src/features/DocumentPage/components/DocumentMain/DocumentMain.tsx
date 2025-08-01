@@ -1,12 +1,11 @@
 import 'highlight.js/styles/github-dark.css';
 import { useEffect } from 'react';
 
+import { Spinner } from '@/components/ui/Spinner';
 import { useCollab } from '@/hooks/useCollab';
 
 import { MarkdownEditor } from './MarkdownEditor';
 import { MarkdownPreview } from './MarkdownPreview';
-
-// import StatusBar from "./StatusBar";
 
 export function DocumentMain({
   docId,
@@ -29,8 +28,8 @@ export function DocumentMain({
 
   if (!docId || !ydoc || !ytext || !provider) {
     return (
-      <div className="flex items-center justify-center h-full w-full text-muted">
-        Loading collaborative session...
+      <div className="flex items-center justify-center h-screen w-full text-muted">
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -44,8 +43,6 @@ export function DocumentMain({
               mode === 'both' ? 'rounded-l-lg' : 'rounded-lg'
             }`}
           >
-            {/* <StatusBar content={doc.content} className="fixed bottom-0" /> */}
-
             <div className="overflow-auto h-full">
               <MarkdownEditor ytext={ytext} provider={provider} />
             </div>

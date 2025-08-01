@@ -73,6 +73,15 @@
     @apply font-display;
   }
 }
+
+// Hide Scrollbar 
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
 /* @theme {
   --color-background: #27272a;
   --color-surface: #2d2e36;
