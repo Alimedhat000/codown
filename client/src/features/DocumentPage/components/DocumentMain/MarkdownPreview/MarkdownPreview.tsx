@@ -12,7 +12,7 @@ import { rehypeCopyHeadingLinks } from '@/lib/rehypeCopyButton';
 export function MarkdownPreview({ content }: { content: string }) {
   return (
     <div
-      className="w-full h-full flex-1 overflow-auto p-6 bg-background
+      className="custom-scrollbar w-full h-full flex-1 overflow-auto p-6 bg-background
             rounded-none"
     >
       <div className="prose prose-invert max-w-none">

@@ -29,7 +29,7 @@ export function MarkdownEditor({
     const yCollabExtension = yCollab(ytext, provider.awareness);
 
     const state = EditorState.create({
-      doc: ytext.toString() ? ytext.toString() : '\n\n\n\n\n\n\n\n',
+      doc: ytext.toString() ? ytext.toString() : '',
       extensions: [basicSetup, ...editorExtensions, yCollabExtension, MyTheme],
     });
 
@@ -44,12 +44,22 @@ export function MarkdownEditor({
       view.destroy();
     };
   }, [ytext, provider]);
-
   return (
-    <>
-      <MarkdownToolbar view={viewRef.current} />
+    <div className="relative w-full flex-1 py-10 ">
+      <MarkdownToolbar
+        view={viewRef.current}
+        className="absolute top-0 left-0 w-full z-10"
+      />
 
-      <div ref={editorRef} className="w-full h-full" />
-    </>
+      <div
+        className="custom-scrollbar h-full overflow-y-scroll"
+        ref={editorRef}
+      />
+      {/* TODO: This is a Place hodlder for the StatusBar */}
+      {/* <MarkdownToolbar
+        view={viewRef.current}
+        className="absolute bottom-0 left-0 w-full z-11"
+      /> */}
+    </div>
   );
 }

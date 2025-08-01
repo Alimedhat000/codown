@@ -30,19 +30,19 @@ export default function DocumentPage() {
           mode={mode}
           setMode={setMode}
           documentTitle={doc?.title}
+          className="fixed top-0 left-0 right-0 z-10"
         />
-        <div className=" flex-1 overflow-hidden">
-          {loading ? (
-            <Spinner />
-          ) : (
-            <DocumentMain
-              mode={mode}
-              doc={editedDoc}
-              setDoc={setEditedDoc}
-              docId={id}
-            />
-          )}
-        </div>
+        {loading ? (
+          <Spinner />
+        ) : (
+          <DocumentMain
+            mode={mode}
+            doc={editedDoc}
+            setDoc={setEditedDoc}
+            docId={id}
+            className="pt-[2.86rem] md:pt-[3.375rem]"
+          />
+        )}
       </DocumentLayout>
     </>
   );

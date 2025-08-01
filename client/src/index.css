@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
-@plugin 'tailwind-scrollbar';
+@plugin 'tailwind-scrollbar' {
+  nocompatible: true;
+  preferredstrategy: 'pseudoelements';
+}
 @import 'tw-animate-css';
 
 @font-face {
@@ -76,12 +79,18 @@
 
 // Hide Scrollbar 
 .scrollbar-hide {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 .scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
 }
+
+.custom-scrollbar {
+  @apply scrollbar scrollbar-hover:scrollbar-thumb-muted-foreground
+  scrollbar-thumb-muted-foreground/70 scrollbar-track-surface scrollbar-w-2.5 scrollbar-thumb-rounded-4xl;
+}
+
 /* @theme {
   --color-background: #27272a;
   --color-surface: #2d2e36;
