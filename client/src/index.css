@@ -23,7 +23,7 @@
 }
 
 @theme {
-  --color-background: #18181b; /* page background */
+  --color-background: #27272a; /* page background */
   --color-foreground: #f4f5f2; /* primary text */
 
   --color-surface: #27272a; /* cards, modals, navs */
@@ -157,4 +157,16 @@
 
 .cm-lineNumbers .cm-gutterElement:hover {
   color: #fff;
+}
+
+.language-mermaid svg {
+  @apply block mx-auto;
+}
+
+code.hljs.language-mermaid {
+  @apply bg-surface;
+}
+
+pre:has(> code.language-mermaid) {
+  @apply bg-surface;
 }

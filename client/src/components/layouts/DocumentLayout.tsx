@@ -11,7 +11,7 @@ export const DocumentLayout = ({ title, children }: layoutProps) => {
   return (
     <>
       <Head title={title} />
-      <div className="flex overflow-hidden relative bg-surface text-text-primary flex-col h-screen">
+      <div className="flex relative bg-surface text-text-primary flex-col h-screen  overflow-y-hidden ">
         {children}
       </div>
     </>

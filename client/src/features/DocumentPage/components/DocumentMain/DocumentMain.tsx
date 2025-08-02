@@ -67,7 +67,11 @@ export function DocumentMain({
         )}
 
         {mode === 'view' && (
-          <Panel defaultSize={100} minSize={35}>
+          <Panel
+            defaultSize={100}
+            minSize={35}
+            className="md:max-w-[800px] mx-auto"
+          >
             <MarkdownPreview content={text} />
           </Panel>
         )}
