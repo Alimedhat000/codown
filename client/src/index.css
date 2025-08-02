@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
-@plugin 'tailwind-scrollbar';
+@plugin 'tailwind-scrollbar' {
+  nocompatible: true;
+  preferredstrategy: 'pseudoelements';
+}
 @import 'tw-animate-css';
 
 @font-face {
@@ -20,7 +23,7 @@
 }
 
 @theme {
-  --color-background: #18181b; /* page background */
+  --color-background: #27272a; /* page background */
   --color-foreground: #f4f5f2; /* primary text */
 
   --color-surface: #27272a; /* cards, modals, navs */
@@ -55,7 +58,8 @@
   --color-success: #2cc882; /* confirmations */
   --color-success-foreground: #ffffff;
 
-  --color-border: #493f89;
+  --color-border: #3f3f42;
+  --color-border-hover: #71717a;
   --color-input: #222222;
   --color-ring: #5b21b6;
 
@@ -72,6 +76,21 @@
     @apply font-display;
   }
 }
+
+// Hide Scrollbar 
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-scrollbar {
+  @apply scrollbar scrollbar-hover:scrollbar-thumb-muted-foreground
+  scrollbar-thumb-muted-foreground/70 scrollbar-track-surface scrollbar-w-2.5 scrollbar-thumb-rounded-4xl;
+}
+
 /* @theme {
   --color-background: #27272a;
   --color-surface: #2d2e36;
@@ -110,7 +129,7 @@
 .prose code::after {
   content: '';
 }
-
+*/
 .gutter {
   background-color: #2d2d2d;
   background-clip: padding-box;
@@ -137,6 +156,17 @@
 }
 
 .cm-lineNumbers .cm-gutterElement:hover {
-  background-color: #918dec;
   color: #fff;
-} */
+}
+
+.language-mermaid svg {
+  @apply block mx-auto;
+}
+
+code.hljs.language-mermaid {
+  @apply bg-surface;
+}
+
+pre:has(> code.language-mermaid) {
+  @apply bg-surface;
+}

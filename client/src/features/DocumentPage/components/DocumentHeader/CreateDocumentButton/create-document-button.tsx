@@ -1,26 +1,27 @@
 import React, { useState } from 'react';
-import { LuFilePlus2 as NewFileIcon } from 'react-icons/lu';
+import { LuPlus as AddIcon } from 'react-icons/lu';
 
 import NewDocumentFormBody from '@/components/common/forms/NewDocumentFormBody';
 import { Button } from '@/components/ui/Button';
 import { Modal, ModalOverlay, ModalTrigger } from '@/components/ui/Modal';
-import { api } from '@/lib/api';
-import type { CreateDocumentForm, Document } from '@/types/api';
+import type { CreateDocumentForm } from '@/types/api';
 
-type Props = {
-  setDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
-};
+interface CreateDocumentButtonProps {
+  onCreateDocument?: (title: string) => Promise<void>;
+  className?: string;
+}
 
-export default function NewDocumentModal({ setDocuments }: Props) {
+export const CreateDocumentButton = ({
+  onCreateDocument,
+  className,
+}: CreateDocumentButtonProps) => {
   const [open, setOpen] = useState(false);
 
-  const onSubmit = async (data: CreateDocumentForm) => {
-    if (!data.title.trim()) return;
+  const handleSubmit = async (data: CreateDocumentForm) => {
+    if (!data.title.trim() || !onCreateDocument) return;
 
     try {
-      const res = await api.post('/document', { title: data.title });
-      setDocuments((prev) => [res.data, ...prev]);
-
+      await onCreateDocument(data.title);
       setOpen(false);
     } catch (err) {
       console.error('Failed to create document', err);
@@ -29,9 +30,9 @@ export default function NewDocumentModal({ setDocuments }: Props) {
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
-      <ModalTrigger>
-        <Button size="icon">
-          <NewFileIcon />
+      <ModalTrigger asChild className={className}>
+        <Button variant="ghost" size="icon">
+          <AddIcon className="h-4 w-4" />
         </Button>
       </ModalTrigger>
       <ModalOverlay />
@@ -39,8 +40,8 @@ export default function NewDocumentModal({ setDocuments }: Props) {
         title="Create New Document"
         description="Give your document a title to begin."
         submittingLabel="Create"
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
       />
     </Modal>
   );
-}
+};

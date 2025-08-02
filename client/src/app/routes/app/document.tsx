@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
-import ContentLayout from '@/components/layouts/ContentLayout';
-import Editor from '@/features/DocumentPage/Editor';
-import NavBarHeader from '@/features/DocumentPage/NavBarHeader';
+import { DocumentLayout } from '@/components/layouts/DocumentLayout';
+import { Spinner } from '@/components/ui/Spinner';
+import { DocumentHeader } from '@/features/DocumentPage/components/DocumentHeader';
+import { DocumentMain } from '@/features/DocumentPage/components/DocumentMain';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useDocument } from '@/hooks/useDocument';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -22,24 +23,27 @@ export default function DocumentPage() {
     if (isSmallScreen) setMode('edit');
   }, [isSmallScreen]);
 
-  if (loading) return <div>Loading...</div>;
-
   return (
     <>
-      <ContentLayout title={doc?.title || 'Document'}>
-        <div className="bg-background text-text-primary h-screen">
-          <NavBarHeader mode={mode} setMode={setMode} />
-          {doc ? null : null}
-          <div className=" flex-1 mt-12 overflow-hidden">
-            <Editor
-              mode={mode}
-              doc={editedDoc}
-              setDoc={setEditedDoc}
-              docId={id}
-            />
-          </div>
-        </div>
-      </ContentLayout>
+      <DocumentLayout title={doc?.title || 'Document'}>
+        <DocumentHeader
+          mode={mode}
+          setMode={setMode}
+          documentTitle={doc?.title}
+          className="fixed top-0 left-0 right-0 z-10"
+        />
+        {loading ? (
+          <Spinner />
+        ) : (
+          <DocumentMain
+            mode={mode}
+            doc={editedDoc}
+            setDoc={setEditedDoc}
+            docId={id}
+            className=" mt-[2.86rem] md:mt-[3.375rem]"
+          />
+        )}
+      </DocumentLayout>
     </>
   );
 }

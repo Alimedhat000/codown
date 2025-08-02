@@ -19,15 +19,23 @@ export type UserMenuProps = {
   username: string;
   avatarUrl?: string;
   logout: () => void;
+  showChevron?: boolean;
+  className?: string;
 };
 
-export function UserMenu({ username, avatarUrl, logout }: UserMenuProps) {
+export function UserMenu({
+  username,
+  avatarUrl,
+  logout,
+  showChevron = true,
+  className,
+}: UserMenuProps) {
   const [IsOpen, setIsOpen] = useState(false);
 
   return (
     <DropdownMenu onOpenChange={setIsOpen}>
       {/* Avatar Image */}
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild className={className}>
         <button
           className={cn(
             'ml-auto focus:outline-none flex items-center space-x-2 hover:bg-surface rounded-md px-2 py-1 ',
@@ -39,7 +47,9 @@ export function UserMenu({ username, avatarUrl, logout }: UserMenuProps) {
               {username.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <ChevronIcon className={IsOpen ? ' rotate-180' : ''} />
+          {showChevron && (
+            <ChevronIcon className={IsOpen ? ' rotate-180' : ''} />
+          )}
         </button>
       </DropdownMenuTrigger>
 

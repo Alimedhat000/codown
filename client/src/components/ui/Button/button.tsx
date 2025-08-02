@@ -30,15 +30,32 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const Comp = asChild ? Slot : 'button';
+
+    // Check if we have multiple children
+    const childrenArray = React.Children.toArray(children);
+    const hasMultipleChildren = childrenArray.length > 1;
+
+    const content = hasMultipleChildren ? (
+      <>
+        {isLoading && <Spinner size="sm" className="text-current" />}
+        {!isLoading && icon && icon}
+        {children}
+      </>
+    ) : (
+      <>
+        {isLoading && <Spinner size="sm" className="text-current" />}
+        {!isLoading && icon && <span className="mr-2">{icon}</span>}
+        <span className="mx-2">{children}</span>
+      </>
+    );
+
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
       >
-        {isLoading && <Spinner size="sm" className="text-current" />}
-        {!isLoading && icon && <span className="mr-2">{icon}</span>}
-        <span className="mx-2">{children}</span>
+        {content}
       </Comp>
     );
   },
