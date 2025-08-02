@@ -13,7 +13,7 @@ export default function DocumentPage() {
   const { id } = useParams();
   const { doc, editedDoc, setEditedDoc, loading, handleSave } = useDocument(id);
 
-  useAutoSave(handleSave, editedDoc, 5000);
+  useAutoSave(handleSave, editedDoc!, 5000);
 
   const [mode, setMode] = useState<EditorMode>('edit');
 

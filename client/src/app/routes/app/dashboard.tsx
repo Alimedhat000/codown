@@ -12,7 +12,7 @@ export default function Dashboard() {
   const fetchDocs = async () => {
     try {
       const res = await api.get('/document');
-      console.log(res);
+      // console.log(res);
       setDocuments(res.data);
     } catch (err) {
       console.error('Failed to fetch documents', err);

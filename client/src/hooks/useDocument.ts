@@ -23,7 +23,7 @@ export function useDocument(id?: string) {
     try {
       setSaving(true);
       await api.put(`/document/${id}`, editedDoc);
-      console.log(editedDoc);
+      // console.log(editedDoc);
       setDoc(editedDoc);
     } catch (err) {
       console.error('Failed to save document:', err);

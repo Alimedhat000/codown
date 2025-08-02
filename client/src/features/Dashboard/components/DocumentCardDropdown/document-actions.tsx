@@ -11,14 +11,13 @@ export function useDocumentActions(
   const [copySuccess, setCopySuccess] = useState(false);
 
   const handleViewDocument = () => {
-    navigate(paths.app.document.getHref(document.id.slice(0, 8)));
+    navigate(paths.app.document.getHref(document.id));
   };
 
   const handleCopyLink = async () => {
     try {
       const link =
-        window.location.origin +
-        paths.app.document.getHref(document.id.slice(0, 8));
+        window.location.origin + paths.app.document.getHref(document.id);
       await navigator.clipboard.writeText(link);
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);

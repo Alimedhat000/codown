@@ -36,7 +36,7 @@ export function DocumentGridCard({
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              console.log(`im ${document.pinned ? 'not ' : ''}pinned now yay`);
+              // console.log(`im ${document.pinned ? 'not ' : ''}pinned now yay`);
             }}
           />
         </div>

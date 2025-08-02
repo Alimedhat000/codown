@@ -30,7 +30,7 @@ export function DocumentList({
         return (
           <Link
             key={doc.id}
-            to={paths.app.document.getHref(doc.id.slice(0, 8))}
+            to={paths.app.document.getHref(doc.id)}
             className="block"
           >
             <Component

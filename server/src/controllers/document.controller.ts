@@ -23,9 +23,7 @@ export const getDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: R
 
   const doc = await prisma.document.findFirst({
     where: {
-      id: {
-        startsWith: req.params.id,
-      },
+      id: req.params.id,
     },
   });
 
@@ -50,7 +48,7 @@ export const updateDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
 
   const doc = await prisma.document.findFirst({
     where: {
-      id: { startsWith: req.params.id },
+      id: req.params.id,
     },
   });
 
@@ -70,7 +68,7 @@ export const updateDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
 export const deleteDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
   const doc = await prisma.document.findFirst({
     where: {
-      id: { startsWith: req.params.id },
+      id: req.params.id,
     },
   });
 

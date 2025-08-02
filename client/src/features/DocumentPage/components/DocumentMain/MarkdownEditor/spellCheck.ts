@@ -407,7 +407,7 @@ const createSpellcheckPlugin = (language: string = 'en_US') => {
 
         // This would need additional implementation to show the widget
         // For now, we'll just log the suggestions
-        console.log(`Suggestions for "${word}":`, suggestions);
+        // console.log(`Suggestions for "${word}":`, suggestions);
       }
     },
     {
@@ -423,7 +423,7 @@ const createSpellcheckPlugin = (language: string = 'en_US') => {
 
             if (word) {
               // Here you could show a context menu with suggestions
-              console.log(`Context menu for misspelled word: ${word}`);
+              // console.log(`Context menu for misspelled word: ${word}`);
             }
           }
         },

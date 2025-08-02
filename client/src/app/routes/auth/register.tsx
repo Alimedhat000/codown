@@ -27,7 +27,7 @@ export default function Register() {
         );
       }
     } catch (err: any) {
-      console.log(err);
+      console.error(err);
       const status = err.response?.status;
 
       switch (status) {

@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 
+import { DocumentData } from '@/types/api';
+
 export function useAutoSave(
   saveFn: () => void,
   doc: DocumentData,
