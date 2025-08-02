@@ -15,6 +15,8 @@ import {
   LuImage,
   LuMinus,
   LuTable,
+  LuSubscript,
+  LuSuperscript,
 } from 'react-icons/lu';
 
 type RunCommandArgs = [before: string, after?: string, prefixNewline?: boolean];
@@ -67,6 +69,20 @@ export const toolbarButtons: ToolbarCommand[] = [
     title: 'Heading',
     action: 'command',
     args: ['# ', '', true],
+  },
+  {
+    type: 'button',
+    icon: LuSubscript,
+    title: 'Subscript',
+    action: 'command',
+    args: ['_', '_', false],
+  },
+  {
+    type: 'button',
+    icon: LuSuperscript,
+    title: 'Superscript',
+    action: 'command',
+    args: ['^', '^', false],
   },
   { type: 'divider' },
 

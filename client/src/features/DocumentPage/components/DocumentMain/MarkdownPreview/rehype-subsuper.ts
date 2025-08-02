@@ -1,8 +1,7 @@
 import { Plugin } from 'unified';
 import { visit } from 'unist-util-visit';
 
-// const supersubRegex = /(\^([^\s]+))(?=\s)|(_([^\s]+))(?=\s)/g;
-const supersubRegex = /(\^([^\s^]+))(?=\s|$)|(_([^\s_]+))(?=\s|$)/g;
+const supersubRegex = /(\^([^\s^]+)\^)|(_([^\s_]+)_)/g;
 
 export const rehypeSupSub: Plugin = () => {
   return (tree: any) => {
