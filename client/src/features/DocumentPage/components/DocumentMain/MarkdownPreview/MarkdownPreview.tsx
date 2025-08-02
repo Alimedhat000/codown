@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeKatex from 'rehype-katex';
@@ -14,11 +15,35 @@ import { rehypeSupSub } from './rehype-subsuper';
 import { remarkTypographer } from './remark-typographer';
 import { rehypeTextDecorations } from './remarkDecorations';
 
-export function MarkdownPreview({ content }: { content: string }) {
+export function MarkdownPreview({
+  content,
+  previewScrollRef,
+  onScroll,
+  syncScroll,
+}: {
+  content: string;
+  previewScrollRef?: React.RefObject<HTMLDivElement | null>;
+  onScroll?: () => void;
+  syncScroll?: boolean;
+}) {
+  useEffect(() => {
+    const el = previewScrollRef?.current;
+    if (!el) return;
+
+    if (syncScroll) {
+      el.addEventListener('scroll', onScroll!);
+    }
+
+    return () => {
+      el.removeEventListener('scroll', onScroll!);
+    };
+  }, [syncScroll, onScroll, previewScrollRef]);
+
   return (
     <div
       className="custom-scrollbar w-full h-full flex-1 overflow-auto p-6 bg-surface
             rounded-none"
+      ref={previewScrollRef}
     >
       <div className="prose prose-invert max-w-none">
         <ReactMarkdown

@@ -1,6 +1,6 @@
 import 'highlight.js/styles/github-dark.css';
-import { useEffect } from 'react';
-import { LuGripVertical } from 'react-icons/lu';
+import { useEffect, useRef, useState } from 'react';
+import { LuLink, LuUnlink } from 'react-icons/lu';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import { Spinner } from '@/components/ui/Spinner';
@@ -24,6 +24,10 @@ export function DocumentMain({
   className?: string;
 }) {
   const { text, ydoc, ytext, provider } = useCollab(docId);
+  const editorScrollRef = useRef<HTMLDivElement>(null);
+  const previewScrollRef = useRef<HTMLDivElement>(null);
+  const isSyncingRef = useRef(false);
+  const [syncScroll, setSyncScroll] = useState(false);
 
   useEffect(() => {
     if (text !== doc.content) {
@@ -31,6 +35,60 @@ export function DocumentMain({
     }
   }, [text, doc, setDoc]);
 
+  const handleEditorScroll = () => {
+    if (!syncScroll) return;
+    if (
+      !syncScroll ||
+      isSyncingRef.current ||
+      !editorScrollRef.current ||
+      !previewScrollRef.current
+    ) {
+      return;
+    }
+
+    isSyncingRef.current = true;
+
+    const editor = editorScrollRef.current;
+    const preview = previewScrollRef.current;
+
+    const scrollRatio =
+      editor.scrollTop / (editor.scrollHeight - editor.clientHeight);
+    preview.scrollTop =
+      scrollRatio * (preview.scrollHeight - preview.clientHeight);
+
+    // Use a shorter timeout and requestAnimationFrame
+    requestAnimationFrame(() => {
+      isSyncingRef.current = false;
+    });
+  };
+
+  const handlePreviewScroll = () => {
+    if (!syncScroll) return;
+
+    if (
+      !syncScroll ||
+      isSyncingRef.current ||
+      !editorScrollRef.current ||
+      !previewScrollRef.current
+    ) {
+      return;
+    }
+
+    isSyncingRef.current = true;
+
+    const editor = editorScrollRef.current;
+    const preview = previewScrollRef.current;
+
+    const scrollRatio =
+      preview.scrollTop / (preview.scrollHeight - preview.clientHeight);
+    editor.scrollTop =
+      scrollRatio * (editor.scrollHeight - editor.clientHeight);
+
+    // Use a shorter timeout and requestAnimationFrame
+    requestAnimationFrame(() => {
+      isSyncingRef.current = false;
+    });
+  };
   if (!docId || !ydoc || !ytext || !provider) {
     return (
       <div className="flex items-center justify-center h-screen w-full text-muted">
@@ -50,11 +108,34 @@ export function DocumentMain({
         {(mode === 'edit' || mode === 'both') && (
           <>
             <Panel defaultSize={50} minSize={35} className="flex h-full">
-              <MarkdownEditor ytext={ytext} provider={provider} />
+              <MarkdownEditor
+                ytext={ytext}
+                provider={provider}
+                editorScrollRef={editorScrollRef}
+                onScroll={handleEditorScroll}
+                syncScroll={syncScroll}
+              />
             </Panel>
             {mode === 'both' && (
-              <PanelResizeHandle className="w-4 flex items-center justify-center bg-border hover:bg-border-hover active:bg-border-hover cursor-col-resize transition">
-                <LuGripVertical className="w-4 h-4 text-foreground" />
+              <PanelResizeHandle className="group relative w-2 flex items-center justify-center bg-border hover:bg-border-hover active:bg-border-hover cursor-col-resize transition">
+                {/* Overlay Button */}
+                <div
+                  className="absolute z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-header hover:bg-border p-4 rounded-full transition border border-border
+               opacity-0 group-hover:opacity-100 cursor-pointer pointer-events-auto"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation(); // Prevents the resize handle from being triggered
+                    setSyncScroll(!syncScroll);
+                    console.log('changed the thing to ', !syncScroll);
+                  }}
+                  style={{ cursor: 'default' }} // <- force non-resize cursor
+                >
+                  {syncScroll ? (
+                    <LuLink className="w-5 h-5" />
+                  ) : (
+                    <LuUnlink className="w-5 h-5" />
+                  )}
+                </div>
               </PanelResizeHandle>
             )}
           </>
@@ -62,7 +143,12 @@ export function DocumentMain({
 
         {mode === 'both' && (
           <Panel defaultSize={50} minSize={15}>
-            <MarkdownPreview content={text} />
+            <MarkdownPreview
+              content={text}
+              previewScrollRef={previewScrollRef}
+              onScroll={handlePreviewScroll}
+              syncScroll={syncScroll}
+            />
           </Panel>
         )}
 

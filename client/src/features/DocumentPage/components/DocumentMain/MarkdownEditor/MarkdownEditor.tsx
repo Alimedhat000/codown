@@ -26,9 +26,15 @@ const markdownKeymap = keymap.of([
 export function MarkdownEditor({
   ytext,
   provider,
+  editorScrollRef,
+  onScroll,
+  syncScroll,
 }: {
   ytext: Y.Text | null;
   provider: any;
+  editorScrollRef?: React.RefObject<HTMLDivElement | null>;
+  onScroll: () => void;
+  syncScroll?: boolean;
 }) {
   const [spellcheck, setSpellcheck] = useState(false);
   const [useTabs, setUseTabs] = useState(true);
@@ -71,10 +77,28 @@ export function MarkdownEditor({
 
     viewRef.current = view;
 
+    if (editorScrollRef) {
+      editorScrollRef.current = editorRef.current;
+    }
+
     return () => {
       view.destroy();
     };
-  }, [ytext, provider, useTabs, spellcheck]); // Add spellcheck to dependencies
+  }, [ytext, provider, useTabs, spellcheck, editorScrollRef]); // Add spellcheck to dependencies
+
+  useEffect(() => {
+    if (!editorRef.current) return;
+
+    const el = editorRef.current;
+
+    if (syncScroll) {
+      el.addEventListener('scroll', onScroll);
+    }
+
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+    };
+  }, [syncScroll, onScroll]);
 
   return (
     <div className="relative w-full flex-1 py-10 ">
