@@ -1,15 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 
 import { api } from '@/lib/api';
-
-type DocumentData = { title: string; content: string };
+import { DocumentData } from '@/types/api';
 
 export function useDocument(id?: string) {
   const [doc, setDoc] = useState<DocumentData | null>(null);
-  const [editedDoc, setEditedDoc] = useState<DocumentData>({
-    title: '',
-    content: '',
-  });
+  const [editedDoc, setEditedDoc] = useState<DocumentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 

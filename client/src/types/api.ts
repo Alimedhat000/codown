@@ -16,3 +16,14 @@ export type Document = {
 export type CreateDocumentForm = {
   title: string;
 };
+
+export type DocumentData = {
+  id?: string;
+  title: string;
+  content: string;
+  isPublic?: boolean;
+  createdAt: string;
+  updatedAt: string;
+  authorId: string;
+  versionCount?: string;
+};

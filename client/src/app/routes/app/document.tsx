@@ -40,7 +40,7 @@ export default function DocumentPage() {
             doc={editedDoc}
             setDoc={setEditedDoc}
             docId={id}
-            className="pt-[2.86rem] md:pt-[3.375rem]"
+            className=" mt-[2.86rem] md:mt-[3.375rem]"
           />
         )}
       </DocumentLayout>

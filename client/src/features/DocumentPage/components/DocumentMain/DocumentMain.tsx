@@ -5,6 +5,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import { Spinner } from '@/components/ui/Spinner';
 import { useCollab } from '@/hooks/useCollab';
+import { DocumentData } from '@/types/api';
 import { cn } from '@/utils/cn';
 
 import { MarkdownEditor } from './MarkdownEditor';
@@ -19,7 +20,7 @@ export function DocumentMain({
 }: {
   docId: string | undefined;
   mode: EditorMode;
-  doc: DocumentData;
+  doc: DocumentData | null;
   setDoc: (doc: DocumentData) => void;
   className?: string;
 }) {
@@ -30,7 +31,7 @@ export function DocumentMain({
   const [syncScroll, setSyncScroll] = useState(false);
 
   useEffect(() => {
-    if (text !== doc.content) {
+    if (doc && text !== doc.content) {
       setDoc({ ...doc, content: text });
     }
   }, [text, doc, setDoc]);
@@ -123,7 +124,7 @@ export function DocumentMain({
     >
       <PanelGroup
         direction="horizontal"
-        className="h-full w-full"
+        className="h-full w-full overflow-y-hidden"
         autoSaveId="persistence"
       >
         {(mode === 'edit' || mode === 'both') && (
@@ -163,12 +164,13 @@ export function DocumentMain({
         )}
 
         {mode === 'both' && (
-          <Panel defaultSize={50} minSize={15}>
+          <Panel defaultSize={50} minSize={15} className="overflow-y-hidden">
             <MarkdownPreview
               content={text}
               previewScrollRef={previewScrollRef}
               onScroll={handlePreviewScroll}
               syncScroll={syncScroll}
+              lastUpdated={doc?.updatedAt}
             />
           </Panel>
         )}
@@ -177,9 +179,9 @@ export function DocumentMain({
           <Panel
             defaultSize={100}
             minSize={35}
-            className="md:max-w-[800px] mx-auto"
+            className="md:max-w-[800px] mx-auto overflow-y-hidden"
           >
-            <MarkdownPreview content={text} />
+            <MarkdownPreview content={text} lastUpdated={doc?.updatedAt} />
           </Panel>
         )}
       </PanelGroup>
