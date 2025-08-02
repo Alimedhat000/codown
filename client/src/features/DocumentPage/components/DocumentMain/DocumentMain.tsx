@@ -35,6 +35,23 @@ export function DocumentMain({
     }
   }, [text, doc, setDoc]);
 
+  useEffect(() => {
+    if (!syncScroll) return;
+
+    const editorEl = editorScrollRef?.current;
+    const previewEl = previewScrollRef?.current;
+
+    if (!editorEl || !previewEl) return;
+
+    // Get scroll percentage from editor
+    const percent =
+      editorEl.scrollTop / (editorEl.scrollHeight - editorEl.clientHeight);
+
+    // Apply it to preview
+    previewEl.scrollTop =
+      percent * (previewEl.scrollHeight - previewEl.clientHeight);
+  }, [syncScroll]);
+
   const handleEditorScroll = () => {
     if (!syncScroll) return;
     if (
@@ -104,7 +121,11 @@ export function DocumentMain({
         className,
       )}
     >
-      <PanelGroup direction="horizontal" className="h-full w-full">
+      <PanelGroup
+        direction="horizontal"
+        className="h-full w-full"
+        autoSaveId="persistence"
+      >
         {(mode === 'edit' || mode === 'both') && (
           <>
             <Panel defaultSize={50} minSize={35} className="flex h-full">
@@ -120,13 +141,13 @@ export function DocumentMain({
               <PanelResizeHandle className="group relative w-2 flex items-center justify-center bg-border hover:bg-border-hover active:bg-border-hover cursor-col-resize transition">
                 {/* Overlay Button */}
                 <div
-                  className="absolute z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-header hover:bg-border p-4 rounded-full transition border border-border
+                  className="absolute z-8 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-header hover:bg-border p-4 rounded-full transition border border-border
                opacity-0 group-hover:opacity-100 cursor-pointer pointer-events-auto"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation(); // Prevents the resize handle from being triggered
                     setSyncScroll(!syncScroll);
-                    console.log('changed the thing to ', !syncScroll);
+                    // console.log('changed the thing to ', !syncScroll);
                   }}
                   style={{ cursor: 'default' }} // <- force non-resize cursor
                 >
