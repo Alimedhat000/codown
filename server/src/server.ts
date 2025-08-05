@@ -58,20 +58,3 @@ if (process.env.NODE_ENV !== 'test') {
     console.log(chalk.cyan(`Server is running on http://localhost:${process.env.PORT}`));
   });
 }
-
-// // Export function to start server programmatically (for tests)
-// export function startServer(port?: number) {
-//   const serverPort = port || process.env.PORT || 5001;
-//   const server = http.createServer(app);
-
-//   return new Promise<http.Server>((resolve, reject) => {
-//     const httpServer = server.listen(serverPort, (err?: any) => {
-//       if (err) {
-//         reject(err);
-//       } else {
-//         console.log(chalk.cyan(`Test server running on http://localhost:${serverPort}`));
-//         resolve(httpServer);
-//       }
-//     });
-//   });
-// }

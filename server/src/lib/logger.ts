@@ -5,9 +5,14 @@ export const logger = createLogger({
   format: format.combine(
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     format.errors({ stack: true }),
+    format.colorize({ all: true }),
     format.splat(),
-    format.printf(({ timestamp, level, message }) => {
-      return `[${timestamp}] ${level.toUpperCase()}: ${message}`;
+    format.printf(({ timestamp, level, message, action, userId, ip }) => {
+      const userInfo = userId ? `[User:${userId}]` : '[Anonymous]';
+      const ipInfo = ip ? `[IP:${ip === '::1' ? 'Localhost' : ip}]` : '';
+      const actionInfo = action ? `[${action}]` : '';
+
+      return `[${timestamp}] ${level}: ${actionInfo}${userInfo}${ipInfo} ${message}`;
     })
   ),
   transports: [
