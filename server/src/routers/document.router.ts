@@ -10,6 +10,7 @@ import {
   getDocByShareId,
   getDocs,
   getRequests,
+  getShareLink,
   rejectRequest,
   removeCollaborator,
   updateDoc,
@@ -20,8 +21,7 @@ import { authenticate } from '@/middlewares/auth.middleware';
 export const docRouter = express.Router();
 
 docRouter.use(authenticate);
-// test this
-docRouter.get('/share/:shareId', getDocByShareId); // used to get the share id for the document
+docRouter.get('/share/:shareId', getDocByShareId); // used to get document via share id
 
 docRouter.post('/', createDoc);
 docRouter.get('/', getDocs);
@@ -29,8 +29,9 @@ docRouter.get('/:id', getDoc);
 docRouter.put('/:id', updateDoc);
 docRouter.delete('/:id', deleteDoc);
 
-// test these
 docRouter.patch('/:id/settings', updateDocSettings); // Used to toggle allowSelfJoin for the document // !Owner only access
+
+docRouter.get('/:id/share-link', getShareLink); // get the document share link with the share token
 
 docRouter.get('/:id/collaborators', getCollaborators); // returns list
 docRouter.post('/:id/collaborators', addCollaborator); // adds a new one //!Owner only access

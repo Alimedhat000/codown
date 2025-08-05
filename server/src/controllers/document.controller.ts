@@ -3,6 +3,7 @@ import asyncErrorWrapper from 'express-async-handler';
 import { StatusCodes } from 'http-status-codes';
 
 import { prisma } from '@/lib/prisma';
+import { generateShareToken, verifyShareToken } from '@/lib/shareToken';
 
 export const createDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
   const { title, content = '', isPublic = false } = req.body;
@@ -107,10 +108,29 @@ export const updateDocSettings = asyncErrorWrapper(async (req: AuthenticatedRequ
 
 export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
   const { shareId } = req.params;
+  const { token } = req.query;
   const userId = req.user?.userId;
+
+  if (typeof token !== 'string') {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: 'Missing or invalid token' });
+    return;
+  }
 
   if (!shareId) {
     res.status(StatusCodes.BAD_REQUEST).json({ error: 'Missing shareId in URL' });
+    return;
+  }
+
+  let decoded: { shareId: string; permission: 'view' | 'edit' };
+  try {
+    decoded = verifyShareToken(token);
+  } catch {
+    res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid or expired token' });
+    return;
+  }
+
+  if (decoded.shareId !== shareId) {
+    res.status(StatusCodes.FORBIDDEN).json({ error: 'Token mismatch' });
     return;
   }
   const doc = await prisma.document.findUnique({
@@ -131,15 +151,11 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
   }
 
   if (doc.allowSelfJoin) {
-    // ! Permission is controlled via a query param which is insecure
-    // ! Change this immediately
-    const permission = req.query.perm === 'view' ? 'view' : 'edit';
-
     await prisma.collaborator.create({
       data: {
         documentId: doc.id,
         userId,
-        permission,
+        permission: decoded.permission,
       },
     });
 
@@ -158,6 +174,27 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
 
     res.status(StatusCodes.ACCEPTED).json({ message: 'Request submitted. Waiting for approval.' });
   }
+});
+
+export const getShareLink = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
+  const { permission = 'view' } = req.query;
+
+  if (!['view', 'edit'].includes(permission as string)) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid permission' });
+    return;
+  }
+  const doc = await prisma.document.findUnique({ where: { id } });
+
+  if (!doc || doc.authorId !== req.user?.userId) {
+    res.status(StatusCodes.FORBIDDEN).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  const token = generateShareToken(doc.shareId, permission as 'view' | 'edit');
+  const url = `${process.env.CLIENT_BASE}/document/share/${doc.shareId}?token=${token}`;
+
+  res.json({ url });
 });
 
 export const getRequests = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {

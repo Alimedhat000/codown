@@ -135,10 +135,41 @@ describe('Document Routes', () => {
       },
     });
 
-    // New user joins via shareId
-    const res2 = await request(app).get(`/api/document/share/${doc.shareId}`).set('Authorization', `Bearer ${token}`); // same user for simplicity
+    const shareUrl = await request(app)
+      .get(`/api/document/${doc.id}/share-link?permission=view`)
+      .set('Authorization', `Bearer ${token}`);
+    //Parse the token out from the URL
+    const parsed = new URL(shareUrl.body.url);
+    const shareId = parsed.pathname.split('/').pop(); // 'share123'
+    const shareToken = parsed.searchParams.get('token'); // actual JWT token
+
+    expect(shareId).toBe('share123');
+    expect(shareToken).toBeDefined();
+
+    // Simulate collaborator opening the share link
+    const res2 = await request(app)
+      .get(`/api/document/share/${shareId}?token=${shareToken}`)
+      .set('Authorization', `Bearer ${token}`); // test user's token
 
     expect([StatusCodes.OK, StatusCodes.ACCEPTED]).toContain(res2.status);
+  });
+
+  it('should reject request with invalid token', async () => {
+    const doc = await prisma.document.create({
+      data: {
+        title: 'Shareable',
+        authorId: userId,
+        allowSelfJoin: true,
+        shareId: 'share999',
+        content: '',
+      },
+    });
+
+    const res = await request(app)
+      .get(`/api/document/share/${doc.shareId}?token=invalidtoken`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
   });
 
   it('should fetch and approve collaboration requests', async () => {
