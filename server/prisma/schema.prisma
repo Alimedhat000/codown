@@ -8,34 +8,65 @@ generator client {
 }
 
 model User {
-  id           String     @id @default(uuid())
-  email        String     @unique
-  username     String     @unique
-  password     String
-  fullName     String?
-  refreshToken String?
-  isActive     Boolean    @default(true)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  Document     Document[]
+  id                   String                 @id @default(uuid())
+  email                String                 @unique
+  username             String                 @unique
+  password             String
+  fullName             String?
+  refreshToken         String?
+  isActive             Boolean                @default(true)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  Document             Document[]
+  Collaborator         Collaborator[]
+  CollaborationRequest CollaborationRequest[]
 
   @@map("users")
 }
 
 model Document {
-  id           String   @id @default(uuid())
-  title        String
-  content      String
-  isPublic     Boolean  @default(false)
-  versionCount Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String   @id @default(uuid())
+  title         String
+  content       String
+  isPublic      Boolean  @default(false)
+  shareId       String   @unique @default(cuid())
+  allowSelfJoin Boolean  @default(false)
+  versionCount  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  author           User              @relation(fields: [authorId], references: [id])
-  authorId         String
-  YjsDocumentState YjsDocumentState?
+  author               User                   @relation(fields: [authorId], references: [id])
+  authorId             String
+  YjsDocumentState     YjsDocumentState?
+  Collaborator         Collaborator[]
+  CollaborationRequest CollaborationRequest[]
 
   @@map("documents")
+}
+
+model Collaborator {
+  id         String   @id @default(uuid())
+  document   Document @relation(fields: [documentId], references: [id])
+  documentId String
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  permission String   @default("edit") // "edit" or "view"
+
+  @@unique([documentId, userId])
+  @@map("collaborators")
+}
+
+model CollaborationRequest {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  document   Document @relation(fields: [documentId], references: [id])
+  documentId String
+  status     String   @default("pending") // pending | accepted | rejected
+  createdAt  DateTime @default(now())
+
+  @@unique([documentId, userId])
+  @@map("collaboration_requests")
 }
 
 model YjsDocumentState {
