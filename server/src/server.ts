@@ -53,10 +53,15 @@ if (process.env.NODE_ENV !== 'test') {
   const server = http.createServer(app);
 
   socketServer.listen(5002, () => {
-    console.log(chalk.green('Hocus Pocus server is running on ws://localhost:5002'));
+    console.log(
+      chalk.bold.green('✓ Hocuspocus server running on ') + chalk.bold.underline.magenta('ws://localhost:5002')
+    );
   });
 
   server.listen(process.env.PORT, () => {
-    console.log(chalk.cyan(`Server is running on http://localhost:${process.env.PORT}`));
+    console.log(
+      chalk.green('✓'),
+      chalk.bold.cyan('API server running on ') + chalk.bold.underline.magenta(`http://localhost:${process.env.PORT}`)
+    );
   });
 }

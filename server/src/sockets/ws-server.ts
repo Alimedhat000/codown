@@ -5,6 +5,7 @@ import { dbPersistence } from '@/lib/dbPersistence';
 
 const server = new Server({
   port: 5002,
+  quiet: true,
   extensions: [dbPersistence, new Logger()],
 });
 

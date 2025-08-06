@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import { fileURLToPath } from 'url';
@@ -47,8 +48,14 @@ export const setupSwagger = (app: any) => {
     app.use('/api/docs', swaggerUi.serve);
     app.get('/api/docs', swaggerUi.setup(swaggerDocument, options));
 
-    console.log(`📚 Swagger documentation available at: ${baseUrl.replace('/api', '')}/api/docs`);
+    console.log(
+      chalk.green('✓') +
+        ' ' +
+        chalk.bold.white('Swagger documentation running at') +
+        ' ' +
+        chalk.underline.magenta(`${baseUrl.replace('/api', '')}/api/docs`)
+    );
   } catch (error) {
-    console.error('Failed to setup Swagger documentation:', error);
+    console.error(chalk.red('Failed to setup Swagger documentation:', error));
   }
 };
