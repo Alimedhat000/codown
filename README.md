@@ -59,8 +59,8 @@ Update the environment variables as needed (e.g., database URL).
 pnpm dev
 ```
 ## Roadmap
-- Polish The UI (just finished the dashboard ＼(＾▽＾)／, document next ｡･ﾟﾟ･(>д<)･ﾟﾟ･｡)
-- User authorization
+- ~~Polish The UI~~ (Done ＼(＾▽＾)／)
+- ~~Document Sharing with User authorization~~ ヽ(*≧ω≦)ﾉ
 - Export documents to PDF
 - Version history and timeline
 - Testing and Improving CI setup
@@ -68,4 +68,5 @@ pnpm dev
 
 ## Screenshots
 To be added cuz im lazy (* ^ ω ^)
+
 
