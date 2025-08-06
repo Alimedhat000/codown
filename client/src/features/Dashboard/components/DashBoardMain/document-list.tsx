@@ -9,8 +9,9 @@ import { DocumentRow } from '../DocumentRow';
 type Props = {
   documents: Document[];
   view: 'grid' | 'row';
-  onDocumentUpdated: (updatedDocument: Document) => void;
-  onDocumentDeleted: (documentId: string) => void;
+  onDocumentUpdated?: (updatedDocument: Document) => void;
+  onDocumentDeleted?: (documentId: string) => void;
+  isOwned?: boolean;
 };
 
 export function DocumentList({
@@ -18,6 +19,7 @@ export function DocumentList({
   view,
   onDocumentUpdated,
   onDocumentDeleted,
+  isOwned,
 }: Props) {
   const gridClass = 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2';
   const containerClass = view === 'grid' ? gridClass : 'space-y-2';
@@ -35,8 +37,9 @@ export function DocumentList({
           >
             <Component
               document={doc}
-              onDocumentUpdated={onDocumentUpdated}
-              onDocumentDeleted={onDocumentDeleted}
+              isOwned={isOwned}
+              onDocumentUpdated={onDocumentUpdated!}
+              onDocumentDeleted={onDocumentDeleted!}
             />
           </Link>
         );

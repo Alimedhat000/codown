@@ -12,6 +12,7 @@ import { errorMiddleware } from '@/middlewares/error.middleware';
 import { morganFile, morganWinston } from '@/middlewares/logging.middleware';
 import { router } from '@/routers';
 
+import { setupSwagger } from './config/swagger';
 import socketServer from './sockets/ws-server';
 
 export const app = express();
@@ -33,24 +34,34 @@ app.use(
 // Cookie parser
 app.use(cookieParser());
 
-// Logger middleware
-app.use(morganFile);
-app.use(morganWinston);
-
+if (process.env.NODE_ENV !== 'test') {
+  // Logger middleware
+  app.use(morganFile);
+  app.use(morganWinston);
+}
 // Serving static files
 app.use(express.static(path.join(path.resolve(), 'public')));
 
+setupSwagger(app);
 // Routes
 app.use('/api', router);
 
 // Error middlewaree
 app.use(errorMiddleware);
 
-const server = http.createServer(app);
+if (process.env.NODE_ENV !== 'test') {
+  const server = http.createServer(app);
 
-socketServer.listen(5002, () => {
-  console.log(chalk.green('Hocus Pocus server is running on ws://localhost:5002'));
-});
-server.listen(process.env.PORT, () => {
-  console.log(chalk.cyan(`Server is running on http://localhost:${process.env.PORT}`));
-});
+  socketServer.listen(5002, () => {
+    console.log(
+      chalk.bold.green('✓ Hocuspocus server running on ') + chalk.bold.underline.magenta('ws://localhost:5002')
+    );
+  });
+
+  server.listen(process.env.PORT, () => {
+    console.log(
+      chalk.green('✓'),
+      chalk.bold.cyan('API server running on ') + chalk.bold.underline.magenta(`http://localhost:${process.env.PORT}`)
+    );
+  });
+}

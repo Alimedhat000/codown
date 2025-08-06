@@ -12,9 +12,11 @@ export interface DocumentHeaderProps {
   avatarUrl?: string;
   logout?: () => void;
   documentTitle?: string;
-  collaborators?: Array<{ id: string; name: string; avatarUrl?: string }>;
   onCreateDocument?: (title: string) => Promise<void>;
   className?: string;
+  docId?: string;
+  isReadOnly?: boolean;
+  isCollaborator?: boolean;
 }
 
 export const DocumentHeader: React.FC<DocumentHeaderProps> = ({
@@ -23,10 +25,11 @@ export const DocumentHeader: React.FC<DocumentHeaderProps> = ({
   username,
   avatarUrl,
   logout,
+  docId,
   documentTitle,
-  collaborators = [],
   onCreateDocument,
   className,
+  isCollaborator,
 }) => {
   return (
     <div
@@ -42,9 +45,10 @@ export const DocumentHeader: React.FC<DocumentHeaderProps> = ({
         username={username}
         avatarUrl={avatarUrl}
         logout={logout}
+        docId={docId}
         documentTitle={documentTitle}
-        collaborators={collaborators}
         onCreateDocument={onCreateDocument}
+        isCollaborator={isCollaborator}
       />
     </div>
   );

@@ -44,6 +44,13 @@ const createAppRouter = () =>
             })),
         },
         {
+          path: paths.app.share.path,
+          lazy: () =>
+            import('./routes/app/share').then((mod) => ({
+              Component: mod.default,
+            })),
+        },
+        {
           path: paths.app.document.path,
           lazy: () =>
             import('./routes/app/document').then((mod) => ({

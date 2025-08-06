@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   LuUsers as GroupIcon,
   LuChevronDown as ChevronIcon,
+  LuTrash2 as TrashIcon,
 } from 'react-icons/lu';
 
 import { Button } from '@/components/ui/Button';
@@ -9,29 +10,34 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
+  // DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/Dropdown';
+import { useCollaborators } from '@/hooks/useCollaborators';
 import { cn } from '@/utils/cn';
 
 interface CollaboratorsDropdownProps {
-  collaborators: Array<{ id: string; name: string; avatarUrl?: string }>;
+  docId?: string;
   className?: string;
+  isCollaborator?: boolean;
 }
 
 export const CollaboratorsDropdown = ({
-  collaborators,
+  docId,
   className,
+  isCollaborator,
 }: CollaboratorsDropdownProps) => {
-  const [open, setopen] = useState(false);
+  const [email, setEmail] = useState('');
+  const { collaborators, loading, addCollaborator, removeCollaborator } =
+    useCollaborators(docId, isCollaborator);
+
+  const _handleAdd = async () => {
+    await addCollaborator(email);
+    setEmail('');
+  };
 
   return (
-    <DropdownMenu
-      open={open}
-      onOpenChange={() => {
-        setopen(!open);
-      }}
-    >
+    <DropdownMenu>
       <DropdownMenuTrigger asChild className={className}>
         <Button variant="ghost" className="gap-1 flex px-2 ">
           <GroupIcon className="h-4 w-4" />
@@ -46,16 +52,48 @@ export const CollaboratorsDropdown = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {collaborators.length > 0 ? (
-          collaborators.map((collaborator, index) => (
-            <React.Fragment key={collaborator.id}>
-              <DropdownMenuItem>{collaborator.name}</DropdownMenuItem>
-              {index < collaborators.length - 1 && <DropdownMenuSeparator />}
-            </React.Fragment>
-          ))
-        ) : (
-          <DropdownMenuItem disabled>No collaborators</DropdownMenuItem>
-        )}
+        <div className="space-y-2">
+          {loading ? (
+            <DropdownMenuItem disabled>Loading…</DropdownMenuItem>
+          ) : collaborators.length > 0 ? (
+            collaborators.map((collaborator, _index) => (
+              <div
+                key={collaborator.id}
+                className="flex items-center justify-between px-2 py-1 rounded hover:bg-muted gap-3"
+              >
+                <span className="text-sm truncate">
+                  {collaborator.user.username}
+                </span>
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  onClick={() => removeCollaborator(collaborator.id)}
+                >
+                  <TrashIcon className="w-4 h-4 " />
+                </Button>
+              </div>
+            ))
+          ) : (
+            <DropdownMenuItem disabled>No collaborators</DropdownMenuItem>
+          )}
+        </div>
+
+        {/* <div className="flex items-center gap-1">
+          <Input
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="h-8 text-xs"
+          />
+          <Button
+            size="icon"
+            onClick={handleAdd}
+            disabled={!email.trim()}
+            className="h-8 w-8"
+          >
+            <PlusIcon className="w-4 h-4" />
+          </Button>
+        </div> */}
       </DropdownMenuContent>
     </DropdownMenu>
   );

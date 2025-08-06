@@ -1,9 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
 import request from 'supertest';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { prisma } from '@/lib/prisma';
-import { app } from '@/server';
+import { app } from '@/server'; // This imports the express app without starting the server
 
 function extractCookies(rawCookies: string[] | string | undefined): string {
   if (!rawCookies) return '';
@@ -12,10 +11,6 @@ function extractCookies(rawCookies: string[] | string | undefined): string {
 }
 
 describe('Auth Routes', () => {
-  beforeEach(async () => {
-    await prisma.user.deleteMany(); // Reset database
-  });
-
   it('should register a user', async () => {
     const res = await request(app).post('/api/auth/register').send({
       email: 'test@test.dev',

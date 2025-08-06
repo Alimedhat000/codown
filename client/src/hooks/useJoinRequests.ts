@@ -1,0 +1,66 @@
+import { useCallback, useEffect, useState } from 'react';
+
+import { api } from '@/lib/api';
+import { CollaborationRequest } from '@/types/api';
+
+export const getJoinRequests = async (docId: string) => {
+  const res = await api.get(`/document/${docId}/requests`);
+  return res.data;
+};
+
+export const approveJoinRequest = async (docId: string, requestId: string) => {
+  const res = await api.post(
+    `/document/${docId}/requests/${requestId}/approve`,
+  );
+  return res.data;
+};
+
+export const rejectJoinRequest = async (docId: string, requestId: string) => {
+  const res = await api.delete(
+    `/document/${docId}/requests/${requestId}/reject`,
+  );
+  return res.data;
+};
+
+export function useJoinRequests(
+  docId?: string | null,
+  isCollaborator?: boolean,
+) {
+  const [requests, setRequests] = useState<CollaborationRequest[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchRequests = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getJoinRequests(docId!);
+      setRequests(data);
+    } catch (err) {
+      console.error('Failed to fetch join requests:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [docId]);
+
+  const approve = async (requestId: string) => {
+    await approveJoinRequest(docId!, requestId);
+    setRequests((prev) => prev.filter((r) => r.id !== requestId));
+  };
+
+  const reject = async (requestId: string) => {
+    await rejectJoinRequest(docId!, requestId);
+    setRequests((prev) => prev.filter((r) => r.id !== requestId));
+  };
+
+  useEffect(() => {
+    if (isCollaborator) return;
+    if (docId) fetchRequests();
+  }, [docId, isCollaborator, fetchRequests]);
+
+  return {
+    requests,
+    loading,
+    approve,
+    reject,
+    refetch: fetchRequests,
+  };
+}

@@ -12,6 +12,7 @@ export const getUser = asyncErrorWrapper(async (req: AuthenticatedRequest, res: 
       id: true,
       username: true,
       email: true,
+      fullName: true,
       createdAt: true,
       updatedAt: true,
     },

@@ -9,22 +9,26 @@ type DocumentGridCardProps = {
   document: Document;
   onDocumentUpdated: (updatedDocument: Document) => void;
   onDocumentDeleted: (documentId: string) => void;
+  isOwned?: boolean;
 };
 
 export function DocumentGridCard({
   document,
   onDocumentUpdated,
   onDocumentDeleted,
+  isOwned,
 }: DocumentGridCardProps) {
   return (
     <div className="bg-surface ring ring-surface-border hover:ring-muted-foreground group relative rounded-xl p-4 shadow hover:ring">
       {/* Dropdown Menu */}
-      <DocumentCardDropdown
-        document={document}
-        triggerClassname="absolute top-2 right-2 p-1 hover:bg-muted rounded-sm opacity-0 group-hover:opacity-100 transition-opacity"
-        onDocumentUpdated={onDocumentUpdated}
-        onDocumentDeleted={onDocumentDeleted}
-      />
+      {isOwned ? (
+        <DocumentCardDropdown
+          document={document}
+          triggerClassname="absolute top-2 right-2 p-1 hover:bg-muted rounded-sm opacity-0 group-hover:opacity-100 transition-opacity"
+          onDocumentUpdated={onDocumentUpdated}
+          onDocumentDeleted={onDocumentDeleted}
+        />
+      ) : null}
 
       {/* Content */}
       <div className="flex flex-col gap-2">

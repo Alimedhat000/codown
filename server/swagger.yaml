@@ -1,0 +1,979 @@
+openapi: 3.0.3
+info:
+  title: Document Collaboration API
+  description: A comprehensive API for document collaboration with user authentication and sharing capabilities
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: User authentication endpoints
+  - name: User
+    description: User management endpoints
+  - name: Documents
+    description: Document CRUD and collaboration endpoints
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: User unique identifier
+        username:
+          type: string
+          description: User's username
+        email:
+          type: string
+          format: email
+          description: User's email address
+        fullName:
+          type: string
+          description: User's full name
+        createdAt:
+          type: string
+          format: date-time
+          description: User creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: User last update timestamp
+
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Document unique identifier
+        title:
+          type: string
+          description: Document title
+        content:
+          type: string
+          description: Document content
+        isPublic:
+          type: boolean
+          description: Whether the document is public
+        allowSelfJoin:
+          type: boolean
+          description: Whether users can join as collaborators automatically
+        shareId:
+          type: string
+          description: Unique share identifier for the document
+        authorId:
+          type: string
+          format: uuid
+          description: ID of the document author
+        createdAt:
+          type: string
+          format: date-time
+          description: Document creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Document last update timestamp
+
+    Collaborator:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Collaborator record ID
+        documentId:
+          type: string
+          format: uuid
+          description: Document ID
+        userId:
+          type: string
+          format: uuid
+          description: User ID
+        permission:
+          type: string
+          enum: [view, edit]
+          description: Collaboration permission level
+        user:
+          $ref: '#/components/schemas/User'
+        createdAt:
+          type: string
+          format: date-time
+
+    CollaborationRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Request ID
+        documentId:
+          type: string
+          format: uuid
+          description: Document ID
+        userId:
+          type: string
+          format: uuid
+          description: Requesting user ID
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+          description: Request status
+        user:
+          $ref: '#/components/schemas/User'
+        createdAt:
+          type: string
+          format: date-time
+
+    AuthTokens:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            username:
+              type: string
+            email:
+              type: string
+              format: email
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        details:
+          type: object
+          description: Additional error details
+
+    ValidationError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            issues:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  path:
+                    type: array
+                    items:
+                      type: string
+                  message:
+                    type: string
+
+paths:
+  # Authentication Endpoints
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - username
+                - password
+                - fullName
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                username:
+                  type: string
+                  example: johndoe
+                password:
+                  type: string
+                  minLength: 8
+                  example: securepassword123
+                fullName:
+                  type: string
+                  example: John Doe
+      responses:
+        201:
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User Created
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        409:
+          description: Username or email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and return access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  example: securepassword123
+      responses:
+        200:
+          description: Login successful
+          headers:
+            Set-Cookie:
+              description: Refresh token cookie
+              schema:
+                type: string
+                example: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite=Strict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokens'
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        401:
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User logout
+      description: Logout user and clear tokens
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out successfully
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Generate new access token using refresh token
+      security:
+        - CookieAuth: []
+      responses:
+        200:
+          description: Token refreshed successfully
+          headers:
+            Set-Cookie:
+              description: New access token cookie
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokens'
+        401:
+          description: Invalid or missing refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # User Endpoints
+  /user:
+    get:
+      tags:
+        - User
+      summary: Get current user
+      description: Retrieve current authenticated user information
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  username:
+                    type: string
+                  email:
+                    type: string
+                    format: email
+                  createdAt:
+                    type: string
+                    format: date-time
+                  updatedAt:
+                    type: string
+                    format: date-time
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # Document Endpoints
+  /document:
+    post:
+      tags:
+        - Documents
+      summary: Create a new document
+      description: Create a new document
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+              properties:
+                title:
+                  type: string
+                  example: My New Document
+                content:
+                  type: string
+                  example: Document content here...
+                  default: ""
+                isPublic:
+                  type: boolean
+                  default: false
+      responses:
+        201:
+          description: Document created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      tags:
+        - Documents
+      summary: Get user's documents
+      description: Retrieve all documents created by the authenticated user
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Documents retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Document'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /document/{id}:
+    get:
+      tags:
+        - Documents
+      summary: Get a specific document
+      description: Retrieve a specific document by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Document retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      tags:
+        - Documents
+      summary: Update a document
+      description: Update an existing document
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Updated Document Title
+                content:
+                  type: string
+                  example: Updated document content...
+                isPublic:
+                  type: boolean
+      responses:
+        200:
+          description: Document updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Documents
+      summary: Delete a document
+      description: Delete an existing document
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        204:
+          description: Document deleted successfully
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /document/{id}/settings:
+    patch:
+      tags:
+        - Documents
+      summary: Update document settings
+      description: Update document collaboration settings (Owner only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                allowSelfJoin:
+                  type: boolean
+                  description: Allow users to join as collaborators automatically
+      responses:
+        200:
+          description: Settings updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    $ref: '#/components/schemas/Document'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: Forbidden - Owner only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /document/{id}/share-link:
+    get:
+      tags:
+        - Documents
+      summary: Get document share link
+      description: Generate a shareable link for the document (Owner only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+        - name: permission
+          in: query
+          required: false
+          description: Permission level for the share link
+          schema:
+            type: string
+            enum: [view, edit]
+            default: view
+      responses:
+        200:
+          description: Share link generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    example: https://example.com/document/share/abc123?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        400:
+          description: Invalid permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: Forbidden - Owner only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /document/share/{shareId}:
+    get:
+      tags:
+        - Documents
+      summary: Access shared document
+      description: Access a document via share link
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: shareId
+          in: path
+          required: true
+          description: Document share ID
+          schema:
+            type: string
+        - name: token
+          in: query
+          required: true
+          description: Share token for verification
+          schema:
+            type: string
+      responses:
+        200:
+          description: Document accessed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        202:
+          description: Collaboration request submitted, waiting for approval
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Request submitted. Waiting for approval.
+        400:
+          description: Missing or invalid token/shareId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        403:
+          description: Token mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Document not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /document/{id}/collaborators:
+    get:
+      tags:
+        - Documents
+      summary: Get document collaborators
+      description: Retrieve all collaborators for a document
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Collaborators retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Collaborator'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Documents
+      summary: Add collaborator
+      description: Add a new collaborator to the document (Owner only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - permission
+              properties:
+                userId:
+                  type: string
+                  format: uuid
+                  description: User ID to add as collaborator
+                permission:
+                  type: string
+                  enum: [view, edit]
+                  description: Permission level for the collaborator
+      responses:
+        200:
+          description: Collaborator added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collaborator'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /document/{id}/collaborators/{userId}:
+    delete:
+      tags:
+        - Documents
+      summary: Remove collaborator
+      description: Remove a collaborator from the document (Owner only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+        - name: userId
+          in: path
+          required: true
+          description: Collaborator user ID to remove
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Collaborator removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Removed
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /document/{id}/requests:
+    get:
+      tags:
+        - Documents
+      summary: Get collaboration requests
+      description: Retrieve pending collaboration requests for a document (Owner only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Collaboration requests retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CollaborationRequest'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /document/{id}/requests/{requestId}/approve:
+    post:
+      tags:
+        - Documents
+      summary: Approve collaboration request
+      description: Approve a pending collaboration request (Owner only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+        - name: requestId
+          in: path
+          required: true
+          description: Collaboration request ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Request approved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Approved
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /document/{id}/requests/{requestId}/reject:
+    delete:
+      tags:
+        - Documents
+      summary: Reject collaboration request
+      description: Reject a pending collaboration request (Owner only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Document ID
+          schema:
+            type: string
+            format: uuid
+        - name: requestId
+          in: path
+          required: true
+          description: Collaboration request ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Request rejected successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Rejected
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
