@@ -58,7 +58,7 @@ export function MarkdownPreview({
     >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="fixed bottom-4 right-4 z-50 px-4 py-2 bg-border rounded-md shadow-lg  hover:bg-border/80 transition">
+          <button className="fixed bottom-4 right-4 z-5 px-4 py-2 bg-border rounded-md shadow-lg  hover:bg-border/80 transition">
             <LuMenu />
           </button>
         </DropdownMenuTrigger>
