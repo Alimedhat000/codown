@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LuFileText as FileIcon, LuPin as PinIcon } from 'react-icons/lu';
+import {
+  LuFileText as FileIcon,
+  LuPin as PinIcon,
+  LuShare as ShareIcon,
+} from 'react-icons/lu';
 
 import { Document } from '@/types/api';
 
@@ -21,7 +25,8 @@ const sortOptions = [
 type SortValue = (typeof sortOptions)[number]['value'];
 
 type DashboardMainProps = {
-  documents: Document[];
+  ownedDocs: Document[];
+  collaboratedDocs: Document[];
   loading: boolean;
   setDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
 };
@@ -48,7 +53,8 @@ function sortDocuments(documents: Document[], sort: SortValue) {
 }
 
 export default function DashboardMain({
-  documents,
+  ownedDocs,
+  collaboratedDocs,
   loading,
   setDocuments,
 }: DashboardMainProps) {
@@ -66,13 +72,20 @@ export default function DashboardMain({
     return () => clearTimeout(timeout);
   }, [loading]);
 
-  const sortedDocs = useMemo(
-    () => sortDocuments(documents, sort),
-    [documents, sort],
+  const sortedOwned = useMemo(
+    () => sortDocuments(ownedDocs, sort),
+    [ownedDocs, sort],
+  );
+  const sortedCollaborated = useMemo(
+    () => sortDocuments(collaboratedDocs, sort),
+    [collaboratedDocs, sort],
   );
 
-  const pinned = sortedDocs.filter((doc) => doc.pinned);
-  const others = sortedDocs.filter((doc) => !doc.pinned);
+  const ownedPinned = sortedOwned.filter((doc) => doc.pinned);
+  const ownedOthers = sortedOwned.filter((doc) => !doc.pinned);
+
+  const collaboratedPinned = sortedCollaborated.filter((doc) => doc.pinned);
+  const collaboratedOthers = sortedCollaborated.filter((doc) => !doc.pinned);
 
   const handleDocumentUpdated = (updated: Document) => {
     setDocuments((docs) =>
@@ -106,32 +119,68 @@ export default function DashboardMain({
         </>
       ) : (
         <>
-          {pinned.length > 0 && (
+          {ownedDocs.length === 0 && collaboratedDocs.length === 0 && (
+            <h1 className="text-xl font-semibold text-muted-foreground">
+              It's empty in here — start by creating a new document!
+            </h1>
+          )}
+
+          {ownedPinned.length > 0 && (
             <DocumentSection
-              title="Pinned"
+              title="Your Pinned Notes"
               icon={<PinIcon size={20} />}
-              count={pinned.length}
+              count={ownedPinned.length}
             >
               <DocumentList
-                documents={pinned}
+                documents={ownedPinned}
                 view={view}
                 onDocumentUpdated={handleDocumentUpdated}
                 onDocumentDeleted={handleDocumentDeleted}
+                isOwned={true}
               />
             </DocumentSection>
           )}
-          <DocumentSection
-            title="Notes"
-            icon={<FileIcon size={20} />}
-            count={others.length}
-          >
-            <DocumentList
-              documents={others}
-              view={view}
-              onDocumentUpdated={handleDocumentUpdated}
-              onDocumentDeleted={handleDocumentDeleted}
-            />
-          </DocumentSection>
+          {ownedOthers.length > 0 && (
+            <DocumentSection
+              title="Your Notes"
+              icon={<FileIcon size={20} />}
+              count={ownedOthers.length}
+            >
+              <DocumentList
+                documents={ownedOthers}
+                view={view}
+                onDocumentUpdated={handleDocumentUpdated}
+                onDocumentDeleted={handleDocumentDeleted}
+                isOwned={true}
+              />
+            </DocumentSection>
+          )}
+          {collaboratedPinned.length > 0 && (
+            <DocumentSection
+              title="Shared Pinned Notes"
+              icon={<ShareIcon size={20} />}
+              count={collaboratedPinned.length}
+            >
+              <DocumentList
+                documents={collaboratedPinned}
+                view={view}
+                isOwned={false}
+              />
+            </DocumentSection>
+          )}
+          {collaboratedOthers.length > 0 && (
+            <DocumentSection
+              title="Shared Notes"
+              icon={<ShareIcon size={20} />}
+              count={collaboratedOthers.length}
+            >
+              <DocumentList
+                documents={collaboratedOthers}
+                view={view}
+                isOwned={false}
+              />
+            </DocumentSection>
+          )}
         </>
       )}
     </>

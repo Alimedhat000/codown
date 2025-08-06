@@ -32,5 +32,9 @@ export const paths = {
       path: 'doc/:id',
       getHref: (id: string) => `/app/doc/${id}`,
     },
+    share: {
+      path: 'doc/share/:shareid',
+      getHref: (shareid: string) => `/app/doc/share/${shareid}`,
+    },
   },
 } as const;

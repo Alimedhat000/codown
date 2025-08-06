@@ -17,12 +17,14 @@ export function DocumentMain({
   doc,
   setDoc,
   className,
+  isReadOnly,
 }: {
   docId: string | undefined;
   mode: EditorMode;
   doc: DocumentData | null;
   setDoc: (doc: DocumentData) => void;
   className?: string;
+  isReadOnly?: boolean;
 }) {
   const { text, ydoc, ytext, provider } = useCollab(docId);
   const editorScrollRef = useRef<HTMLDivElement>(null);
@@ -136,6 +138,7 @@ export function DocumentMain({
                 editorScrollRef={editorScrollRef}
                 onScroll={handleEditorScroll}
                 syncScroll={syncScroll}
+                isReadOnly={isReadOnly}
               />
             </Panel>
             {mode === 'both' && (

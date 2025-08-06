@@ -66,7 +66,8 @@ describe('Document Routes', () => {
 
     const res = await request(app).get('/api/document').set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(StatusCodes.OK);
-    expect(res.body).toHaveLength(1);
+    expect(res.body.owned).toHaveLength(1);
+    expect(res.body.collaborated).toHaveLength(0);
   });
 
   it('should get a specific document', async () => {
@@ -233,8 +234,10 @@ describe('Document Routes', () => {
 
     expect(addRes.status).toBe(StatusCodes.OK);
 
+    const collaboratorId = addRes.body.id;
+
     const removeRes = await request(app)
-      .delete(`/api/document/${doc.id}/collaborators/${newUser.id}`)
+      .delete(`/api/document/${doc.id}/collaborators/${collaboratorId}`)
       .set('Authorization', `Bearer ${token}`);
 
     expect(removeRes.status).toBe(StatusCodes.OK);

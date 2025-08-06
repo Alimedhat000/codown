@@ -9,12 +9,14 @@ type DocumentRowProps = {
   document: Document;
   onDocumentUpdated: (updatedDocument: Document) => void;
   onDocumentDeleted: (documentId: string) => void;
+  isOwned?: boolean;
 };
 
 export function DocumentRow({
   document,
   onDocumentUpdated,
   onDocumentDeleted,
+  isOwned,
 }: DocumentRowProps) {
   return (
     <div className="hover:bg-surface ring ring-surface-border hover:ring-muted-foreground flex items-center justify-between rounded-md px-4 py-3">
@@ -24,11 +26,13 @@ export function DocumentRow({
           {dateFormat(new Date(document.updatedAt))}
         </span>
       </div>
-      <DocumentCardDropdown
-        document={document}
-        onDocumentUpdated={onDocumentUpdated}
-        onDocumentDeleted={onDocumentDeleted}
-      />
+      {isOwned ? (
+        <DocumentCardDropdown
+          document={document}
+          onDocumentUpdated={onDocumentUpdated}
+          onDocumentDeleted={onDocumentDeleted}
+        />
+      ) : null}
     </div>
   );
 }

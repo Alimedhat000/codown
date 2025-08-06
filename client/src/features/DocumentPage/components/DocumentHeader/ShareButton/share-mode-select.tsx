@@ -13,11 +13,13 @@ const options = [
 
 export function ShareModeSelect({
   onChange,
+  value,
 }: {
-  onChange: (permission: 'view' | 'edit') => Promise<void>;
+  onChange: (permission: 'view' | 'edit') => void;
+  value: 'view' | 'edit';
 }) {
   return (
-    <RadixSelect.Root defaultValue="view" onValueChange={onChange}>
+    <RadixSelect.Root value={value} onValueChange={onChange}>
       <RadixSelect.Trigger className="flex w-full items-center justify-between rounded-md border border-border bg-popover px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-border">
         <RadixSelect.Value placeholder="Select mode" />
         <RadixSelect.Icon className="ml-2 text-muted-foreground">

@@ -63,6 +63,7 @@ model CollaborationRequest {
   document   Document @relation(fields: [documentId], references: [id])
   documentId String
   status     String   @default("pending") // pending | accepted | rejected
+  permission String   @default("edit") // "edit" or "view"
   createdAt  DateTime @default(now())
 
   @@unique([documentId, userId])

@@ -19,6 +19,7 @@ import { cn } from '@/utils/cn';
 interface CollaboratorsDropdownProps {
   docId?: string;
   className?: string;
+  isCollaborator?: boolean;
 }
 
 export const CollaboratorsDropdown = ({
@@ -36,12 +37,7 @@ export const CollaboratorsDropdown = ({
   };
 
   return (
-    <DropdownMenu
-      open={open}
-      onOpenChange={() => {
-        setOpen(!open);
-      }}
-    >
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild className={className}>
         <Button variant="ghost" className="gap-1 flex px-2 ">
           <GroupIcon className="h-4 w-4" />
@@ -65,7 +61,9 @@ export const CollaboratorsDropdown = ({
                 key={collaborator.id}
                 className="flex items-center justify-between px-2 py-1 rounded hover:bg-muted gap-3"
               >
-                <span className="text-sm truncate">{collaborator.email}</span>
+                <span className="text-sm truncate">
+                  {collaborator.user.username}
+                </span>
                 <Button
                   size="icon"
                   variant="destructive"

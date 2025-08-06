@@ -15,6 +15,8 @@ export interface DocumentHeaderProps {
   onCreateDocument?: (title: string) => Promise<void>;
   className?: string;
   docId?: string;
+  isReadOnly?: boolean;
+  isCollaborator?: boolean;
 }
 
 export const DocumentHeader: React.FC<DocumentHeaderProps> = ({
@@ -27,6 +29,7 @@ export const DocumentHeader: React.FC<DocumentHeaderProps> = ({
   documentTitle,
   onCreateDocument,
   className,
+  isCollaborator,
 }) => {
   return (
     <div
@@ -45,6 +48,7 @@ export const DocumentHeader: React.FC<DocumentHeaderProps> = ({
         docId={docId}
         documentTitle={documentTitle}
         onCreateDocument={onCreateDocument}
+        isCollaborator={isCollaborator}
       />
     </div>
   );

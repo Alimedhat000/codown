@@ -8,14 +8,34 @@ export function useDocument(id?: string) {
   const [editedDoc, setEditedDoc] = useState<DocumentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [access, setAccess] = useState<{
+    isOwner: boolean;
+    isCollaborator: boolean;
+    permission: 'view' | 'edit';
+  } | null>(null);
 
   useEffect(() => {
-    if (!id) return;
-    api.get(`/document/${id}`).then((res) => {
-      setDoc(res.data);
-      setEditedDoc(res.data);
+    if (!id) {
       setLoading(false);
-    });
+      return;
+    }
+
+    setLoading(true);
+
+    api
+      .get(`/document/${id}`)
+      .then((res) => {
+        setDoc(res.data);
+        setEditedDoc(res.data);
+        setAccess(res.data.access);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch document:', err);
+        setAccess(null); // ensure we don’t reuse old access
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [id]);
 
   const handleSave = useCallback(async () => {
@@ -23,7 +43,6 @@ export function useDocument(id?: string) {
     try {
       setSaving(true);
       await api.put(`/document/${id}`, editedDoc);
-      // console.log(editedDoc);
       setDoc(editedDoc);
     } catch (err) {
       console.error('Failed to save document:', err);
@@ -39,5 +58,6 @@ export function useDocument(id?: string) {
     loading,
     saving,
     handleSave,
+    access,
   };
 }

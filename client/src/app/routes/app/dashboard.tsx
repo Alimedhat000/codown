@@ -6,14 +6,16 @@ import { api } from '@/lib/api';
 import { Document } from '@/types/api';
 
 export default function Dashboard() {
-  const [documents, setDocuments] = useState<Document[]>([]);
+  const [ownedDocs, setOwnedDocs] = useState<Document[]>([]);
+  const [collaboratedDocs, setCollaboratedDocs] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchDocs = async () => {
     try {
       const res = await api.get('/document');
       // console.log(res);
-      setDocuments(res.data);
+      setOwnedDocs(res.data.owned || []);
+      setCollaboratedDocs(res.data.collaborated || []);
     } catch (err) {
       console.error('Failed to fetch documents', err);
     } finally {
@@ -28,9 +30,10 @@ export default function Dashboard() {
   return (
     <DashboardLayout title="Dashboard">
       <DashboardMain
-        documents={documents}
+        ownedDocs={ownedDocs}
+        collaboratedDocs={collaboratedDocs}
         loading={loading}
-        setDocuments={setDocuments}
+        setDocuments={setOwnedDocs}
       />
     </DashboardLayout>
   );

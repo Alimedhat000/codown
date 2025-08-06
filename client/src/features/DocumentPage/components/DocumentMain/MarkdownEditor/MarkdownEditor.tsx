@@ -7,6 +7,10 @@ import { useEffect, useRef, useState } from 'react';
 import { yCollab } from 'y-codemirror.next';
 import * as Y from 'yjs';
 
+import { useAuth } from '@/context/auth';
+import { cn } from '@/utils/cn';
+import { generateUserColor } from '@/utils/generateUserColor';
+
 import { editorExtensions } from './EditorExtensions';
 import { MyTheme } from './EditorTheme';
 import { markdownCommands } from './KeyMapExtension';
@@ -29,13 +33,17 @@ export function MarkdownEditor({
   editorScrollRef,
   onScroll,
   syncScroll,
+  isReadOnly,
 }: {
   ytext: Y.Text | null;
   provider: any;
   editorScrollRef?: React.RefObject<HTMLDivElement | null>;
   onScroll: () => void;
   syncScroll?: boolean;
+  isReadOnly?: boolean;
 }) {
+  const { user } = useAuth(); // Get current user
+
   const [spellcheck, setSpellcheck] = useState(false);
   const [useTabs, setUseTabs] = useState(true);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -47,6 +55,17 @@ export function MarkdownEditor({
     // Clean up previous editor if remounting
     if (viewRef.current) {
       viewRef.current.destroy();
+    }
+
+    if (user && provider.awareness) {
+      provider.awareness.setLocalStateField('user', {
+        name: user.username,
+        id: user.id,
+        email: user.email,
+        avatar: user.avatarUrl,
+        // You can add a color for the user's cursor/selection
+        color: generateUserColor(user.id),
+      });
     }
 
     // Create the collaboration extension
@@ -67,6 +86,9 @@ export function MarkdownEditor({
         indentation,
         markdownKeymap, // Add the markdown shortcuts
         ...spellcheckExtensions,
+        isReadOnly
+          ? EditorView.editable.of(false)
+          : EditorView.editable.of(true), // 👈 add this
       ],
     });
 
@@ -84,7 +106,7 @@ export function MarkdownEditor({
     return () => {
       view.destroy();
     };
-  }, [ytext, provider, useTabs, spellcheck, editorScrollRef]); // Add spellcheck to dependencies
+  }, [ytext, provider, useTabs, spellcheck, editorScrollRef, isReadOnly, user]); // Add spellcheck to dependencies
 
   useEffect(() => {
     if (!editorRef.current) return;
@@ -101,11 +123,13 @@ export function MarkdownEditor({
   }, [syncScroll, onScroll]);
 
   return (
-    <div className="relative w-full flex-1 py-10 ">
-      <MarkdownToolbar
-        view={viewRef.current}
-        className="absolute top-0 left-0 w-full z-9"
-      />
+    <div className={cn('relative w-full flex-1', { 'py-10': !isReadOnly })}>
+      {!isReadOnly && (
+        <MarkdownToolbar
+          view={viewRef.current}
+          className="absolute top-0 left-0 w-full z-9"
+        />
+      )}
 
       <div
         className="custom-scrollbar h-full overflow-y-scroll"

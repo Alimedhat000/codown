@@ -3,6 +3,10 @@ export type User = {
   username: string;
   email: string;
   avatarUrl?: string;
+  fullName?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type Document = {
@@ -30,7 +34,18 @@ export type DocumentData = {
 
 export interface Collaborator {
   id: string;
-  name: string;
-  email: string;
-  avatarUrl?: string;
+  documentId: string;
+  userId: string;
+  permission: 'view' | 'edit';
+  user: User;
 }
+
+export type CollaborationRequest = {
+  id: string;
+  userId: string;
+  documentId: string;
+  status: 'pending' | 'approved' | 'rejected';
+  permission: 'view' | 'edit';
+  createdAt: string;
+  user: User;
+};

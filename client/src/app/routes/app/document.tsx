@@ -1,23 +1,34 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { DocumentLayout } from '@/components/layouts/DocumentLayout';
 import { Spinner } from '@/components/ui/Spinner';
+import { paths } from '@/config/paths';
 import { DocumentHeader } from '@/features/DocumentPage/components/DocumentHeader';
 import { DocumentMain } from '@/features/DocumentPage/components/DocumentMain';
-import { useAutoSave } from '@/hooks/useAutoSave';
 import { useDocument } from '@/hooks/useDocument';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 export default function DocumentPage() {
   const { id } = useParams();
-  const { doc, editedDoc, setEditedDoc, loading, handleSave } = useDocument(id);
+  const { doc, editedDoc, setEditedDoc, loading, /*handleSave,*/ access } =
+    useDocument(id);
+  const navigate = useNavigate();
 
-  useAutoSave(handleSave, editedDoc!, 5000);
+  const isReadOnly = access?.permission === 'view';
+  const isCollaborator = access?.isCollaborator;
 
   const [mode, setMode] = useState<EditorMode>('edit');
 
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (!access || (!access.isOwner && !access.isCollaborator)) {
+      navigate(paths.app.dashboard.getHref());
+    }
+  }, [access, loading, navigate]);
 
   useEffect(() => {
     if (isSmallScreen) setMode('edit');
@@ -32,6 +43,8 @@ export default function DocumentPage() {
           documentTitle={doc?.title}
           docId={id}
           className="fixed top-0 left-0 right-0 z-10"
+          isReadOnly={isReadOnly}
+          isCollaborator={isCollaborator}
         />
         {loading ? (
           <Spinner />
@@ -42,6 +55,7 @@ export default function DocumentPage() {
             setDoc={setEditedDoc}
             docId={id}
             className=" mt-[2.86rem] md:mt-[3.375rem]"
+            isReadOnly={isReadOnly}
           />
         )}
       </DocumentLayout>

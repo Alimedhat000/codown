@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { Response } from 'express';
 import asyncErrorWrapper from 'express-async-handler';
 import { StatusCodes } from 'http-status-codes';
@@ -70,9 +71,24 @@ export const getDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: R
   try {
     const doc = await prisma.document.findFirst({
       where: { id: documentId },
+      include: {
+        Collaborator: {
+          where: { userId },
+          select: {
+            userId: true,
+            permission: true, // assuming you store 'view', 'edit', etc.
+          },
+        },
+      },
     });
 
-    if (!doc || doc.authorId !== userId) {
+    const collaboratorEntry = doc?.Collaborator[0]; // because we filtered by userId
+
+    const isOwner = doc?.authorId === userId;
+    const isCollaborator = doc?.Collaborator.some(c => c.userId === userId);
+    const permissionFromDB = isOwner ? 'owner' : (collaboratorEntry?.permission ?? 'none');
+
+    if (!doc || (!isOwner && !isCollaborator)) {
       logger.warn('Document access denied', {
         action: 'GET_DOCUMENT_DENIED',
         ...clientInfo,
@@ -94,7 +110,14 @@ export const getDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: R
       title: doc.title,
     });
 
-    res.status(StatusCodes.OK).json(doc);
+    res.status(StatusCodes.OK).json({
+      ...doc,
+      access: {
+        isOwner,
+        isCollaborator: isCollaborator,
+        permission: permissionFromDB,
+      },
+    });
   } catch (error) {
     logger.error('Document access failed', {
       action: 'GET_DOCUMENT_ERROR',
@@ -120,8 +143,22 @@ export const getDocs = asyncErrorWrapper(async (req: AuthenticatedRequest, res: 
   });
 
   try {
-    const docs = await prisma.document.findMany({
+    const ownedDocs = await prisma.document.findMany({
       where: { authorId: userId },
+      orderBy: { updatedAt: 'desc' },
+    });
+
+    const collaboratedDocs = await prisma.document.findMany({
+      where: {
+        Collaborator: {
+          some: {
+            userId,
+          },
+        },
+        NOT: {
+          authorId: userId, // exclude owned docs
+        },
+      },
       orderBy: { updatedAt: 'desc' },
     });
 
@@ -129,10 +166,14 @@ export const getDocs = asyncErrorWrapper(async (req: AuthenticatedRequest, res: 
       action: 'GET_DOCUMENTS_SUCCESS',
       ...clientInfo,
       userId,
-      documentCount: docs.length,
+      ownedCount: ownedDocs.length,
+      collaboratedCount: collaboratedDocs.length,
     });
 
-    res.status(StatusCodes.OK).json(docs);
+    res.status(StatusCodes.OK).json({
+      owned: ownedDocs,
+      collaborated: collaboratedDocs,
+    });
   } catch (error) {
     logger.error('Documents list retrieval failed', {
       action: 'GET_DOCUMENTS_ERROR',
@@ -152,30 +193,34 @@ export const updateDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
   const documentId = req.params.id;
   const { title, content, isPublic } = req.body;
 
-  logger.info('Document update attempt', {
-    action: 'UPDATE_DOCUMENT_ATTEMPT',
-    ...clientInfo,
-    userId,
-    documentId,
-    title,
-    isPublic,
-    contentLength: content?.length,
-  });
+  // logger.info('Document update attempt', {
+  //   action: 'UPDATE_DOCUMENT_ATTEMPT',
+  //   ...clientInfo,
+  //   userId,
+  //   documentId,
+  //   title,
+  //   isPublic,
+  //   contentLength: content?.length,
+  // });
 
   try {
     const doc = await prisma.document.findFirst({
       where: { id: documentId },
+      include: { Collaborator: true },
     });
 
-    if (!doc || doc.authorId !== userId) {
-      logger.warn('Document update denied', {
-        action: 'UPDATE_DOCUMENT_DENIED',
-        ...clientInfo,
-        userId,
-        documentId,
-        documentExists: !!doc,
-        isOwner: doc?.authorId === userId,
-      });
+    const isOwner = doc?.authorId === userId;
+    const isEditor = doc?.Collaborator.some(c => c.userId === userId && c.permission === 'edit');
+
+    if (!doc || (!isOwner && !isEditor)) {
+      // logger.warn('Document update denied', {
+      //   action: 'UPDATE_DOCUMENT_DENIED',
+      //   ...clientInfo,
+      //   userId,
+      //   documentId,
+      //   documentExists: !!doc,
+      //   isOwner: doc?.authorId === userId,
+      // });
 
       res.status(StatusCodes.NOT_FOUND).json({ error: 'Document not found' });
       return;
@@ -186,14 +231,14 @@ export const updateDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
       data: { title, content, isPublic },
     });
 
-    logger.info('Document updated successfully', {
-      action: 'UPDATE_DOCUMENT_SUCCESS',
-      ...clientInfo,
-      userId,
-      documentId,
-      title: updatedDoc.title,
-      isPublic: updatedDoc.isPublic,
-    });
+    // logger.info('Document updated successfully', {
+    //   action: 'UPDATE_DOCUMENT_SUCCESS',
+    //   ...clientInfo,
+    //   userId,
+    //   documentId,
+    //   title: updatedDoc.title,
+    //   isPublic: updatedDoc.isPublic,
+    // });
 
     res.status(StatusCodes.OK).json(updatedDoc);
   } catch (error) {
@@ -370,6 +415,7 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
   let decoded: { shareId: string; permission: 'view' | 'edit' };
   try {
     decoded = verifyShareToken(token);
+    console.log(chalk.bold.red('DECODED'), decoded);
   } catch (error) {
     logger.warn('Shared document access failed - token verification failed', {
       action: 'ACCESS_SHARED_DOCUMENT_TOKEN_VERIFICATION_FAILED',
@@ -399,7 +445,15 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
   try {
     const doc = await prisma.document.findUnique({
       where: { shareId },
-      include: { Collaborator: true },
+      include: {
+        Collaborator: {
+          where: { userId },
+          select: {
+            userId: true,
+            permission: true, // assuming you store 'view', 'edit', etc.
+          },
+        },
+      },
     });
 
     if (!doc) {
@@ -414,9 +468,13 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
       return;
     }
 
-    const isAlreadyCollaborator = doc.Collaborator.some(c => c.userId === userId);
+    const collaboratorEntry = doc?.Collaborator[0]; // because we filtered by userId
 
-    if (isAlreadyCollaborator) {
+    const isOwner = doc?.authorId === userId;
+    const isCollaborator = doc?.Collaborator.some(c => c.userId === userId);
+    const permissionFromDB = isOwner ? 'owner' : (collaboratorEntry?.permission ?? 'none');
+
+    if (isCollaborator || isOwner) {
       logger.info('Shared document accessed - existing collaborator', {
         action: 'ACCESS_SHARED_DOCUMENT_EXISTING_COLLABORATOR',
         ...clientInfo,
@@ -426,7 +484,14 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
         permission: decoded.permission,
       });
 
-      res.status(StatusCodes.OK).json(doc);
+      res.status(StatusCodes.OK).json({
+        ...doc,
+        access: {
+          isOwner,
+          isCollaborator: isCollaborator,
+          permission: permissionFromDB,
+        },
+      });
       return;
     }
 
@@ -448,7 +513,14 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
         permission: decoded.permission,
       });
 
-      res.status(StatusCodes.OK).json(doc);
+      res.status(StatusCodes.OK).json({
+        ...doc,
+        access: {
+          isOwner,
+          isCollaborator: isCollaborator,
+          permission: permissionFromDB,
+        },
+      });
     } else {
       const existingRequest = await prisma.collaborationRequest.findFirst({
         where: { documentId: doc.id, userId },
@@ -456,7 +528,11 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
 
       if (!existingRequest) {
         await prisma.collaborationRequest.create({
-          data: { documentId: doc.id, userId },
+          data: {
+            documentId: doc.id,
+            userId,
+            permission: decoded.permission, // "edit" or "view"
+          },
         });
 
         logger.info('Collaboration request created', {
@@ -539,7 +615,7 @@ export const getShareLink = asyncErrorWrapper(async (req: AuthenticatedRequest, 
     }
 
     const token = generateShareToken(doc.shareId, permission as 'view' | 'edit');
-    const url = `${process.env.CLIENT_BASE}/document/share/${doc.shareId}?token=${token}`;
+    const url = `${process.env.CLIENT_BASE}/app/doc/share/${doc.shareId}?token=${token}`;
 
     logger.info('Share link generated successfully', {
       action: 'GENERATE_SHARE_LINK_SUCCESS',
@@ -625,55 +701,74 @@ export const getRequests = asyncErrorWrapper(async (req: AuthenticatedRequest, r
 
 export const approveRequest = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
   const clientInfo = getClientInfo(req);
-  const { id, requestId } = req.params;
+  const { id: documentId, requestId } = req.params;
   const userId = req.user?.userId;
 
   logger.info('Collaboration request approval attempt', {
     action: 'APPROVE_COLLABORATION_REQUEST_ATTEMPT',
     ...clientInfo,
     userId,
-    documentId: id,
+    documentId,
     requestId,
   });
 
   try {
-    const doc = await prisma.document.findUnique({ where: { id } });
+    const doc = await prisma.document.findUnique({ where: { id: documentId } });
 
     if (!doc || doc.authorId !== userId) {
       logger.warn('Collaboration request approval failed - unauthorized', {
         action: 'APPROVE_COLLABORATION_REQUEST_UNAUTHORIZED',
         ...clientInfo,
         userId,
-        documentId: id,
+        documentId,
         requestId,
         documentExists: !!doc,
         isOwner: doc?.authorId === userId,
       });
 
       res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Unauthorized' });
+
       return;
     }
 
-    await prisma.collaborationRequest.update({
+    // Get the request to extract the requester user ID
+    const request = await prisma.collaborationRequest.update({
       where: { id: requestId },
-      data: { status: 'rejected' },
+      data: { status: 'approved' },
     });
 
-    logger.info('Collaboration request rejected successfully', {
-      action: 'REJECT_COLLABORATION_REQUEST_SUCCESS',
+    // Add the requester as a collaborator
+    await prisma.collaborator.upsert({
+      where: {
+        documentId_userId: {
+          documentId,
+          userId: request.userId,
+        },
+      },
+      update: {}, // already exists? do nothing
+      create: {
+        documentId,
+        userId: request.userId,
+        permission: request.permission,
+      },
+    });
+
+    logger.info('Collaboration request approved and collaborator added', {
+      action: 'APPROVE_COLLABORATION_REQUEST_SUCCESS',
       ...clientInfo,
       ownerId: userId,
-      documentId: id,
+      documentId,
       requestId,
     });
 
-    res.json({ message: 'Rejected' });
+    res.json({ message: 'Approved and collaborator added' });
+    return;
   } catch (error) {
-    logger.error('Collaboration request rejection failed', {
-      action: 'REJECT_COLLABORATION_REQUEST_ERROR',
+    logger.error('Collaboration request approval failed', {
+      action: 'APPROVE_COLLABORATION_REQUEST_ERROR',
       ...clientInfo,
       userId,
-      documentId: id,
+      documentId,
       requestId,
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
@@ -843,9 +938,27 @@ export const removeCollaborator = asyncErrorWrapper(async (req: AuthenticatedReq
       return;
     }
 
-    const result = await prisma.collaborator.deleteMany({
-      where: { documentId: id, userId: collaboratorId },
+    const collaborator = await prisma.collaborator.findUnique({
+      where: { id: collaboratorId },
+      select: { userId: true, documentId: true },
     });
+
+    if (!collaborator) {
+      throw new Error('Collaborator not found');
+    }
+
+    const result = await prisma.collaborator.deleteMany({
+      where: { documentId: id, id: collaboratorId },
+    });
+
+    await prisma.collaborationRequest.deleteMany({
+      where: {
+        userId: collaborator.userId,
+        documentId: collaborator.documentId,
+      },
+    });
+
+    console.log(chalk.red('HERE'), result, collaboratorId, id);
 
     logger.info('Collaborator removed successfully', {
       action: 'REMOVE_COLLABORATOR_SUCCESS',
