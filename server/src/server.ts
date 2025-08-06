@@ -12,6 +12,7 @@ import { errorMiddleware } from '@/middlewares/error.middleware';
 import { morganFile, morganWinston } from '@/middlewares/logging.middleware';
 import { router } from '@/routers';
 
+import { setupSwagger } from './config/swagger';
 import socketServer from './sockets/ws-server';
 
 export const app = express();
@@ -41,6 +42,7 @@ if (process.env.NODE_ENV !== 'test') {
 // Serving static files
 app.use(express.static(path.join(path.resolve(), 'public')));
 
+setupSwagger(app);
 // Routes
 app.use('/api', router);
 
