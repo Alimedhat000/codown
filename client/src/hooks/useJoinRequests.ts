@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { api } from '@/lib/api';
 import { CollaborationRequest } from '@/types/api';
@@ -22,11 +22,14 @@ export const rejectJoinRequest = async (docId: string, requestId: string) => {
   return res.data;
 };
 
-export function useJoinRequests(docId?: string | null) {
+export function useJoinRequests(
+  docId?: string | null,
+  isCollaborator?: boolean,
+) {
   const [requests, setRequests] = useState<CollaborationRequest[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getJoinRequests(docId!);
@@ -36,7 +39,7 @@ export function useJoinRequests(docId?: string | null) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [docId]);
 
   const approve = async (requestId: string) => {
     await approveJoinRequest(docId!, requestId);
@@ -49,8 +52,9 @@ export function useJoinRequests(docId?: string | null) {
   };
 
   useEffect(() => {
+    if (isCollaborator) return;
     if (docId) fetchRequests();
-  }, [docId]);
+  }, [docId, isCollaborator, fetchRequests]);
 
   return {
     requests,

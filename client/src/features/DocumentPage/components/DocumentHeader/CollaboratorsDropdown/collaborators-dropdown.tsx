@@ -25,11 +25,11 @@ interface CollaboratorsDropdownProps {
 export const CollaboratorsDropdown = ({
   docId,
   className,
+  isCollaborator,
 }: CollaboratorsDropdownProps) => {
-  const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
   const { collaborators, loading, addCollaborator, removeCollaborator } =
-    useCollaborators(docId, open);
+    useCollaborators(docId, isCollaborator);
 
   const _handleAdd = async () => {
     await addCollaborator(email);
@@ -37,7 +37,7 @@ export const CollaboratorsDropdown = ({
   };
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild className={className}>
         <Button variant="ghost" className="gap-1 flex px-2 ">
           <GroupIcon className="h-4 w-4" />

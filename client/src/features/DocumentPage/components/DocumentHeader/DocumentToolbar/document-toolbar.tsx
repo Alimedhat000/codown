@@ -48,7 +48,12 @@ export const DocumentToolbar = ({
       </div>
 
       <div className="order-3 md:order-4 flex items-center gap-2">
-        {!isCollaborator && <CollaboratorsDropdown docId={docId} />}
+        {!isCollaborator && (
+          <CollaboratorsDropdown
+            docId={docId}
+            isCollaborator={isCollaborator}
+          />
+        )}
         {username && logout && (
           <UserMenu
             username={username}
@@ -61,7 +66,7 @@ export const DocumentToolbar = ({
       </div>
       {!isCollaborator ? (
         <div className="order-4 md:order-5 flex items-center gap-2">
-          <ShareButton docId={docId} />
+          <ShareButton docId={docId} isCollaborator={isCollaborator} />
           <MoreOptionsDropdown />
         </div>
       ) : null}

@@ -19,11 +19,10 @@ import { ShareModeSelect } from './share-mode-select';
 type Props = {
   className?: string;
   docId?: string;
+  isCollaborator?: boolean;
 };
 
-export const ShareButton = ({ className, docId }: Props) => {
-  const [open, setOpen] = useState(false);
-
+export const ShareButton = ({ className, docId, isCollaborator }: Props) => {
   const [permission, setPermission] = useState<'view' | 'edit'>('view');
 
   const {
@@ -31,14 +30,14 @@ export const ShareButton = ({ className, docId }: Props) => {
     loading: requestsLoading,
     approve,
     reject,
-  } = useJoinRequests(open ? docId! : null);
+  } = useJoinRequests(docId!, isCollaborator);
 
   const {
     shareLink,
     loading: linkLoading,
     error,
     refresh,
-  } = useShareLink(open ? docId : undefined, permission);
+  } = useShareLink(docId, permission, isCollaborator);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(shareLink);
@@ -52,7 +51,7 @@ export const ShareButton = ({ className, docId }: Props) => {
   };
 
   return (
-    <DropdownMenu onOpenChange={setOpen}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild className={className}>
         <Button size="sm" className="md:space-x-2">
           <ShareIcon className="block" />

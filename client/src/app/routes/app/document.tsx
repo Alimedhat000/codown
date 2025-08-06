@@ -34,6 +34,8 @@ export default function DocumentPage() {
     if (isSmallScreen) setMode('edit');
   }, [isSmallScreen]);
 
+  if (loading) return;
+
   return (
     <>
       <DocumentLayout title={doc?.title || 'Document'}>
