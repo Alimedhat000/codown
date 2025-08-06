@@ -27,3 +27,10 @@ export type DocumentData = {
   authorId: string;
   versionCount?: string;
 };
+
+export interface Collaborator {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+}

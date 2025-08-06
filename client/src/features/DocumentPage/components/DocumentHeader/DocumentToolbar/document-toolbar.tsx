@@ -16,8 +16,8 @@ interface DocumentToolbarProps {
   avatarUrl?: string;
   logout?: () => void;
   documentTitle?: string;
-  collaborators: Array<{ id: string; name: string; avatarUrl?: string }>;
   onCreateDocument?: (title: string) => Promise<void>;
+  docId?: string;
 }
 
 export const DocumentToolbar = ({
@@ -26,8 +26,8 @@ export const DocumentToolbar = ({
   username,
   avatarUrl,
   logout,
+  docId,
   documentTitle,
-  collaborators,
   onCreateDocument,
 }: DocumentToolbarProps) => {
   return (
@@ -48,7 +48,7 @@ export const DocumentToolbar = ({
       </div>
 
       <div className="order-3 md:order-4 flex items-center gap-2">
-        <CollaboratorsDropdown collaborators={collaborators} />
+        <CollaboratorsDropdown docId={docId} />
         {username && logout && (
           <UserMenu
             username={username}
@@ -61,7 +61,7 @@ export const DocumentToolbar = ({
       </div>
 
       <div className="order-4 md:order-5 flex items-center gap-2">
-        <ShareButton />
+        <ShareButton docId={docId} />
         <MoreOptionsDropdown />
       </div>
     </div>
