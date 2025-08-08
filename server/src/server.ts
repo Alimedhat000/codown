@@ -2,7 +2,7 @@ import '@/config/env.config';
 
 import chalk from 'chalk';
 import cookieParser from 'cookie-parser';
-// import cors from 'cors';
+import cors from 'cors';
 import express from 'express';
 import expressWebsockets from 'express-ws';
 import helmet from 'helmet';
@@ -23,13 +23,21 @@ app.use(helmet());
 // Json parser
 app.use(express.json());
 
+const allowedOrigins = ['https://codown.vercel.app', 'http://localhost:5173'];
+
 // Cors middleware
-// app.use(
-//   cors({
-//     origin: process.env.CLIENT_BASE, // your frontend origin
-//     credentials: true, // allow cookies
-//   })
-// );
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // Cookie parser
 app.use(cookieParser());
