@@ -2,7 +2,7 @@ import '@/config/env.config';
 
 import chalk from 'chalk';
 import cookieParser from 'cookie-parser';
-import cors from 'cors';
+// import cors from 'cors';
 import express from 'express';
 import expressWebsockets from 'express-ws';
 import helmet from 'helmet';
@@ -24,12 +24,12 @@ app.use(helmet());
 app.use(express.json());
 
 // Cors middleware
-app.use(
-  cors({
-    origin: process.env.CLIENT_BASE, // your frontend origin
-    credentials: true, // allow cookies
-  })
-);
+// app.use(
+//   cors({
+//     origin: process.env.CLIENT_BASE, // your frontend origin
+//     credentials: true, // allow cookies
+//   })
+// );
 
 // Cookie parser
 app.use(cookieParser());
