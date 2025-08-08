@@ -177,10 +177,10 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
     });
 
     res.cookie('refreshToken', refreshToken, {
-      httpOnly: true, // Ensure the cookie cannot be accessed via JavaScript (security against XSS attacks)
-      maxAge: 24 * 60 * 60 * 1000, // 24hrs
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: 'none', // ✅ allow cross-site cookies
+      secure: true, // ✅ must be secure for SameSite=None
     });
 
     res.status(StatusCodes.OK).json({
@@ -320,8 +320,8 @@ export const refreshToken = asyncErrorWrapper(async (req: Request, res: Response
     res.cookie('accessToken', newAccessToken, {
       httpOnly: true,
       maxAge: 15 * 60 * 1000,
-      sameSite: 'strict',
-      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none', // ✅
+      secure: true, // ✅
     });
 
     res.status(StatusCodes.OK).json({
