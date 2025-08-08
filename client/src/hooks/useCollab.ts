@@ -2,6 +2,8 @@ import { HocuspocusProvider } from '@hocuspocus/provider';
 import { useEffect, useRef, useState } from 'react';
 import * as Y from 'yjs';
 
+import { env } from '@/config/env';
+
 export function useCollab(docId: string | undefined) {
   const [text, setText] = useState('');
   const ydocRef = useRef<Y.Doc | null>(null);
@@ -13,7 +15,7 @@ export function useCollab(docId: string | undefined) {
 
     const ydoc = new Y.Doc();
     const provider = new HocuspocusProvider({
-      url: 'ws://localhost:5002', // Hocuspocus server URL
+      url: env.Socket_URL, // Hocuspocus server URL
       name: docId, // Room/document ID
       document: ydoc,
     });
