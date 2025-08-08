@@ -1,9 +1,9 @@
 import { Logger } from '@hocuspocus/extension-logger';
-import { Server } from '@hocuspocus/server';
+import { Hocuspocus } from '@hocuspocus/server';
 
 import { dbPersistence } from '@/lib/dbPersistence';
 
-const server = new Server({
+const server = new Hocuspocus({
   // port: 5002,
   quiet: true,
   extensions: [dbPersistence, new Logger()],

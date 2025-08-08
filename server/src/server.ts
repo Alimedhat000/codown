@@ -4,8 +4,8 @@ import chalk from 'chalk';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
+import expressWebsockets from 'express-ws';
 import helmet from 'helmet';
-import http from 'http';
 import path from 'path';
 
 import { errorMiddleware } from '@/middlewares/error.middleware';
@@ -15,7 +15,7 @@ import { router } from '@/routers';
 import { setupSwagger } from './config/swagger';
 import socketServer from './sockets/ws-server';
 
-export const app = express();
+export const { app } = expressWebsockets(express());
 
 // Helmet => HTTP Security Headers.
 app.use(helmet());
@@ -50,15 +50,19 @@ app.use('/api', router);
 app.use(errorMiddleware);
 
 if (process.env.NODE_ENV !== 'test') {
-  const server = http.createServer(app);
+  // const server = http.createServer(app);
 
-  socketServer.listen(5002, () => {
-    console.log(
-      chalk.bold.green('✓ Hocuspocus server running on ') + chalk.bold.underline.magenta('ws://localhost:5002')
-    );
+  // socketServer.listen(Number(process.env.PORT), () => {
+  //   console.log(
+  //     chalk.bold.green('✓ Hocuspocus server running on ') + chalk.bold.underline.magenta('ws://localhost:5002')
+  //   );
+  // });
+
+  app.ws('/collaboration', (websocket, request) => {
+    socketServer.handleConnection(websocket, request);
   });
 
-  server.listen(process.env.PORT, () => {
+  app.listen(process.env.PORT, () => {
     console.log(
       chalk.green('✓'),
       chalk.bold.cyan('API server running on ') + chalk.bold.underline.magenta(`http://localhost:${process.env.PORT}`)
