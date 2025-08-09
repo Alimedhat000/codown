@@ -64,9 +64,10 @@ pnpm dev
 - Export documents to PDF
 - Version history and timeline
 - Testing and Improving CI setup
-- Maybe Deployment ¯\\_(ツ)_/¯
+- ~~Maybe Deployment~~ d=(´▽｀)=b
 
 ## Screenshots
 To be added cuz im lazy (* ^ ω ^)
+
 
 
