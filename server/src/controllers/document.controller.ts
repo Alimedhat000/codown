@@ -374,26 +374,23 @@ export const updateDocSettings = asyncErrorWrapper(async (req: AuthenticatedRequ
   }
 });
 
-export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
+export const getDocByToken = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
   const clientInfo = getClientInfo(req);
-  const { shareId } = req.params;
-  const { token } = req.query;
+  const { token } = req.params; // Now getting token from URL params instead of query
   const userId = req.user?.userId;
 
   logger.info('Shared document access attempt', {
     action: 'ACCESS_SHARED_DOCUMENT_ATTEMPT',
     ...clientInfo,
     userId,
-    shareId,
     hasToken: !!token,
   });
 
-  if (typeof token !== 'string') {
+  if (!token || typeof token !== 'string') {
     logger.warn('Shared document access failed - invalid token format', {
       action: 'ACCESS_SHARED_DOCUMENT_INVALID_TOKEN_FORMAT',
       ...clientInfo,
       userId,
-      shareId,
       tokenType: typeof token,
     });
 
@@ -401,18 +398,8 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
     return;
   }
 
-  if (!shareId) {
-    logger.warn('Shared document access failed - missing shareId', {
-      action: 'ACCESS_SHARED_DOCUMENT_MISSING_SHARE_ID',
-      ...clientInfo,
-      userId,
-    });
-
-    res.status(StatusCodes.BAD_REQUEST).json({ error: 'Missing shareId in URL' });
-    return;
-  }
-
   let decoded: { shareId: string; permission: 'view' | 'edit' };
+
   try {
     decoded = verifyShareToken(token);
     console.log(chalk.bold.red('DECODED'), decoded);
@@ -421,7 +408,6 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
       action: 'ACCESS_SHARED_DOCUMENT_TOKEN_VERIFICATION_FAILED',
       ...clientInfo,
       userId,
-      shareId,
       error: error instanceof Error ? error.message : 'Unknown error',
     });
 
@@ -429,18 +415,7 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
     return;
   }
 
-  if (decoded.shareId !== shareId) {
-    logger.warn('Shared document access failed - token mismatch', {
-      action: 'ACCESS_SHARED_DOCUMENT_TOKEN_MISMATCH',
-      ...clientInfo,
-      userId,
-      shareId,
-      decodedShareId: decoded.shareId,
-    });
-
-    res.status(StatusCodes.FORBIDDEN).json({ error: 'Token mismatch' });
-    return;
-  }
+  const { shareId } = decoded; // Extract shareId from the decoded token
 
   try {
     const doc = await prisma.document.findUnique({
@@ -450,7 +425,7 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
           where: { userId },
           select: {
             userId: true,
-            permission: true, // assuming you store 'view', 'edit', etc.
+            permission: true,
           },
         },
       },
@@ -468,7 +443,7 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
       return;
     }
 
-    const collaboratorEntry = doc?.Collaborator[0]; // because we filtered by userId
+    const collaboratorEntry = doc?.Collaborator[0];
 
     const isOwner = doc?.authorId === userId;
     const isCollaborator = doc?.Collaborator.some(c => c.userId === userId);
@@ -531,7 +506,7 @@ export const getDocByShareId = asyncErrorWrapper(async (req: AuthenticatedReques
           data: {
             documentId: doc.id,
             userId,
-            permission: decoded.permission, // "edit" or "view"
+            permission: decoded.permission,
           },
         });
 
@@ -615,7 +590,8 @@ export const getShareLink = asyncErrorWrapper(async (req: AuthenticatedRequest, 
     }
 
     const token = generateShareToken(doc.shareId, permission as 'view' | 'edit');
-    const url = `${process.env.CLIENT_BASE}/app/doc/share/${doc.shareId}?token=${token}`;
+    // Updated URL structure - token is now in the path
+    const url = `${process.env.CLIENT_BASE}/app/doc/share/${token}`;
 
     logger.info('Share link generated successfully', {
       action: 'GENERATE_SHARE_LINK_SUCCESS',
