@@ -15,6 +15,9 @@ import { router } from '@/routers';
 import { setupSwagger } from './config/swagger';
 import socketServer from './sockets/ws-server';
 
+const isProduction = process.env.NODE_ENV === 'production';
+const isTest = process.env.NODE_ENV === 'test';
+
 export const { app } = expressWebsockets(express());
 
 // Helmet => HTTP Security Headers.
@@ -42,11 +45,11 @@ app.use(
 // Cookie parser
 app.use(cookieParser());
 
-if (process.env.NODE_ENV !== 'test') {
-  // Logger middleware
+if (!isProduction && !isTest) {
   app.use(morganFile);
   app.use(morganWinston);
 }
+
 // Serving static files
 app.use(express.static(path.join(path.resolve(), 'public')));
 
@@ -57,15 +60,7 @@ app.use('/api', router);
 // Error middlewaree
 app.use(errorMiddleware);
 
-if (process.env.NODE_ENV !== 'test') {
-  // const server = http.createServer(app);
-
-  // socketServer.listen(Number(process.env.PORT), () => {
-  //   console.log(
-  //     chalk.bold.green('✓ Hocuspocus server running on ') + chalk.bold.underline.magenta('ws://localhost:5002')
-  //   );
-  // });
-
+if (!isTest) {
   app.ws('/collaboration', (websocket, request) => {
     socketServer.handleConnection(websocket, request);
   });

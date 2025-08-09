@@ -1,7 +1,10 @@
 import { createLogger, format, transports } from 'winston';
 
+const isProduction = process.env.NODE_ENV === 'production';
+const isTest = process.env.NODE_ENV === 'test';
+
 export const logger = createLogger({
-  level: 'info',
+  level: isProduction ? 'error' : 'info',
   format: format.combine(
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     format.errors({ stack: true }),
@@ -16,8 +19,18 @@ export const logger = createLogger({
     })
   ),
   transports: [
-    new transports.Console(), // Log to console
+    // Console logging only in development
+    ...(!isProduction && !isTest ? [new transports.Console()] : []),
+
+    // Error log file (always in prod, optional in dev)
     new transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new transports.File({ filename: 'logs/combined.log' }),
+
+    // Combined log file only in development
+    ...(!isProduction && !isTest ? [new transports.File({ filename: 'logs/combined.log' })] : []),
   ],
 });
+
+// Disable all logging in test environment
+if (isTest) {
+  logger.clear();
+}
