@@ -7,17 +7,15 @@ import {
   LuCircleAlert as AlertIcon,
   LuLoaderCircle as LoaderIcon,
 } from 'react-icons/lu';
-import { useParams, useSearchParams, useNavigate } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { paths } from '@/config/paths';
 import { api } from '@/lib/api';
 
 export default function Share() {
-  const { shareid } = useParams();
-  const [searchParams] = useSearchParams();
+  const { token } = useParams(); // Now getting token from URL params directly
   const navigate = useNavigate();
-  const token = searchParams.get('token');
 
   const [status, setStatus] = useState<
     'loading' | 'redirecting' | 'waiting' | 'rejected' | 'error'
@@ -25,7 +23,8 @@ export default function Share() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (!shareid || !token) {
+    if (!token) {
+      console.log('No Token');
       setStatus('error');
       setMessage('Invalid share link.');
       return;
@@ -33,9 +32,7 @@ export default function Share() {
 
     const accessDocument = async () => {
       try {
-        const res = await api.get(`/document/share/${shareid}`, {
-          params: { token },
-        });
+        const res = await api.get(`/document/share/${token}`);
 
         if (res.status === 200) {
           const docId = res.data.id;
@@ -67,7 +64,7 @@ export default function Share() {
     };
 
     accessDocument();
-  }, [shareid, token, navigate]);
+  }, [token, navigate]);
 
   const getStatusConfig = () => {
     switch (status) {

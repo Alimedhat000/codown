@@ -1,6 +1,3 @@
-// Todo: add the landing page to the home path and
-// Todo: move all the app paths to app/**
-
 export const paths = {
   landing: {
     path: '/',
@@ -33,8 +30,8 @@ export const paths = {
       getHref: (id: string) => `/app/doc/${id}`,
     },
     share: {
-      path: 'doc/share/:shareid',
-      getHref: (shareid: string) => `/app/doc/share/${shareid}`,
+      path: 'doc/share/:token',
+      getHref: (token: string) => `/app/doc/share/${token}`,
     },
   },
 } as const;

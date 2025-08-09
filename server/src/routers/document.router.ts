@@ -7,7 +7,7 @@ import {
   deleteDoc,
   getCollaborators,
   getDoc,
-  getDocByShareId,
+  getDocByToken,
   getDocs,
   getRequests,
   getShareLink,
@@ -21,7 +21,7 @@ import { authenticate } from '@/middlewares/auth.middleware';
 export const docRouter = express.Router();
 
 docRouter.use(authenticate);
-docRouter.get('/share/:shareId', getDocByShareId); // used to get document via share id
+docRouter.get('/share/:token', getDocByToken);
 
 docRouter.post('/', createDoc);
 docRouter.get('/', getDocs);

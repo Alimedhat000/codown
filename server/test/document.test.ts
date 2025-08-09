@@ -3,6 +3,7 @@ import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { prisma } from '@/lib/prisma';
+import { verifyShareToken } from '@/lib/shareToken';
 import { app } from '@/server'; // your express app
 
 function extractCookies(rawCookies: string[] | string | undefined): string {
@@ -141,15 +142,17 @@ describe('Document Routes', () => {
       .set('Authorization', `Bearer ${token}`);
     //Parse the token out from the URL
     const parsed = new URL(shareUrl.body.url);
-    const shareId = parsed.pathname.split('/').pop(); // 'share123'
-    const shareToken = parsed.searchParams.get('token'); // actual JWT token
+    const shareToken = parsed.pathname.split('/').pop();
 
-    expect(shareId).toBe('share123');
     expect(shareToken).toBeDefined();
+
+    const decoded = verifyShareToken(shareToken!);
+    expect(decoded.shareId).toBe('share123');
+    expect(decoded.permission).toBe('view');
 
     // Simulate collaborator opening the share link
     const res2 = await request(app)
-      .get(`/api/document/share/${shareId}?token=${shareToken}`)
+      .get(`/api/document/share/${shareToken}`) // Token is now in the path
       .set('Authorization', `Bearer ${token}`); // test user's token
 
     expect([StatusCodes.OK, StatusCodes.ACCEPTED]).toContain(res2.status);
