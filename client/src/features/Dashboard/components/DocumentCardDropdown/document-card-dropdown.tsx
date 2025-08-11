@@ -52,6 +52,7 @@ export function DocumentCardDropdown({
       <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger
           className={cn('hover:bg-muted rounded-sm p-1', triggerClassname)}
+          aria-label="options"
         >
           <MoreIcon className="text-muted-foreground h-4 w-4" />
         </DropdownMenuTrigger>
@@ -74,7 +75,11 @@ export function DocumentCardDropdown({
             <span>Open in View mode</span>
           </DropdownMenuItem>
 
-          <DropdownMenuItem disabled className={DropdownMenuItemClassname}>
+          <DropdownMenuItem
+            disabled
+            className={DropdownMenuItemClassname}
+            aria-label="pin"
+          >
             <PinIcon />
             <span>Pin</span>
           </DropdownMenuItem>
@@ -87,6 +92,7 @@ export function DocumentCardDropdown({
               setDropdownOpen(false);
               setShowRenameModal(true);
             }}
+            aria-label="rename"
           >
             <EditIcon />
             <span>Rename</span>
@@ -99,6 +105,7 @@ export function DocumentCardDropdown({
               e.preventDefault();
               handleCopyLink();
             }}
+            aria-label="copylink"
           >
             <LinkIcon />
             <span>{copySuccess ? 'Link copied!' : 'Copy link'}</span>
@@ -117,6 +124,7 @@ export function DocumentCardDropdown({
               setDropdownOpen(false);
               setShowDeleteModal(true);
             }}
+            aria-label="delete"
           >
             <DeleteIcon />
             <span>Delete this note</span>
