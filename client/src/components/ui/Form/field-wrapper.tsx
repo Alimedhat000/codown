@@ -6,6 +6,7 @@ import { Label } from './label';
 
 type FieldWrapperProps = {
   label?: string;
+  id?: string;
   className?: string;
   children: React.ReactNode;
   error?: FieldError | undefined;
@@ -16,11 +17,16 @@ export type FieldWrapperPassThroughProps = Omit<
   'className' | 'children'
 >;
 
-export const FieldWrapper = ({ label, error, children }: FieldWrapperProps) => {
+export const FieldWrapper = ({
+  label,
+  id,
+  error,
+  children,
+}: FieldWrapperProps) => {
   return (
     <div>
       <div className="flex justify-between items-start w-full pb-2">
-        {label && <Label>{label}</Label>}
+        {label && <Label htmlFor={id}>{label}</Label>}
         {error?.message && <Error errorMessage={error.message} />}
       </div>
       {children}

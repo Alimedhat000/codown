@@ -38,6 +38,7 @@ export default function RegisterForm({
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
         <Input
           type="email"
+          id="email"
           label="Email"
           placeholder="Enter your email"
           registration={register('email')}
@@ -48,6 +49,7 @@ export default function RegisterForm({
         <Input
           type="text"
           label="Username"
+          id="username"
           placeholder="Enter your username"
           registration={register('username')}
           error={errors.username}
@@ -57,6 +59,7 @@ export default function RegisterForm({
         <Input
           type="text"
           label="Full Name"
+          id="fullname"
           placeholder="Enter your full name"
           registration={register('fullName')}
           error={errors.fullName}
@@ -65,6 +68,7 @@ export default function RegisterForm({
 
         <Input
           type="password"
+          id="password"
           label="Password"
           placeholder="Enter your password"
           registration={register('password')}
