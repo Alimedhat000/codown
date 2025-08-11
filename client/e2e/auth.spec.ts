@@ -76,8 +76,8 @@ test.describe('Authentication Flow', () => {
     await page.goto('/login');
 
     // Fill in login form (use test credentials)
-    await page.getByLabel(/email/i).fill('ali@mail.com');
-    await page.getByLabel(/password/i).fill('secure1234');
+    await page.getByLabel(/email/i).fill('test@example.com');
+    await page.getByLabel(/password/i).fill('testpassword');
 
     // Submit form
     await page.getByRole('button', { name: /login|sign in/i }).click();

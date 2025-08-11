@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "generate": "plop",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:e2e": "ts-node ../server/scripts/seed-test-user.ts && playwright test"
   },
   "dependencies": {
     "@codemirror/commands": "^6.8.1",
