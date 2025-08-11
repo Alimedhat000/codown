@@ -54,6 +54,7 @@ export function DeleteDocumentModal({
         </div>
         <div className="flex justify-end space-x-2 pt-4">
           <button
+            aria-label="cancel"
             onClick={() => onOpenChange(false)}
             type="button"
             className="px-4 py-2 text-sm border border-surface-border hover:border-muted-foreground transition-all rounded-md"
@@ -62,6 +63,8 @@ export function DeleteDocumentModal({
             Cancel
           </button>
           <Button
+            aria-label="delete"
+            id="delete"
             onClick={handleDelete}
             disabled={isDeleting}
             variant="destructive"

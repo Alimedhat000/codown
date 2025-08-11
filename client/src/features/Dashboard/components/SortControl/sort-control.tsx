@@ -33,6 +33,7 @@ export function SortControl({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        aria-label="sort"
         className={`px-4 flex items-center gap-2 py-2 bg-surface  text-sm border border-surface-border hover:border-muted-foreground transition-all rounded-md ${className}`}
       >
         <SortIcon />

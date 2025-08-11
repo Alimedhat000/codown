@@ -29,7 +29,7 @@ export default function NewDocumentModal({ setDocuments }: Props) {
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
-      <ModalTrigger>
+      <ModalTrigger aria-label="new document">
         <Button size="icon">
           <NewFileIcon />
         </Button>

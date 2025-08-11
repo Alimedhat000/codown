@@ -19,7 +19,7 @@ export function DocumentGridCard({
   isOwned,
 }: DocumentGridCardProps) {
   return (
-    <div className="bg-surface ring ring-surface-border hover:ring-muted-foreground group relative rounded-xl p-4 shadow hover:ring">
+    <div className="document-item bg-surface ring ring-surface-border hover:ring-muted-foreground group relative rounded-xl p-4 shadow hover:ring">
       {/* Dropdown Menu */}
       {isOwned ? (
         <DocumentCardDropdown

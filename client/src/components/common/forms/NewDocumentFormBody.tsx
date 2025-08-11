@@ -52,6 +52,7 @@ export default function NewDocumentFormBody({
         <form onSubmit={handleSubmit(submit)}>
           <ModalBody>
             <Input
+              id="documenttitle"
               type="text"
               label="Document Title"
               placeholder="New document title"
@@ -67,12 +68,14 @@ export default function NewDocumentFormBody({
             <ModalClose asChild>
               <button
                 type="button"
+                name="cancel"
+                aria-label="cancel button"
                 className="px-4 py-2 text-sm border border-surface-border hover:border-muted-foreground transition-all rounded-md "
               >
                 Cancel
               </button>
             </ModalClose>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" id="create" disabled={isSubmitting}>
               {isSubmitting ? 'Creating...' : submittingLabel}
             </Button>
           </ModalFooter>
