@@ -35,7 +35,7 @@ export function UserMenu({
   return (
     <DropdownMenu onOpenChange={setIsOpen}>
       {/* Avatar Image */}
-      <DropdownMenuTrigger asChild className={className}>
+      <DropdownMenuTrigger asChild className={className} aria-label="User menu">
         <button
           className={cn(
             'ml-auto focus:outline-none flex items-center space-x-2 hover:bg-surface rounded-md px-2 py-1 ',

@@ -13,21 +13,27 @@ export type InputProps = React.InputHTMLAttributes<HTMLInputElement> &
   FieldWrapperPassThroughProps &
   VariantProps<typeof inputVariants> & {
     className?: string;
+    id?: string;
     registration: Partial<UseFormRegisterReturn>;
   };
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, variant, type, label, error, registration, ...props }, ref) => {
+  (
+    { className, variant, type, label, id, error, registration, ...props },
+    ref,
+  ) => {
     const [showPassword, setShowPassword] = React.useState(false);
 
     const isPassword = type === 'password';
     const inputType = isPassword && showPassword ? 'text' : type;
 
     return (
-      <FieldWrapper label={label} error={error}>
+      <FieldWrapper label={label} error={error} id={id}>
         <div className="relative">
           <input
+            aria-label={label}
             type={inputType}
+            id={id}
             className={cn(
               inputVariants({ variant }),
               error && 'border-error focus-visible:ring-error pr-10',
