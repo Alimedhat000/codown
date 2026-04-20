@@ -7,9 +7,10 @@
   "scripts": {
     "start": "node dist/server.js",
     "build": "esbuild src/server.ts --bundle --platform=node --packages=external --outfile=dist/server.js --format=esm",
-    "dev:esbuild": "pnpm run build --watch",
+    "build:watch": "pnpm run build --watch",
     "dev:start": "nodemon dist/server.js",
     "dev": "run-p dev:*",
+    "dev:docker": "pnpm run build && node dist/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:ci": "eslint --max-warnings 0 .",
