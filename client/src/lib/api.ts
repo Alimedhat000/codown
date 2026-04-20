@@ -4,7 +4,7 @@ import { env } from '@/config/env';
 import { getAccessToken } from '@/utils/token';
 
 export const api = axios.create({
-  baseURL: env.API_URL,
+  baseURL: `${env.API_URL}/api`,
   withCredentials: true,
 });
 

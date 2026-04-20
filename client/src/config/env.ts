@@ -6,12 +6,17 @@ const createEnv = () => {
     Socket_URL: z.string(),
   });
 
+  const keyMapping: Record<string, string> = {
+    VITE_APP_SOCKET_URL: 'Socket_URL',
+  };
+
   const envVars = Object.entries(import.meta.env).reduce<
     Record<string, string>
   >((acc, curr) => {
     const [key, value] = curr;
     if (key.startsWith('VITE_APP_')) {
-      acc[key.replace('VITE_APP_', '')] = value;
+      const newKey = keyMapping[key] || key.replace('VITE_APP_', '');
+      acc[newKey] = value;
     }
     return acc;
   }, {});

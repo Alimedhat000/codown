@@ -1,0 +1,37 @@
+# Dependencies (reinstalled inside Docker)
+node_modules
+**/node_modules
+
+# Build outputs
+**/dist
+**/storybook-static
+
+# Test & dev artifacts
+**/*.test.*
+**/*.spec.*
+**/coverage
+**/.vitest
+
+# Local env files (secrets must come from compose env / secrets)
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Editor & OS
+.vscode
+.idea
+**/.DS_Store
+*.log
+
+# Git
+.git
+.github
+.husky
+
+# Docs
+docs
+README.md
+**/DOCS.md
+
+# Dev-only client extras (not needed for production build)
+client/generators

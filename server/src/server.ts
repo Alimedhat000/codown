@@ -2,7 +2,7 @@ import '@/config/env.config';
 
 import chalk from 'chalk';
 import cookieParser from 'cookie-parser';
-import cors from 'cors';
+// import cors from 'cors';
 import express from 'express';
 import expressWebsockets from 'express-ws';
 import helmet from 'helmet';
@@ -26,21 +26,21 @@ app.use(helmet());
 // Json parser
 app.use(express.json());
 
-const allowedOrigins = ['http://localhost:5173', 'http://localhost', 'http://localhost:3000'];
+// const allowedOrigins = ['http://localhost:5173', 'http://localhost', 'http://localhost:3000'];
 
 // Cors middleware
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       if (!origin || allowedOrigins.includes(origin)) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error('Not allowed by CORS'));
+//       }
+//     },
+//     credentials: true,
+//   })
+// );
 
 // Cookie parser
 app.use(cookieParser());
@@ -54,6 +54,12 @@ if (!isProduction && !isTest) {
 app.use(express.static(path.join(path.resolve(), 'public')));
 
 setupSwagger(app);
+
+// Health check
+app.get('/health', (request, response) => {
+  response.status(200).json({ status: 'ok' });
+});
+
 // Routes
 app.use('/api', router);
 
