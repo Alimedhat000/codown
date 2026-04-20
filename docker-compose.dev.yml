@@ -40,7 +40,7 @@ services:
       sh -c "
         npx prisma@6.3.1 migrate deploy --schema=./prisma/schema.prisma &&
         pnpm run build &&
-        (pnpm run dev:esbuild &) &&
+        (npx esbuild src/server.ts --bundle --platform=node --packages=external --outfile=dist/server.js --format=esm --watch=forever &) &&
         pnpm run dev:start
       "
     depends_on:
