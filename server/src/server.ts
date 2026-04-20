@@ -26,7 +26,7 @@ app.use(helmet());
 // Json parser
 app.use(express.json());
 
-const allowedOrigins = ['https://codown.vercel.app', 'http://localhost:5173'];
+const allowedOrigins = ['http://localhost:5173', 'http://localhost', 'http://localhost:3000'];
 
 // Cors middleware
 app.use(
