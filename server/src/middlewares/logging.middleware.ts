@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import crypto from 'crypto';
 import fs from 'fs';
 import type { IncomingMessage, ServerResponse } from 'http';
 import morgan from 'morgan';
@@ -6,6 +7,10 @@ import { TokenIndexer } from 'morgan';
 import path from 'path';
 
 import { logger } from '../lib/logger';
+
+const generateRequestId = (): string => {
+  return crypto.randomBytes(4).toString('hex');
+};
 
 // Ensure logs folder exists
 const logDir = path.join(path.resolve(), 'logs');
@@ -17,6 +22,18 @@ if (!fs.existsSync(logDir)) {
 const morganStream = {
   write: (message: string) => logger.info?.(message.trim()),
 };
+
+// Add request ID to morgan
+morgan.token('requestId', (req: IncomingMessage) => {
+  const id = (req as IncomingMessage & { requestId?: string }).requestId;
+  return id || 'unknown';
+});
+
+// Add IP address to morgan
+morgan.token('clientIp', (req: IncomingMessage) => {
+  const ip = req.socket?.remoteAddress || req.headers['x-forwarded-for'] as string || '-';
+  return ip.replace('::ffff:', '').replace('::1', 'localhost');
+});
 
 // Optional file stream (logs raw HTTP details)
 const accessLogStream = fs.createWriteStream(path.join(logDir, 'access.log'), {
@@ -45,7 +62,21 @@ const coloredFormat = (
   const time = chalk.gray(`${tokens['response-time']?.(req, res) ?? '0'} ms`);
   const length = chalk.white(tokens.res?.(req, res, 'content-length') ?? '0');
 
-  return `${method} ${url} ${statusColor} - ${length}b - ${time}`;
+  const requestId = tokens.requestId?.(req, res) || 'unknown';
+  const clientIp = tokens.clientIp?.(req, res) || '-';
+
+  return `[${requestId}] [${clientIp}] ${method} ${url} ${statusColor} - ${length}b - ${time}`;
+};
+
+// Request ID middleware - generate ID for each request
+export const requestIdMiddleware = (
+  req: IncomingMessage,
+  res: ServerResponse,
+  next: () => void
+): void => {
+  const id = generateRequestId();
+  (req as IncomingMessage & { requestId: string }).requestId = id;
+  next();
 };
 
 // Exported middlewares

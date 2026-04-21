@@ -13,7 +13,7 @@ import { RegisterUserSchema } from '@/validations/register.schema';
 export const registerUser = asyncErrorWrapper(async (req: Request, res: Response) => {
   const clientInfo = getClientInfo(req);
 
-  logger.info('User registration attempt', {
+  logger.debug('User registration attempt', {
     action: 'REGISTER_ATTEMPT',
     ...clientInfo,
     email: req.body.email,
@@ -62,7 +62,7 @@ export const registerUser = asyncErrorWrapper(async (req: Request, res: Response
       },
     });
 
-    logger.info('User registered successfully', {
+    logger.debug('User registered successfully', {
       action: 'REGISTER_SUCCESS',
       ...clientInfo,
       userId: newUser.id,
@@ -88,7 +88,7 @@ export const registerUser = asyncErrorWrapper(async (req: Request, res: Response
 export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) => {
   const clientInfo = getClientInfo(req);
 
-  logger.info('User login attempt', {
+  logger.debug('User login attempt', {
     action: 'LOGIN_ATTEMPT',
     ...clientInfo,
     email: req.body.email,
@@ -167,7 +167,7 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
       data: { refreshToken },
     });
 
-    logger.info('User logged in successfully', {
+    logger.debug('User logged in successfully', {
       action: 'LOGIN_SUCCESS',
       ...clientInfo,
       userId: user.id,
@@ -208,7 +208,7 @@ export const logoutUser = asyncErrorWrapper(async (req: AuthenticatedRequest, re
   const clientInfo = getClientInfo(req);
   const userId = req.user?.userId;
 
-  logger.info('User logout attempt', {
+  logger.debug('User logout attempt', {
     action: 'LOGOUT_ATTEMPT',
     ...clientInfo,
     userId,
@@ -230,7 +230,7 @@ export const logoutUser = asyncErrorWrapper(async (req: AuthenticatedRequest, re
       data: { refreshToken: null },
     });
 
-    logger.info('User logged out successfully', {
+    logger.debug('User logged out successfully', {
       action: 'LOGOUT_SUCCESS',
       ...clientInfo,
       userId,
@@ -256,7 +256,7 @@ export const refreshToken = asyncErrorWrapper(async (req: Request, res: Response
   const clientInfo = getClientInfo(req);
   const refreshToken = req.cookies.refreshToken;
 
-  logger.info('Token refresh attempt', {
+  logger.debug('Token refresh attempt', {
     action: 'REFRESH_TOKEN_ATTEMPT',
     ...clientInfo,
     hasRefreshToken: !!refreshToken,
@@ -310,7 +310,7 @@ export const refreshToken = asyncErrorWrapper(async (req: Request, res: Response
       { expiresIn: '15m' }
     );
 
-    logger.info('Token refreshed successfully', {
+    logger.debug('Token refreshed successfully', {
       action: 'REFRESH_TOKEN_SUCCESS',
       ...clientInfo,
       userId: user.id,

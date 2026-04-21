@@ -13,7 +13,7 @@ export const createDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
   const userId = req.user?.userId;
   const { title, content = '', isPublic = false } = req.body;
 
-  logger.info('Document creation attempt', {
+  logger.debug('Document creation attempt', {
     action: 'CREATE_DOCUMENT_ATTEMPT',
     ...clientInfo,
     userId,
@@ -32,7 +32,7 @@ export const createDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
       },
     });
 
-    logger.info('Document created successfully', {
+    logger.debug('Document created successfully', {
       action: 'CREATE_DOCUMENT_SUCCESS',
       ...clientInfo,
       userId,
@@ -61,7 +61,7 @@ export const getDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: R
   const userId = req.user?.userId;
   const documentId = req.params.id;
 
-  logger.info('Document access attempt', {
+  logger.debug('Document access attempt', {
     action: 'GET_DOCUMENT_ATTEMPT',
     ...clientInfo,
     userId,
@@ -102,7 +102,7 @@ export const getDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: R
       return;
     }
 
-    logger.info('Document accessed successfully', {
+    logger.debug('Document accessed successfully', {
       action: 'GET_DOCUMENT_SUCCESS',
       ...clientInfo,
       userId,
@@ -136,7 +136,7 @@ export const getDocs = asyncErrorWrapper(async (req: AuthenticatedRequest, res: 
   const clientInfo = getClientInfo(req);
   const userId = req.user?.userId;
 
-  logger.info('Documents list request', {
+  logger.debug('Documents list request', {
     action: 'GET_DOCUMENTS_ATTEMPT',
     ...clientInfo,
     userId,
@@ -162,7 +162,7 @@ export const getDocs = asyncErrorWrapper(async (req: AuthenticatedRequest, res: 
       orderBy: { updatedAt: 'desc' },
     });
 
-    logger.info('Documents list retrieved successfully', {
+    logger.debug('Documents list retrieved successfully', {
       action: 'GET_DOCUMENTS_SUCCESS',
       ...clientInfo,
       userId,
@@ -260,7 +260,7 @@ export const deleteDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
   const userId = req.user?.userId;
   const documentId = req.params.id;
 
-  logger.info('Document deletion attempt', {
+  logger.debug('Document deletion attempt', {
     action: 'DELETE_DOCUMENT_ATTEMPT',
     ...clientInfo,
     userId,
@@ -290,7 +290,7 @@ export const deleteDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
       where: { id: doc.id },
     });
 
-    logger.info('Document deleted successfully', {
+    logger.debug('Document deleted successfully', {
       action: 'DELETE_DOCUMENT_SUCCESS',
       ...clientInfo,
       userId,
@@ -319,7 +319,7 @@ export const updateDocSettings = asyncErrorWrapper(async (req: AuthenticatedRequ
   const { allowSelfJoin } = req.body;
   const userId = req.user?.userId;
 
-  logger.info('Update document settings attempt', {
+  logger.debug('Update document settings attempt', {
     action: 'UPDATE_DOCUMENT_SETTINGS_ATTEMPT',
     ...clientInfo,
     userId,
@@ -349,7 +349,7 @@ export const updateDocSettings = asyncErrorWrapper(async (req: AuthenticatedRequ
       data: { allowSelfJoin },
     });
 
-    logger.info('Document settings updated successfully', {
+    logger.debug('Document settings updated successfully', {
       action: 'UPDATE_DOCUMENT_SETTINGS_SUCCESS',
       ...clientInfo,
       userId,
@@ -379,7 +379,7 @@ export const getDocByToken = asyncErrorWrapper(async (req: AuthenticatedRequest,
   const { token } = req.params; // Now getting token from URL params instead of query
   const userId = req.user?.userId;
 
-  logger.info('Shared document access attempt', {
+  logger.debug('Shared document access attempt', {
     action: 'ACCESS_SHARED_DOCUMENT_ATTEMPT',
     ...clientInfo,
     userId,
@@ -450,7 +450,7 @@ export const getDocByToken = asyncErrorWrapper(async (req: AuthenticatedRequest,
     const permissionFromDB = isOwner ? 'owner' : (collaboratorEntry?.permission ?? 'none');
 
     if (isCollaborator || isOwner) {
-      logger.info('Shared document accessed - existing collaborator', {
+      logger.debug('Shared document - existing collaborator', {
         action: 'ACCESS_SHARED_DOCUMENT_EXISTING_COLLABORATOR',
         ...clientInfo,
         userId,
@@ -479,7 +479,7 @@ export const getDocByToken = asyncErrorWrapper(async (req: AuthenticatedRequest,
         },
       });
 
-      logger.info('Shared document accessed - auto-joined as collaborator', {
+      logger.debug('Shared document - auto-joined as collaborator', {
         action: 'ACCESS_SHARED_DOCUMENT_AUTO_JOINED',
         ...clientInfo,
         userId,
@@ -510,7 +510,7 @@ export const getDocByToken = asyncErrorWrapper(async (req: AuthenticatedRequest,
           },
         });
 
-        logger.info('Collaboration request created', {
+        logger.debug('Collaboration request created', {
           action: 'COLLABORATION_REQUEST_CREATED',
           ...clientInfo,
           userId,
@@ -519,7 +519,7 @@ export const getDocByToken = asyncErrorWrapper(async (req: AuthenticatedRequest,
           permission: decoded.permission,
         });
       } else {
-        logger.info('Existing collaboration request found', {
+        logger.debug('Existing collaboration request found', {
           action: 'COLLABORATION_REQUEST_EXISTS',
           ...clientInfo,
           userId,
@@ -551,7 +551,7 @@ export const getShareLink = asyncErrorWrapper(async (req: AuthenticatedRequest, 
   const { id } = req.params;
   const { permission = 'view' } = req.query;
 
-  logger.info('Share link generation attempt', {
+  logger.debug('Share link generation attempt', {
     action: 'GENERATE_SHARE_LINK_ATTEMPT',
     ...clientInfo,
     userId,
@@ -593,7 +593,7 @@ export const getShareLink = asyncErrorWrapper(async (req: AuthenticatedRequest, 
     // Updated URL structure - token is now in the path
     const url = `${process.env.CLIENT_BASE}/app/doc/share/${token}`;
 
-    logger.info('Share link generated successfully', {
+    logger.debug('Share link generated successfully', {
       action: 'GENERATE_SHARE_LINK_SUCCESS',
       ...clientInfo,
       userId,
@@ -623,7 +623,7 @@ export const getRequests = asyncErrorWrapper(async (req: AuthenticatedRequest, r
   const { id } = req.params;
   const userId = req.user?.userId;
 
-  logger.info('Get collaboration requests attempt', {
+  logger.debug('Get collaboration requests attempt', {
     action: 'GET_COLLABORATION_REQUESTS_ATTEMPT',
     ...clientInfo,
     userId,
@@ -652,7 +652,7 @@ export const getRequests = asyncErrorWrapper(async (req: AuthenticatedRequest, r
       include: { user: true },
     });
 
-    logger.info('Collaboration requests retrieved successfully', {
+    logger.debug('Collaboration requests retrieved successfully', {
       action: 'GET_COLLABORATION_REQUESTS_SUCCESS',
       ...clientInfo,
       userId,
@@ -680,7 +680,7 @@ export const approveRequest = asyncErrorWrapper(async (req: AuthenticatedRequest
   const { id: documentId, requestId } = req.params;
   const userId = req.user?.userId;
 
-  logger.info('Collaboration request approval attempt', {
+  logger.debug('Collaboration request approval attempt', {
     action: 'APPROVE_COLLABORATION_REQUEST_ATTEMPT',
     ...clientInfo,
     userId,
@@ -729,7 +729,7 @@ export const approveRequest = asyncErrorWrapper(async (req: AuthenticatedRequest
       },
     });
 
-    logger.info('Collaboration request approved and collaborator added', {
+    logger.debug('Collaboration request approved and collaborator added', {
       action: 'APPROVE_COLLABORATION_REQUEST_SUCCESS',
       ...clientInfo,
       ownerId: userId,
@@ -759,7 +759,7 @@ export const rejectRequest = asyncErrorWrapper(async (req: AuthenticatedRequest,
   const { id, requestId } = req.params;
   const userId = req.user?.userId;
 
-  logger.info('Collaboration request rejection attempt', {
+  logger.debug('Collaboration request rejection attempt', {
     action: 'REJECT_COLLABORATION_REQUEST_ATTEMPT',
     ...clientInfo,
     userId,
@@ -792,7 +792,7 @@ export const getCollaborators = asyncErrorWrapper(async (req: AuthenticatedReque
   const { id } = req.params;
   const userId = req.user?.userId;
 
-  logger.info('Get collaborators attempt', {
+  logger.debug('Get collaborators attempt', {
     action: 'GET_COLLABORATORS_ATTEMPT',
     ...clientInfo,
     userId,
@@ -825,7 +825,7 @@ export const addCollaborator = asyncErrorWrapper(async (req: AuthenticatedReques
   const { userId: newCollaboratorId, permission } = req.body;
   const ownerId = req.user?.userId;
 
-  logger.info('Add collaborator attempt', {
+  logger.debug('Add collaborator attempt', {
     action: 'ADD_COLLABORATOR_ATTEMPT',
     ...clientInfo,
     ownerId,
@@ -856,7 +856,7 @@ export const addCollaborator = asyncErrorWrapper(async (req: AuthenticatedReques
       data: { documentId: id, userId: newCollaboratorId, permission },
     });
 
-    logger.info('Collaborator added successfully', {
+    logger.debug('Collaborator added successfully', {
       action: 'ADD_COLLABORATOR_SUCCESS',
       ...clientInfo,
       ownerId,
@@ -888,7 +888,7 @@ export const removeCollaborator = asyncErrorWrapper(async (req: AuthenticatedReq
   const { id, userId: collaboratorId } = req.params;
   const ownerId = req.user?.userId;
 
-  logger.info('Remove collaborator attempt', {
+  logger.debug('Remove collaborator attempt', {
     action: 'REMOVE_COLLABORATOR_ATTEMPT',
     ...clientInfo,
     ownerId,
@@ -936,7 +936,7 @@ export const removeCollaborator = asyncErrorWrapper(async (req: AuthenticatedReq
 
     console.log(chalk.red('HERE'), result, collaboratorId, id);
 
-    logger.info('Collaborator removed successfully', {
+    logger.debug('Collaborator removed successfully', {
       action: 'REMOVE_COLLABORATOR_SUCCESS',
       ...clientInfo,
       ownerId,

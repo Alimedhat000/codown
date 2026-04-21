@@ -1,7 +1,7 @@
 import '@/config/env.config';
 
-import chalk from 'chalk';
 import cookieParser from 'cookie-parser';
+import { logger } from '@/lib/logger';
 // import cors from 'cors';
 import express from 'express';
 import expressWebsockets from 'express-ws';
@@ -9,7 +9,7 @@ import helmet from 'helmet';
 import path from 'path';
 
 import { errorMiddleware } from '@/middlewares/error.middleware';
-import { morganFile, morganWinston } from '@/middlewares/logging.middleware';
+import { morganFile, morganWinston, requestIdMiddleware } from '@/middlewares/logging.middleware';
 import { router } from '@/routers';
 
 import { setupSwagger } from './config/swagger';
@@ -45,6 +45,9 @@ app.use(express.json());
 // Cookie parser
 app.use(cookieParser());
 
+// Request ID for tracing
+app.use(requestIdMiddleware);
+
 if (!isProduction && !isTest) {
   app.use(morganFile);
   app.use(morganWinston);
@@ -72,9 +75,8 @@ if (!isTest) {
   });
 
   app.listen(process.env.PORT, () => {
-    console.log(
-      chalk.green('✓'),
-      chalk.bold.cyan('API server running on ') + chalk.bold.underline.magenta(`http://localhost:${process.env.PORT}`)
-    );
+    logger.info(`API server started on port ${process.env.PORT}`, {
+      action: 'SERVER_START',
+    });
   });
 }

@@ -7,7 +7,7 @@ export const getClientInfo = (req: Request) => {
     ip = ip.replace('::ffff:', '');
   }
 
-  console.log(ip);
+  //console.log(ip);
   return {
     ip,
     userAgent: req.get('User-Agent'),
