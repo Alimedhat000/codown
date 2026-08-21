@@ -45,9 +45,7 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
-        with:
-          version: 8
-          run_install: false
+        # no version input: read from packageManager in package.json (11.1.1)
 
       - name: Get pnpm store directory
         shell: bash
