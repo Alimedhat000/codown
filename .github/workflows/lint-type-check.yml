@@ -68,7 +68,7 @@ jobs:
           cp client/.env.example client/.env
 
       - name: Install dependencies
-        run: pnpm install  --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
         run: pnpm --filter server db:generate
