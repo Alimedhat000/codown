@@ -10,7 +10,7 @@ export const logger = createLogger({
     format.errors({ stack: true }),
     format.colorize({ all: true }),
     format.splat(),
-    format.printf(({ timestamp, level, message, action, userId, ip }) => {
+    format.printf(({ timestamp, level, message, action }) => {
       const actionInfo = action ? `[${action}]` : '';
 
       return `[${timestamp}] ${level}: ${actionInfo}${message}`;

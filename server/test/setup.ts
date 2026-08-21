@@ -7,7 +7,7 @@ process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || process.env.DATABASE
 // console.log('NODE_ENV:', process.env.NODE_ENV);
 // console.log('DATABASE_URL:', process.env.DATABASE_URL);
 
-import { PrismaClient } from '@prisma/client'; // ✅ Loaded after DATABASE_URL is set
+import { Prisma, PrismaClient } from '@prisma/client'; // ✅ Loaded after DATABASE_URL is set
 
 const prisma = new PrismaClient();
 
@@ -23,7 +23,7 @@ afterEach(async () => {
   const tableNames = ['collaboration_requests', 'collaborators', 'yjs_document_states', 'documents', 'users'];
 
   try {
-    await prisma.$transaction(async tx => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       for (const tableName of tableNames) {
         await tx.$executeRawUnsafe(`TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE;`);
       }

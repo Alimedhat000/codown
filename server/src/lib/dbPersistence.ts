@@ -1,8 +1,8 @@
 import { Database } from '@hocuspocus/extension-database';
 import * as Y from 'yjs';
 
-import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { prisma } from '@/lib/prisma';
 import { slugIDtoFullID } from '@/utils/slugIDtoFullID';
 
 export const dbPersistence = new Database({

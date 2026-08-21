@@ -31,7 +31,7 @@ morgan.token('requestId', (req: IncomingMessage) => {
 
 // Add IP address to morgan
 morgan.token('clientIp', (req: IncomingMessage) => {
-  const ip = req.socket?.remoteAddress || req.headers['x-forwarded-for'] as string || '-';
+  const ip = req.socket?.remoteAddress || (req.headers['x-forwarded-for'] as string) || '-';
   return ip.replace('::ffff:', '').replace('::1', 'localhost');
 });
 
@@ -69,11 +69,7 @@ const coloredFormat = (
 };
 
 // Request ID middleware - generate ID for each request
-export const requestIdMiddleware = (
-  req: IncomingMessage,
-  res: ServerResponse,
-  next: () => void
-): void => {
+export const requestIdMiddleware = (req: IncomingMessage, res: ServerResponse, next: () => void): void => {
   const id = generateRequestId();
   (req as IncomingMessage & { requestId: string }).requestId = id;
   next();
