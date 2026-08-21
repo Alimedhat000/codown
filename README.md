@@ -29,35 +29,50 @@ It’s a personal project to explore real-time synchronization using WebSockets 
 
 ## Getting Started
 
+### Option A — Docker dev stack (recommended)
 
-
-### 1. Clone the Repository
+Full stack with hot reload: Postgres + API (esbuild watch + nodemon) + Vite HMR, kept in sync by [compose watch](https://docs.docker.com/compose/file-watch/) — source edits sync into the containers live.
 
 ```bash
-git clone https://github.com/Alimedhat000/codown.git
-cd codown
+# first run (builds images)
+pnpm docker:dev
+
+# later runs (skip --build)
+docker compose -f docker-compose.dev.yml up --watch
+
+# stop
+pnpm docker:down
 ```
 
-### 2. Install Dependencies
+- Client → http://localhost:5173
+- API → http://localhost:5000 (`/health`, `/api/docs`)
+- Prisma Studio (opt-in): `docker compose -f docker-compose.dev.yml --profile tools up studio` → http://localhost:5555
+
+Dependency/lockfile/config changes trigger an automatic rebuild+restart via watch. After editing `server/prisma/schema.prisma`, run:
+
 ```bash
+docker compose -f docker-compose.dev.yml exec server pnpm exec prisma migrate dev
+```
+
+### Option B — Local (hybrid)
+
+Postgres in Docker, app on the host:
+
+```bash
+docker compose -f docker-compose.dev.yml up -d db    # DB only
+cp server/.env.example server/.env                   # point DATABASE_URL creds at root .env values
+cp client/.env.example client/.env
 pnpm install
+pnpm dev                                             # client + server (esbuild watch + nodemon) in parallel
 ```
 
-### 3. Make sure you install Postgre and have a db up and running 
-
-### 4. Setup Environment Variables
-Create a .env file based on the example provided:
+### Production
 
 ```bash
-cp .env.example .env
+docker compose up --build   # requires POSTGRES_PASSWORD + JWT secrets (see .env.example)
 ```
 
-Update the environment variables as needed (e.g., database URL).
-
-### 5. Start Development Server
-```bash
-pnpm dev
-```
+Env vars: per-package `.env.example` files for local dev; root `.env.example` feeds docker-compose.
 ## Roadmap
 - ~~Polish The UI~~ (Done ＼(＾▽＾)／)
 - ~~Document Sharing with User authorization~~ ヽ(*≧ω≦)ﾉ
