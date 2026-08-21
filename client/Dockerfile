@@ -19,13 +19,23 @@ RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile --ignore-scripts
 
 # ──────────────────────────────────────────────
-# Stage 2: builder — vite build
+# dev — full client source present, nothing built; used by
+# docker-compose.dev.yml with `docker compose watch` (Vite HMR at runtime).
+# Needs the whole client/ tree: vite.config.ts loads the Storybook test
+# plugin, which expects .storybook/ to exist.
 # ──────────────────────────────────────────────
-FROM deps AS builder
-
-WORKDIR /app
+FROM deps AS dev
 
 COPY client/ ./client/
+
+CMD ["pnpm", "--filter", "client", "dev", "--host", "0.0.0.0"]
+
+# ──────────────────────────────────────────────
+# Stage 2: builder — vite build
+# ──────────────────────────────────────────────
+FROM dev AS builder
+
+WORKDIR /app
 
 # Build args injected at build time → baked into the JS bundle as VITE_ env vars
 ARG VITE_APP_API_URL

@@ -1,13 +1,19 @@
+# syntax=docker/dockerfile:1
 # ──────────────────────────────────────────────
-# Stage 1: builder — full install + compile
+# base — shared tooling (pinned pnpm)
 # ──────────────────────────────────────────────
-FROM node:22-alpine AS builder
+FROM node:22-alpine AS base
 
 # Pin pnpm to match the repo's packageManager field (layer-cached, no corepack indirection)
 ARG PNPM_VERSION=11.1.1
 RUN npm install -g pnpm@${PNPM_VERSION}
 
 WORKDIR /app
+
+# ──────────────────────────────────────────────
+# deps — workspace install, manifest-only layers for caching
+# ──────────────────────────────────────────────
+FROM base AS deps
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY server/package.json ./server/
@@ -17,9 +23,36 @@ COPY client/package.json ./client/
 RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile --ignore-scripts
 
+# ──────────────────────────────────────────────
+# code — server source; prisma schema first so generate stays cached
+# across src-only edits
+# ──────────────────────────────────────────────
+FROM deps AS code
+
+COPY server/prisma ./server/prisma
+COPY server/swagger.yaml ./server/swagger.yaml
 COPY server/ ./server/
 
+# ──────────────────────────────────────────────
+# generated — prisma client generated (no bundle yet)
+# ──────────────────────────────────────────────
+FROM code AS generated
+
 RUN pnpm --filter server db:generate
+
+# ──────────────────────────────────────────────
+# dev — source present, nothing compiled; used by docker-compose.dev.yml
+# with `docker compose watch` (esbuild --watch + nodemon run at runtime)
+# ──────────────────────────────────────────────
+FROM generated AS dev
+
+CMD ["pnpm", "--filter", "server", "dev"]
+
+# ──────────────────────────────────────────────
+# builder — compile prod bundle
+# ──────────────────────────────────────────────
+FROM generated AS builder
+
 RUN pnpm --filter server build
 
 # ──────────────────────────────────────────────

@@ -1,5 +1,16 @@
 name: codown-dev
 
+# Usage:
+#   first run:        docker compose -f docker-compose.dev.yml up --build --watch
+#   subsequent runs:  docker compose -f docker-compose.dev.yml up --watch
+#   stop:             docker compose -f docker-compose.dev.yml down
+#
+# File syncing is handled by compose watch (develop.watch below) — source edits
+# are synced into the running containers; dependency/lockfile/config changes
+# trigger an automatic rebuild+restart of the affected service.
+# Schema changes: edit server/prisma/schema.prisma, then run
+#   docker compose -f docker-compose.dev.yml exec server pnpm exec prisma migrate dev
+
 services:
   # ─────────────────────────────────────────
   # PostgreSQL
@@ -14,7 +25,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     healthcheck:
       test:
         [
@@ -27,21 +38,20 @@ services:
       start_period: 15s
 
   # ─────────────────────────────────────────
-  # Express API — hot-reload via nodemon+esbuild
+  # Express API — esbuild watch + nodemon via `pnpm dev`
   # ─────────────────────────────────────────
   server:
     build:
       context: .
       dockerfile: server/Dockerfile
-      target: builder
+      target: dev
     restart: unless-stopped
+    init: true
     working_dir: /app/server
     command: >
       sh -c "
-        npx prisma@6.3.1 migrate deploy --schema=./prisma/schema.prisma &&
-        pnpm run build &&
-        (npx esbuild src/server.ts --bundle --platform=node --packages=external --outfile=dist/server.js --format=esm --watch=forever &) &&
-        pnpm run dev:start
+        pnpm exec prisma migrate deploy --schema=./prisma/schema.prisma &&
+        pnpm dev
       "
     depends_on:
       db:
@@ -57,47 +67,85 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-codown}:${POSTGRES_PASSWORD:-changeme}@db:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-codown}
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev_jwt_access_secret}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev_jwt_refresh_secret}
-      CLIENT_URL: ${CLIENT_URL:-http://localhost:5173}
+      CLIENT_BASE: ${CLIENT_URL:-http://localhost:5173}
     ports:
       - "${SERVER_PORT:-5000}:${SERVER_PORT:-5000}"
-    volumes:
-      # Hot-reload: mount source + output so nodemon picks up esbuild changes
-      - ./server/src:/app/server/src
-      - ./server/dist:/app/server/dist
-      # Mount prisma dir so schema changes & new migrations are picked up live
-      - ./server/prisma:/app/server/prisma
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-qO-",
+          "http://127.0.0.1:${SERVER_PORT:-5000}/health",
+          "||",
+          "exit",
+          "1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    develop:
+      watch:
+        # app code → esbuild rebuilds + nodemon restarts inside the container
+        - action: sync
+          path: ./server/src
+          target: /app/server/src
+        # schema edits → synced; then run `prisma migrate dev` manually (see header)
+        - action: sync
+          path: ./server/prisma
+          target: /app/server/prisma
+        - action: sync
+          path: ./server/swagger.yaml
+          target: /app/server/swagger.yaml
+        # dependency changes need a fresh install
+        - action: rebuild
+          path: ./server/package.json
+        - action: rebuild
+          path: ./pnpm-lock.yaml
 
   # ─────────────────────────────────────────
-  # Vite dev server
+  # Vite dev server — HMR fed by compose watch sync
   # ─────────────────────────────────────────
   client:
     build:
       context: .
       dockerfile: client/Dockerfile
-      target: deps
+      target: dev
     restart: unless-stopped
-    working_dir: /app/client
+    init: true
     command: pnpm --filter client dev --host 0.0.0.0
     depends_on:
       - server
     environment:
       # Vite reads these at runtime in dev (not baked in like prod)
-      VITE_APP_API_URL: http://localhost:5000
-      VITE_APP_SOCKET_URL: ws://localhost:5000/collaboration
+      VITE_APP_API_URL: http://localhost:${SERVER_PORT:-5000}
+      VITE_APP_SOCKET_URL: ws://localhost:${SERVER_PORT:-5000}/collaboration
     ports:
       - "5173:5173"
-    volumes:
-      # Full src mount so Vite's HMR picks up all file changes
-      - ./client/src:/app/client/src
-      # Also mount public so asset changes are live
-      - ./client/public:/app/client/public
-      # index.html & config files (vite.config.ts, tsconfig.json, etc.)
-      - ./client/index.html:/app/client/index.html
-      - ./client/vite.config.ts:/app/client/vite.config.ts
-      - ./client/tsconfig.json:/app/client/tsconfig.json
-      # Storybook config for vitest integration
-      - ./client/.storybook:/app/client/.storybook
-      - ./client/.storybook/vitest.setup.ts:/app/client/.storybook/vitest.setup.ts:ro
+    healthcheck:
+      test:
+        ["CMD", "wget", "-qO-", "http://127.0.0.1:5173/", "||", "exit", "1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    develop:
+      watch:
+        # app code → Vite HMR picks it up live
+        - action: sync
+          path: ./client/src
+          target: /app/client/src
+        - action: sync
+          path: ./client/public
+          target: /app/client/public
+        # config changes need a process restart → rebuild
+        - action: rebuild
+          path: ./client/vite.config.ts
+        - action: rebuild
+          path: ./client/package.json
+        - action: rebuild
+          path: ./pnpm-lock.yaml
 
   # ─────────────────────────────────────────
   # Prisma Studio — visual DB browser
@@ -106,10 +154,11 @@ services:
     build:
       context: .
       dockerfile: server/Dockerfile
-      target: builder
+      target: generated
     restart: unless-stopped
+    init: true
     working_dir: /app/server
-    command: npx prisma@6.3.1 studio --schema=./prisma/schema.prisma --port 5555 --browser none
+    command: pnpm exec prisma studio --schema=./prisma/schema.prisma --port 5555 --browser none
     depends_on:
       db:
         condition: service_healthy
