@@ -26,8 +26,9 @@ app.use(helmet());
 // Json parser
 app.use(express.json());
 
-// Cors middleware — the Vite dev server (5173) calls the API cross-origin;
-// prod nginx proxies same-origin so this is mostly a dev concern.
+// Cors middleware — the browser calls this API cross-origin in dev (Vite :5173)
+// and in prod too: nginx serves only the SPA with no /api proxy
+// (see client/nginx.conf), so the allowlist must include CLIENT_BASE.
 const allowedOrigins = [
   process.env.CLIENT_BASE ?? 'http://localhost:5173',
   'http://localhost:5173',
