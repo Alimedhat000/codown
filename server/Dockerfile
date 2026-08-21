@@ -3,7 +3,9 @@
 # ──────────────────────────────────────────────
 FROM node:22-alpine AS builder
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Pin pnpm to match the repo's packageManager field (layer-cached, no corepack indirection)
+ARG PNPM_VERSION=11.1.1
+RUN npm install -g pnpm@${PNPM_VERSION}
 
 WORKDIR /app
 
@@ -11,7 +13,9 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY server/package.json ./server/
 COPY client/package.json ./client/
 
-RUN pnpm install --frozen-lockfile --ignore-scripts
+# Cache mount: repeat builds reuse the store instead of re-downloading 1200+ packages
+RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile --ignore-scripts
 
 COPY server/ ./server/
 
@@ -23,7 +27,8 @@ RUN pnpm --filter server build
 # ──────────────────────────────────────────────
 FROM node:22-alpine AS prod-deps
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+ARG PNPM_VERSION=11.1.1
+RUN npm install -g pnpm@${PNPM_VERSION}
 
 WORKDIR /app
 
@@ -31,12 +36,16 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY server/package.json ./server/
 COPY client/package.json ./client/
 
-RUN pnpm install --frozen-lockfile --prod --ignore-scripts --filter server
+RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile --prod --ignore-scripts --filter server
 
 # Copy schema and use npx to run prisma generate without touching pnpm's
-# module state (npx downloads prisma into a temp cache, separate from node_modules)
+# module state (prisma CLI is a devDependency, absent from this prod install;
+# npx downloads it into a temp cache, separate from node_modules).
+# Pinned to the lockfile's prisma version.
 COPY server/prisma ./server/prisma
-RUN npx --yes prisma@6.3.1 generate --schema=./server/prisma/schema.prisma
+RUN --mount=type=cache,id=npm-npx,target=/root/.npm \
+    npx --yes prisma@6.12.0 generate --schema=./server/prisma/schema.prisma
 
 # ──────────────────────────────────────────────
 # Stage 3: runner — final lean image
