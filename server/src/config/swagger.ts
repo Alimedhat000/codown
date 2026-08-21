@@ -1,3 +1,4 @@
+import type { Application } from 'express';
 import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import { fileURLToPath } from 'url';
@@ -7,7 +8,7 @@ import { logger } from '@/lib/logger';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-export const setupSwagger = (app: any) => {
+export const setupSwagger = (app: Application) => {
   // Only serve Swagger in development and staging
   if (process.env.NODE_ENV === 'production') {
     return;

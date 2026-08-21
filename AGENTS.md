@@ -5,7 +5,8 @@ Real-time collaborative Markdown editor. pnpm workspace monorepo: `client/` (Rea
 ## Commands
 
 - `pnpm install` then `pnpm dev` — client (Vite, port 5173) + server in parallel. Per-package: `pnpm --filter client|server <script>`.
-- `pnpm --filter server dev` runs nodemon on `dist/server.js` — it does **not** build first. Run `pnpm --filter server build` first; there is no local watch build (only the dev Docker compose uses esbuild `--watch`).
+- `pnpm --filter server dev` = esbuild `--watch=forever` (builds to `dist/server.js`) + nodemon in parallel. First run needs no manual build; if `dist/` is stale before the first watch pass, wait a beat or run `pnpm --filter server build` once.
+- `pnpm docker:dev` / `pnpm docker:down` — wrappers for the dev compose stack (see Docker).
 - `pnpm build` / `lint` / `typecheck` / `test` at root run both packages in parallel (npm-run-all). CI order is lint → typecheck → build → test.
 - Root `format` only runs `server lint:fix` — it does not touch the client.
 - `pnpm --filter client generate` = plop, scaffolds components under `client/generators/`.
@@ -35,5 +36,6 @@ Real-time collaborative Markdown editor. pnpm workspace monorepo: `client/` (Rea
 
 ## Docker
 
-- `docker-compose.dev.yml`: full dev stack with hot reload (server: esbuild watch + nodemon; client: Vite HMR with src mounted). Prisma Studio is opt-in via `docker compose --profile tools up` (port 5555).
+- `docker-compose.dev.yml`: full dev stack driven by **compose watch** (`develop.watch`). Images use dedicated `dev` stages with source baked in and nothing compiled at build time. Run `docker compose -f docker-compose.dev.yml up --build --watch` (or `pnpm docker:dev`); later runs can skip `--build`. Source edits sync into containers live (server: esbuild rebuild + nodemon restart; client: Vite HMR). Changes to package.json / lockfile / vite.config.ts trigger automatic rebuild+restart of that service. Schema changes: edit `schema.prisma`, then `docker compose -f docker-compose.dev.yml exec server pnpm exec prisma migrate dev`. Prisma Studio is opt-in via `docker compose -f docker-compose.dev.yml --profile tools up studio` (port 5555, runs from the `generated` stage).
 - `docker-compose.yml`: production multi-stage build; client served by nginx (port 80, override with `CLIENT_PORT`); server healthcheck on `/health`; fails fast if `POSTGRES_PASSWORD` or JWT secrets are unset.
+- pnpm is pinned via root `packageManager` field + `ARG PNPM_VERSION` in both Dockerfiles; installs use BuildKit cache mounts (`id=pnpm-store`) shared across all stages/images, so repeat builds don't re-download packages. Root `.npmrc` raises fetch retries/timeouts for flaky networks.

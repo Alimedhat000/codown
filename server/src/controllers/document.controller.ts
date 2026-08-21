@@ -85,7 +85,7 @@ export const getDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: R
     const collaboratorEntry = doc?.Collaborator[0]; // because we filtered by userId
 
     const isOwner = doc?.authorId === userId;
-    const isCollaborator = doc?.Collaborator.some(c => c.userId === userId);
+    const isCollaborator = doc?.Collaborator.some((c: { userId: string }) => c.userId === userId);
     const permissionFromDB = isOwner ? 'owner' : (collaboratorEntry?.permission ?? 'none');
 
     if (!doc || (!isOwner && !isCollaborator)) {
@@ -210,7 +210,9 @@ export const updateDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
     });
 
     const isOwner = doc?.authorId === userId;
-    const isEditor = doc?.Collaborator.some(c => c.userId === userId && c.permission === 'edit');
+    const isEditor = doc?.Collaborator.some(
+      (c: { userId: string; permission: string }) => c.userId === userId && c.permission === 'edit'
+    );
 
     if (!doc || (!isOwner && !isEditor)) {
       // logger.warn('Document update denied', {
@@ -446,7 +448,7 @@ export const getDocByToken = asyncErrorWrapper(async (req: AuthenticatedRequest,
     const collaboratorEntry = doc?.Collaborator[0];
 
     const isOwner = doc?.authorId === userId;
-    const isCollaborator = doc?.Collaborator.some(c => c.userId === userId);
+    const isCollaborator = doc?.Collaborator.some((c: { userId: string }) => c.userId === userId);
     const permissionFromDB = isOwner ? 'owner' : (collaboratorEntry?.permission ?? 'none');
 
     if (isCollaborator || isOwner) {

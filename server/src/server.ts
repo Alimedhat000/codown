@@ -1,13 +1,13 @@
 import '@/config/env.config';
 
 import cookieParser from 'cookie-parser';
-import { logger } from '@/lib/logger';
-// import cors from 'cors';
+import cors from 'cors';
 import express from 'express';
 import expressWebsockets from 'express-ws';
 import helmet from 'helmet';
 import path from 'path';
 
+import { logger } from '@/lib/logger';
 import { errorMiddleware } from '@/middlewares/error.middleware';
 import { morganFile, morganWinston, requestIdMiddleware } from '@/middlewares/logging.middleware';
 import { router } from '@/routers';
@@ -26,21 +26,21 @@ app.use(helmet());
 // Json parser
 app.use(express.json());
 
-// const allowedOrigins = ['http://localhost:5173', 'http://localhost', 'http://localhost:3000'];
+// Cors middleware — the browser calls this API cross-origin in dev (Vite :5173)
+// and in prod too: nginx serves only the SPA with no /api proxy
+// (see client/nginx.conf), so the allowlist must include CLIENT_BASE.
+const allowedOrigins = [
+  process.env.CLIENT_BASE ?? 'http://localhost:5173',
+  'http://localhost:5173',
+  'http://localhost',
+];
 
-// Cors middleware
-// app.use(
-//   cors({
-//     origin: (origin, callback) => {
-//       if (!origin || allowedOrigins.includes(origin)) {
-//         callback(null, true);
-//       } else {
-//         callback(new Error('Not allowed by CORS'));
-//       }
-//     },
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 
 // Cookie parser
 app.use(cookieParser());

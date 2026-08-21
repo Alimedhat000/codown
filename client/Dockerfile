@@ -3,7 +3,9 @@
 # ──────────────────────────────────────────────
 FROM node:22-alpine AS deps
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Pin pnpm to match the repo's packageManager field (layer-cached, no corepack indirection)
+ARG PNPM_VERSION=11.1.1
+RUN npm install -g pnpm@${PNPM_VERSION}
 
 WORKDIR /app
 
@@ -11,17 +13,29 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY client/package.json ./client/
 COPY server/package.json ./server/
 
+# Cache mount: repeat builds reuse the store instead of re-downloading 1200+ packages.
 # --ignore-scripts prevents husky from running and failing
-RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile --ignore-scripts
+
+# ──────────────────────────────────────────────
+# dev — full client source present, nothing built; used by
+# docker-compose.dev.yml with `docker compose watch` (Vite HMR at runtime).
+# Needs the whole client/ tree: vite.config.ts loads the Storybook test
+# plugin, which expects .storybook/ to exist.
+# ──────────────────────────────────────────────
+FROM deps AS dev
+
+COPY client/ ./client/
+
+CMD ["pnpm", "--filter", "client", "dev", "--host", "0.0.0.0"]
 
 # ──────────────────────────────────────────────
 # Stage 2: builder — vite build
 # ──────────────────────────────────────────────
-FROM deps AS builder
+FROM dev AS builder
 
 WORKDIR /app
-
-COPY client/ ./client/
 
 # Build args injected at build time → baked into the JS bundle as VITE_ env vars
 ARG VITE_APP_API_URL
