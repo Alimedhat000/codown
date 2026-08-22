@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as Y from 'yjs';
 
 import { env } from '@/config/env';
+import { getAccessToken } from '@/utils/token';
 
 export function useCollab(docId: string | undefined) {
   const [text, setText] = useState('');
@@ -19,6 +20,7 @@ export function useCollab(docId: string | undefined) {
       url: env.Socket_URL, // Hocuspocus server URL
       name: docId, // Room/document ID
       document: ydoc,
+      token: getAccessToken(), // Required by the server's onAuthenticate hook
     });
 
     const ytext = ydoc.getText('content');
