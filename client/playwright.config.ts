@@ -75,6 +75,18 @@ export default defineConfig({
       dependencies: ['setup'],
     },
     {
+      /* Multi-client tests (second browser context + registrations) are the
+       * heaviest specs; they run in their own serialized stage to avoid
+       * competing with the single-client tests for server/worker resources. */
+      name: 'collaboration-specs',
+      testMatch: /collaboration\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: AUTH_FILE,
+      },
+      dependencies: ['chromium'],
+    },
+    {
       /* Must run after every other authenticated spec: logging out nulls the
        * user's refresh token server-side and invalidates the shared session. */
       name: 'logout-specs',
@@ -83,7 +95,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         storageState: AUTH_FILE,
       },
-      dependencies: ['chromium'],
+      dependencies: ['collaboration-specs'],
     },
 
     // {

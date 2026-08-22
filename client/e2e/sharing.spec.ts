@@ -42,11 +42,12 @@ test.describe('Document Sharing', () => {
     await expect(copyButton).toBeEnabled();
     await copyButton.click({ force: true }); // skip radix open-animation checks
 
+    // Toast renders both a visible div and an sr-only role="status" copy;
+    // assert on the status element (tolerates the app's "Coppied" typo)
+    await expect(page.getByRole('status')).toContainText(/cop{2}ied|copied/i);
+
     const clipboard = await page.evaluate(() => navigator.clipboard.readText());
     expect(new URL(clipboard).pathname).toBe(sharePath);
-
-    // App toast title contains a typo ("Text Coppied"); match tolerantly
-    await expect(page.getByText(/cop{2}ied|copied/i)).toBeVisible();
   });
 
   test('should grant access through the share link', async ({ page }) => {

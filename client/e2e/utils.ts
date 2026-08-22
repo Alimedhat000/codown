@@ -26,3 +26,36 @@ export async function createTestDocument(page: Page, title: string) {
 
   await expect(getDocumentCard(page, title)).toBeVisible();
 }
+
+export async function openDocumentEditor(page: Page, title: string) {
+  await createTestDocument(page, title);
+  await getDocumentCard(page, title).first().click();
+  await expect(page).toHaveURL(/.*\/app\/doc\/.+/);
+}
+
+// Server-generated links currently omit the port (e.g. http://localhost/...),
+// so navigate by pathname against the test baseURL instead of the raw URL.
+export async function getSharePath(
+  page: Page,
+  permission?: 'view' | 'edit',
+): Promise<string> {
+  await page.getByRole('button', { name: 'Share' }).click();
+
+  const menu = page.getByRole('menu');
+  await expect(menu).toBeVisible();
+
+  if (permission) {
+    const label = permission === 'view' ? 'View mode' : 'Edit mode';
+    await menu.getByRole('combobox').click();
+    await page.getByRole('option', { name: label }).click();
+    // Link token is regenerated for the new permission
+    await page.waitForTimeout(500);
+  }
+
+  const linkEl = menu.locator('p').first();
+  await expect(linkEl).toHaveText(/\/app\/doc\/share\/\S+/);
+
+  const sharePath = new URL((await linkEl.textContent()) ?? '').pathname;
+  await page.keyboard.press('Escape'); // close the menu
+  return sharePath;
+}
