@@ -298,4 +298,60 @@ describe('Document Routes', () => {
     expect(JSON.stringify(res.body)).not.toContain('stale-refresh-token-value');
     expect(JSON.stringify(res.body)).not.toContain('leakcollab@test.dev');
   });
+
+  it('should allow edit collaborators to list collaborators', async () => {
+    const doc = await prisma.document.create({
+      data: { title: 'Shared Doc', authorId: userId, content: '' },
+    });
+
+    await request(app).post('/api/auth/register').send({
+      email: 'editor@test.dev',
+      username: 'editor',
+      password: 'secure123',
+    });
+
+    const editorLogin = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'editor@test.dev', password: 'secure123' });
+    const editorId = editorLogin.body.user.id;
+
+    await prisma.collaborator.create({
+      data: { documentId: doc.id, userId: editorId, permission: 'edit' },
+    });
+
+    const res = await request(app)
+      .get(`/api/document/${doc.id}/collaborators`)
+      .set('Authorization', `Bearer ${editorLogin.body.accessToken}`);
+
+    expect(res.status).toBe(StatusCodes.OK);
+    expect(res.body).toHaveLength(1);
+    expect(Object.keys(res.body[0].user).sort()).toEqual(['fullName', 'id', 'username']);
+  });
+
+  it('should forbid view-only collaborators from listing collaborators', async () => {
+    const doc = await prisma.document.create({
+      data: { title: 'Viewer Doc', authorId: userId, content: '' },
+    });
+
+    await request(app).post('/api/auth/register').send({
+      email: 'viewer@test.dev',
+      username: 'viewer',
+      password: 'secure123',
+    });
+
+    const viewerLogin = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'viewer@test.dev', password: 'secure123' });
+    const viewerId = viewerLogin.body.user.id;
+
+    await prisma.collaborator.create({
+      data: { documentId: doc.id, userId: viewerId, permission: 'view' },
+    });
+
+    const res = await request(app)
+      .get(`/api/document/${doc.id}/collaborators`)
+      .set('Authorization', `Bearer ${viewerLogin.body.accessToken}`);
+
+    expect(res.status).toBe(StatusCodes.FORBIDDEN);
+  });
 });
