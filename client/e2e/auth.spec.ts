@@ -67,4 +67,43 @@ test.describe('Authentication Flow', () => {
     await page.getByRole('button', { name: /user menu/i }).click();
     await expect(page.getByRole('menuitem', { name: /logout/i })).toBeVisible();
   });
+
+  test('should register a new account and redirect to login', async ({
+    page,
+  }) => {
+    const suffix = Date.now();
+    await page.goto('/register');
+
+    await page.getByLabel('Email').fill(`e2e-${suffix}@test.local`);
+    await page.getByLabel('Username').fill(`e2e_${suffix}`);
+    await page.getByLabel('Full Name').fill('E2E Registered User');
+    await page.getByLabel('Password').fill('e2epassword');
+
+    await page
+      .getByRole('button', { name: /create account|register|sign up/i })
+      .click();
+
+    // Registration succeeds -> the app sends the user to /login
+    await expect(page).toHaveURL(/\/login/, { timeout: 10_000 });
+  });
+
+  test('should reject registration with an existing email', async ({
+    page,
+  }) => {
+    await page.goto('/register');
+
+    const suffix = Date.now();
+    await page.getByLabel('Email').fill('test@example.com');
+    await page.getByLabel('Username').fill(`e2edup${suffix}`);
+    await page.getByLabel('Full Name').fill('E2E Duplicate User');
+    await page.getByLabel('Password').fill('e2epassword');
+
+    await page
+      .getByRole('button', { name: /create account|register|sign up/i })
+      .click();
+
+    await expect(page.getByText(/already exists|failed/i)).toBeVisible({
+      timeout: 10_000,
+    });
+  });
 });

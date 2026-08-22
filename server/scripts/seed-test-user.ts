@@ -26,6 +26,14 @@ async function main() {
     console.log(`🧹 Removed ${count} leftover test document(s)`);
   }
 
+  // Remove throwaway accounts created by the registration specs in past runs
+  const removedUsers = await prisma.user.deleteMany({
+    where: { email: { startsWith: 'e2e-' } },
+  });
+  if (removedUsers.count > 0) {
+    console.log(`🧹 Removed ${removedUsers.count} leftover e2e account(s)`);
+  }
+
   console.log('✅ Test user ready');
 }
 

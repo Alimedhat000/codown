@@ -1,4 +1,6 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
+import { createTestDocument, getDocumentCard, openDocumentMenu } from './utils';
 
 test.describe('Dashboard', () => {
   test.beforeEach(async ({ page }) => {
@@ -106,28 +108,43 @@ test.describe('Dashboard', () => {
     await page.getByRole('radio', { name: 'Grid view' }).click();
     await expect(container).toHaveClass(/document-grid/);
   });
+
+  test('should sort documents', async ({ page }) => {
+    // Created first, so it is the OLDER of the two but sorts first A->Z
+    const titleA = `AAA Sort Doc ${Date.now()}`;
+    // Created second: NEWER, but sorts last A->Z. Relative order of these two
+    // is asserted (not global order) so concurrent tests cannot interfere.
+    const titleB = `MMM Sort Doc ${Date.now()}`;
+
+    await createTestDocument(page, titleA);
+    await createTestDocument(page, titleB);
+
+    const positionOf = async (title: string) =>
+      page.getByTestId('document-list').evaluate((list, t) => {
+        return Array.from(list.children).findIndex((el) =>
+          el.textContent?.includes(t as string),
+        );
+      }, title);
+
+    await page.getByRole('button', { name: 'sort', exact: true }).click();
+    await page.getByRole('menuitemradio', { name: 'New To Old' }).click();
+
+    let [posA, posB] = await Promise.all([
+      positionOf(titleA),
+      positionOf(titleB),
+    ]);
+    expect(posB).toBeLessThan(posA); // newer (MMM) first
+
+    await page.getByRole('button', { name: 'sort', exact: true }).click();
+    await page.getByRole('menuitemradio', { name: 'A to Z' }).click();
+
+    [posA, posB] = await Promise.all([positionOf(titleA), positionOf(titleB)]);
+    expect(posA).toBeLessThan(posB); // AAA first
+
+    await page.getByRole('button', { name: 'sort', exact: true }).click();
+    await page.getByRole('menuitemradio', { name: 'Z to A' }).click();
+
+    [posA, posB] = await Promise.all([positionOf(titleA), positionOf(titleB)]);
+    expect(posB).toBeLessThan(posA); // MMM first
+  });
 });
-
-function getDocumentCard(page: Page, title: string) {
-  return page.getByRole('link').filter({ hasText: title });
-}
-
-async function openDocumentMenu(page: Page, title: string) {
-  const card = getDocumentCard(page, title);
-  await expect(card).toBeVisible();
-  await card.getByRole('button', { name: 'options' }).click();
-  await expect(page.getByRole('menu')).toBeVisible();
-}
-
-async function createTestDocument(page: Page, title: string) {
-  await page.getByLabel(/new document/i).click();
-
-  const dialog = page.getByRole('dialog');
-  await expect(dialog).toBeVisible();
-
-  await dialog.getByLabel('Document Title').fill(title);
-  await dialog.getByRole('button', { name: /create/i }).click();
-  await expect(dialog).not.toBeVisible();
-
-  await expect(getDocumentCard(page, title)).toBeVisible();
-}

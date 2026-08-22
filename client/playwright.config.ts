@@ -47,11 +47,12 @@ export default defineConfig({
   /* Configure projects for major browsers.
    *
    * Order matters: logging in overwrites the user's single stored refresh
-   * token (server-side), which invalidates every previously-issued session.
-   * The unauthenticated auth specs (which perform a real login) therefore run
-   * BEFORE the setup project saves the storageState shared by dashboard tests;
-   * token refresh itself does not rotate the stored token, so those tests can
-   * safely run in parallel against the same session. */
+   * token (server-side), which invalidates every previously-issued session,
+   * and logging out nulls it entirely. The unauthenticated auth specs
+   * (which perform a real login) therefore run BEFORE the setup project saves
+   * the storageState, the authenticated specs run against that shared session,
+   * and the logout spec runs LAST. Token refresh itself does not rotate the
+   * stored token, so those tests can safely run in parallel. */
   projects: [
     {
       name: 'auth-specs',
@@ -65,13 +66,24 @@ export default defineConfig({
     },
     {
       name: 'chromium',
-      testMatch: /(dashboard)\.spec\.ts/,
+      testMatch: /(dashboard|editor|sharing)\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         /* Tests run as the authenticated test user (see auth.setup.ts). */
         storageState: AUTH_FILE,
       },
       dependencies: ['setup'],
+    },
+    {
+      /* Must run after every other authenticated spec: logging out nulls the
+       * user's refresh token server-side and invalidates the shared session. */
+      name: 'logout-specs',
+      testMatch: /logout\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: AUTH_FILE,
+      },
+      dependencies: ['chromium'],
     },
 
     // {
