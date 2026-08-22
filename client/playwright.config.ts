@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const AUTH_FILE = 'playwright/.auth/user.json';
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -22,12 +24,12 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [['html', { open: 'always' }]],
+  reporter: [['html', { open: 'on-failure' }]],
 
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/test-configuration. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:5173', // Vite default port
+    baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:5173',
 
     /* Collect trace when retrying the failed test. */
     trace: 'on-first-retry',
@@ -35,19 +37,41 @@ export default defineConfig({
     /* Take screenshot on failure */
     screenshot: 'only-on-failure',
 
-    /* Record video on failure */
-    video: 'on',
+    /* Keep video only when a test fails */
+    video: 'retain-on-failure',
 
     /* Run in headless mode */
     headless: true,
-    launchOptions: { slowMo: 1000 },
   },
 
-  /* Configure projects for major browsers */
+  /* Configure projects for major browsers.
+   *
+   * Order matters: logging in overwrites the user's single stored refresh
+   * token (server-side), which invalidates every previously-issued session.
+   * The unauthenticated auth specs (which perform a real login) therefore run
+   * BEFORE the setup project saves the storageState shared by dashboard tests;
+   * token refresh itself does not rotate the stored token, so those tests can
+   * safely run in parallel against the same session. */
   projects: [
     {
+      name: 'auth-specs',
+      testMatch: /auth\.spec\.ts/,
+      use: { storageState: { cookies: [], origins: [] } },
+    },
+    {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+      dependencies: ['auth-specs'],
+    },
+    {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      testMatch: /(dashboard)\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        /* Tests run as the authenticated test user (see auth.setup.ts). */
+        storageState: AUTH_FILE,
+      },
+      dependencies: ['setup'],
     },
 
     // {
@@ -83,8 +107,8 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'cd .. && npm run dev',
-    url: 'http://localhost:5173',
+    command: 'pnpm --dir .. dev',
+    url: process.env.E2E_BASE_URL ?? 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },

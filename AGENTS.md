@@ -24,6 +24,7 @@ Real-time collaborative Markdown editor. pnpm workspace monorepo: `client/` (Rea
 - Only the server has a real test suite: `pnpm --filter server test` (vitest, serial, `fileParallelism: false`).
 - Server tests **require a running Postgres**. `test/setup.ts` runs `prisma db push --force-reset` against `TEST_DATABASE_URL` (falls back to `DATABASE_URL`) on every run and truncates all tables after each test — destructive to the configured DB.
 - Client vitest is wired only to Storybook browser tests (`@storybook/addon-vitest`, headless chromium via Playwright). There is no client `test` script; `client/src/lib/__tests__/api.test.tsx` is not attached to any runner.
+- E2E: `pnpm --filter client test:e2e` (Playwright, chromium). Requires the full dev stack up (or it starts it via `webServer`) and Postgres reachable by the server. It first seeds/resets the test user's data (`server/scripts/seed-test-user.ts` deletes that user's documents), then runs: auth specs (unauthenticated) → login setup → dashboard specs sharing a saved session. Login invalidates previously issued refresh tokens server-side, which is why project order matters — see `client/playwright.config.ts`.
 - Pre-commit: husky + lint-staged run eslint `--fix` on staged files; `lint:ci` uses `--max-warnings 0`.
 
 ## Architecture & conventions
