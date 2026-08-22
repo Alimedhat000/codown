@@ -6,6 +6,7 @@ import { env } from '@/config/env';
 
 export function useCollab(docId: string | undefined) {
   const [text, setText] = useState('');
+  const [isReady, setIsReady] = useState(false);
   const ydocRef = useRef<Y.Doc | null>(null);
   const ytextRef = useRef<Y.Text | null>(null);
   const providerRef = useRef<HocuspocusProvider | null>(null);
@@ -29,6 +30,10 @@ export function useCollab(docId: string | undefined) {
     const updateHandler = () => setText(ytext.toString());
     ytext.observe(updateHandler);
     setText(ytext.toString());
+    // Refs don't trigger renders; for a fresh (empty) document the initial
+    // setText('') is a no-op and no ytext update ever fires, so without this
+    // transition the editor never mounts and the spinner shows forever.
+    setIsReady(true);
 
     return () => {
       ytext.unobserve(updateHandler);
@@ -37,11 +42,13 @@ export function useCollab(docId: string | undefined) {
       ydocRef.current = null;
       ytextRef.current = null;
       providerRef.current = null;
+      setIsReady(false);
     };
   }, [docId]);
 
   return {
     text,
+    isReady,
     ydoc: ydocRef.current,
     ytext: ytextRef.current,
     provider: providerRef.current,

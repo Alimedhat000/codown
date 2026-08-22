@@ -21,11 +21,13 @@ export function DocumentList({
   onDocumentDeleted,
   isOwned,
 }: Props) {
-  const gridClass = 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2';
-  const containerClass = view === 'grid' ? gridClass : 'space-y-2';
+  const gridClass =
+    'document-grid grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2';
+  const containerClass =
+    view === 'grid' ? gridClass : 'document-list space-y-2';
 
   return (
-    <div className={containerClass}>
+    <div className={containerClass} data-testid="document-list">
       {documents.map((doc) => {
         const Component = view === 'grid' ? DocumentGridCard : DocumentRow;
 

@@ -19,7 +19,7 @@ export function DocumentRow({
   isOwned,
 }: DocumentRowProps) {
   return (
-    <div className="hover:bg-surface ring ring-surface-border hover:ring-muted-foreground flex items-center justify-between rounded-md px-4 py-3">
+    <div className="document-item hover:bg-surface ring ring-surface-border hover:ring-muted-foreground flex items-center justify-between rounded-md px-4 py-3">
       <div className="flex flex-col gap-1">
         <p className="text-sm font-medium">{document.title || 'Untitled'}</p>
         <span className="text-muted-foreground text-xs font-medium">

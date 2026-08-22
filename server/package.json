@@ -21,6 +21,7 @@
     "db:studio": "prisma studio",
     "db:migrate": "prisma migrate dev",
     "db:migrate:prod": "prisma migrate deploy",
+    "seed:test": "ts-node scripts/seed-test-user.ts",
     "test": "vitest run"
   },
   "keywords": [],

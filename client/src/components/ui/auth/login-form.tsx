@@ -41,6 +41,7 @@ export default function LoginForm({
       >
         <Input
           type="email"
+          id="email"
           label="Email"
           placeholder="Enter your email"
           registration={register('email')}
@@ -50,6 +51,7 @@ export default function LoginForm({
 
         <Input
           type="password"
+          id="password"
           label="Password"
           placeholder="Enter your password"
           registration={register('password')}
