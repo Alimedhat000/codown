@@ -16,6 +16,7 @@ const envVarsSchema = z.object({
   DATABASE_URL: z.string(),
   JWT_ACCESS_SECRET: z.string(),
   JWT_REFRESH_SECRET: z.string(),
+  SHARE_LINK_SECRET: z.string(),
 });
 
 const parseEnvResult = envVarsSchema.safeParse(process.env);
@@ -27,3 +28,5 @@ if (!parseEnvResult.success) {
 }
 
 export type EnvVars = z.infer<typeof envVarsSchema>;
+
+export const env = parseEnvResult.data;
