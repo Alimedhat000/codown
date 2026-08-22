@@ -26,7 +26,7 @@ export function DocumentMain({
   className?: string;
   isReadOnly?: boolean;
 }) {
-  const { text, ydoc, ytext, provider } = useCollab(docId);
+  const { text, isReady, ydoc, ytext, provider } = useCollab(docId);
   const editorScrollRef = useRef<HTMLDivElement>(null);
   const previewScrollRef = useRef<HTMLDivElement>(null);
   const isSyncingRef = useRef(false);
@@ -109,7 +109,7 @@ export function DocumentMain({
       isSyncingRef.current = false;
     });
   };
-  if (!docId || !ydoc || !ytext || !provider) {
+  if (!docId || !isReady || !ydoc || !ytext || !provider) {
     return (
       <div className="flex items-center justify-center h-screen w-full text-muted">
         <Spinner size="lg" />
