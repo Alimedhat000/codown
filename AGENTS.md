@@ -8,6 +8,7 @@ Real-time collaborative Markdown editor. pnpm workspace monorepo: `client/` (Rea
 - `pnpm --filter server dev` = esbuild `--watch=forever` (builds to `dist/server.js`) + nodemon in parallel. First run needs no manual build; if `dist/` is stale before the first watch pass, wait a beat or run `pnpm --filter server build` once.
 - `pnpm docker:dev` / `pnpm docker:down` — wrappers for the dev compose stack (see Docker).
 - `pnpm build` / `lint` / `typecheck` / `test` at root run both packages in parallel (npm-run-all). CI order is lint → typecheck → build → test.
+- `.github/workflows/e2e.yml` runs the Playwright suite on push/PR (postgres service + migrations + `test:e2e`; webServer boots the dev stack natively from `.env.example`, so the server runs on **5001** in CI — the collaboration specs get `E2E_API_URL` set accordingly). Reports upload as artifacts on failure.
 - Root `format` only runs `server lint:fix` — it does not touch the client.
 - `pnpm --filter client generate` = plop, scaffolds components under `client/generators/`.
 - Client build is `tsc -b && vite build`; server build is a single esbuild ESM bundle → `dist/server.js`.
