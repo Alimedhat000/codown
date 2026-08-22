@@ -245,4 +245,57 @@ describe('Document Routes', () => {
 
     expect(removeRes.status).toBe(StatusCodes.OK);
   });
+
+  it('should forbid non-owners from listing collaborators', async () => {
+    const doc = await prisma.document.create({
+      data: { title: 'Private Doc', authorId: userId, content: '' },
+    });
+
+    await request(app).post('/api/auth/register').send({
+      email: 'outsider@test.dev',
+      username: 'outsider',
+      password: 'secure123',
+    });
+
+    const outsiderLogin = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'outsider@test.dev', password: 'secure123' });
+
+    const res = await request(app)
+      .get(`/api/document/${doc.id}/collaborators`)
+      .set('Authorization', `Bearer ${outsiderLogin.body.accessToken}`);
+
+    expect(res.status).toBe(StatusCodes.FORBIDDEN);
+  });
+
+  it('should not expose credentials when listing collaborators', async () => {
+    const doc = await prisma.document.create({
+      data: { title: 'Leaky', authorId: userId, content: '' },
+    });
+
+    const collaboratorUser = await prisma.user.create({
+      data: {
+        email: 'leakcollab@test.dev',
+        username: 'leakcollab',
+        password: 'super-hashed-secret',
+        fullName: 'Leaky Collaborator',
+        refreshToken: 'stale-refresh-token-value',
+      },
+    });
+
+    await prisma.collaborator.create({
+      data: { documentId: doc.id, userId: collaboratorUser.id, permission: 'edit' },
+    });
+
+    const res = await request(app).get(`/api/document/${doc.id}/collaborators`).set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.OK);
+    expect(res.body).toHaveLength(1);
+    for (const collaborator of res.body) {
+      expect(Object.keys(collaborator.user).sort()).toEqual(['fullName', 'id', 'username']);
+    }
+    expect(JSON.stringify(res.body)).not.toContain('super-hashed-secret');
+    expect(JSON.stringify(res.body)).not.toContain('stale-refresh-token-value');
+    expect(JSON.stringify(res.body)).not.toContain('leakcollab@test.dev');
+  });
 });
