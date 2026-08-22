@@ -49,6 +49,7 @@ services:
       # JWT — using the names your server validation expects
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET is required}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET is required}
+      SHARE_LINK_SECRET: ${SHARE_LINK_SECRET:?SHARE_LINK_SECRET is required}
       # Server code reads CLIENT_BASE for building share links
       CLIENT_BASE: ${CLIENT_URL:-http://localhost}
     ports:
