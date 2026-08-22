@@ -58,4 +58,19 @@ test.describe('Document Editor', () => {
     ).toBeVisible();
     await expect(page.locator('.cm-editor')).toHaveCount(0);
   });
+
+  test('should show editor and preview side by side in split mode', async ({
+    page,
+  }) => {
+    await page.locator('.cm-content').first().click();
+    await page.keyboard.type(MARKDOWN);
+
+    await page.getByRole('radio', { name: /Split view/i }).click();
+
+    // Both panes render simultaneously in split mode
+    await expect(page.locator('.cm-editor')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Hello E2E' }),
+    ).toBeVisible();
+  });
 });

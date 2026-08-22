@@ -32,9 +32,13 @@ async function loginUser2(page: Page, suffix: number) {
   await expect(page).toHaveURL(/.*\/app/, { timeout: 10_000 });
 }
 
-// Owner approves the pending request from the Share menu. The hook fetching
+// Owner resolves the pending request from the Share menu. The hook fetching
 // join requests runs once on mount (no polling), so the page is reloaded first.
-async function approvePendingRequest(page: Page, username: string) {
+async function resolvePendingRequest(
+  page: Page,
+  username: string,
+  action: 'approve' | 'reject',
+) {
   await page.reload();
   await expect(page.locator('.cm-editor')).toBeVisible({ timeout: 10_000 });
 
@@ -44,10 +48,39 @@ async function approvePendingRequest(page: Page, username: string) {
 
   const row = menu.locator('div.rounded-md').filter({ hasText: username });
   await expect(row).toBeVisible();
-  await row.getByRole('button').first().click(); // green approve button
 
-  await expect(row).toHaveCount(0); // removed from the list after approval
+  // First button is the green approve, second the red reject
+  const buttons = row.getByRole('button');
+  await (action === 'approve' ? buttons.first() : buttons.nth(1)).click();
+
+  await expect(row).toHaveCount(0); // removed from the list after resolution
   await page.keyboard.press('Escape');
+}
+
+// Types into one client's editor and expects the text to appear in the
+// other client's editor. Retried because a CodeMirror remount (awareness
+// updates, provider reconnect) can swallow a click's focus, dropping the
+// whole keystroke burst.
+async function typeAndSync(from: Page, to: Page, text: string) {
+  const content = from.locator('.cm-content').first();
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await content.click();
+    await expect(content).toBeFocused();
+    await from.keyboard.type(text);
+
+    try {
+      // Input accepted locally AND propagated over the websocket
+      await expect(
+        from.locator('.cm-content').getByText(text).first(),
+      ).toBeVisible({ timeout: 5_000 });
+      await expect(
+        to.locator('.cm-content').getByText(text).first(),
+      ).toBeVisible({ timeout: 15_000 });
+      return;
+    } catch (error) {
+      if (attempt === 2) throw error;
+    }
+  }
 }
 
 test.describe.serial('Multi-user Collaboration', () => {
@@ -86,7 +119,7 @@ test.describe.serial('Multi-user Collaboration', () => {
     await expect(p2.getByText(/waiting for approval/i)).toBeVisible();
 
     // Owner sees the request and approves it
-    await approvePendingRequest(page, username);
+    await resolvePendingRequest(page, username, 'approve');
 
     // Collaborator now gets through
     await p2.goto(sharePath);
@@ -115,7 +148,7 @@ test.describe.serial('Multi-user Collaboration', () => {
     await p2.goto(sharePath);
     await expect(p2.getByText(/waiting for approval/i)).toBeVisible();
 
-    await approvePendingRequest(page, username);
+    await resolvePendingRequest(page, username, 'approve');
 
     await p2.goto(sharePath);
     await expect(p2).toHaveURL(/.*\/app\/doc\/[^/]+$/, { timeout: 15_000 });
@@ -123,26 +156,78 @@ test.describe.serial('Multi-user Collaboration', () => {
 
     // Owner types; the update must reach the second client over websocket
     const ownerText = `Owner typed this at ${Date.now()}`;
-    await page.locator('.cm-content').first().click();
-    await page.keyboard.type(ownerText);
-    await expect(p2.locator('.cm-content').getByText(ownerText)).toBeVisible({
-      timeout: 15_000,
-    });
+    await typeAndSync(page, p2, ownerText);
 
     // And back the other way
     const collabText = `Collaborator replied at ${Date.now()}`;
-    await p2.locator('.cm-content').first().click();
-    await p2.keyboard.type(collabText);
+    await typeAndSync(p2, page, collabText);
 
-    // Sanity check: the collaborator's own editor accepted the input before
-    // we assert the propagation to the owner
-    await expect(p2.locator('.cm-content').getByText(collabText)).toBeVisible({
-      timeout: 10_000,
+    await ctx2.close();
+  });
+
+  test('view-only collaborator cannot edit', async ({ page, browser }) => {
+    const docTitle = `Collab Readonly Doc ${Date.now()}`;
+    await openDocumentEditor(page, docTitle);
+    const sharePath = await getSharePath(page, 'view');
+
+    const ctx2 = await browser.newContext({
+      storageState: { cookies: [], origins: [] },
     });
+    const p2 = await ctx2.newPage();
+    await createUserViaApi(p2.request, userSuffix);
+    await loginUser2(p2, userSuffix);
+    await p2.goto(sharePath);
+    await expect(p2.getByText(/waiting for approval/i)).toBeVisible();
 
-    await expect(page.locator('.cm-content').getByText(collabText)).toBeVisible(
-      { timeout: 15_000 },
+    await resolvePendingRequest(page, username, 'approve');
+
+    await p2.goto(sharePath);
+    await expect(p2).toHaveURL(/.*\/app\/doc\/[^/]+$/, { timeout: 15_000 });
+    await expect(p2.locator('.cm-editor')).toBeVisible({ timeout: 10_000 });
+
+    // View permission -> CodeMirror rendered non-editable
+    await expect(p2.locator('.cm-content').first()).toHaveAttribute(
+      'contenteditable',
+      'false',
     );
+
+    // Typing must not insert anything into the collaborator's editor
+    const intruderText = `This should never appear ${Date.now()}`;
+    await p2.locator('.cm-content').first().click();
+    await p2.keyboard.type(intruderText);
+    await expect(p2.locator('.cm-content').getByText(intruderText)).toHaveCount(
+      0,
+    );
+
+    await ctx2.close();
+  });
+
+  test('rejected join request denies document access', async ({
+    page,
+    browser,
+  }) => {
+    const docTitle = `Collab Reject Doc ${Date.now()}`;
+    await openDocumentEditor(page, docTitle);
+    const sharePath = await getSharePath(page, 'view');
+
+    const ctx2 = await browser.newContext({
+      storageState: { cookies: [], origins: [] },
+    });
+    const p2 = await ctx2.newPage();
+    await createUserViaApi(p2.request, userSuffix);
+    await loginUser2(p2, userSuffix);
+    await p2.goto(sharePath);
+    await expect(p2.getByText(/waiting for approval/i)).toBeVisible();
+
+    // Owner rejects; the request row disappears from their list
+    await resolvePendingRequest(page, username, 'reject');
+
+    // A rejected request blocks re-entry: still no access on retry
+    await p2.goto(sharePath);
+    await expect(p2).toHaveURL(/.*\/doc\/share\//);
+    await expect(p2.getByText(/waiting for approval/i)).toBeVisible({
+      timeout: 15_000,
+    });
 
     await ctx2.close();
   });

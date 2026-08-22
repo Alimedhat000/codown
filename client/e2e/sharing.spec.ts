@@ -57,4 +57,17 @@ test.describe('Document Sharing', () => {
     await page.goto(sharePath);
     await expect(page).toHaveURL(/.*\/app\/doc\/[^/]+$/, { timeout: 10_000 });
   });
+
+  test('should show an error state for a malformed share link', async ({
+    page,
+  }) => {
+    await page.goto('/app/doc/share/not-a-real-token');
+
+    // Server rejects the token (401) and the route renders its error card
+    // instead of redirecting to a document
+    await expect(page.getByText(/went wrong accessing|invalid/i)).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page).toHaveURL(/.*\/doc\/share\//);
+  });
 });
