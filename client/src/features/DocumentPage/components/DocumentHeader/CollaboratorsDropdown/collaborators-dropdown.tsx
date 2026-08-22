@@ -19,17 +19,17 @@ import { cn } from '@/utils/cn';
 interface CollaboratorsDropdownProps {
   docId?: string;
   className?: string;
-  isCollaborator?: boolean;
+  isOwner?: boolean;
 }
 
 export const CollaboratorsDropdown = ({
   docId,
   className,
-  isCollaborator,
+  isOwner,
 }: CollaboratorsDropdownProps) => {
   const [email, setEmail] = useState('');
   const { collaborators, loading, addCollaborator, removeCollaborator } =
-    useCollaborators(docId, isCollaborator);
+    useCollaborators(docId);
 
   const _handleAdd = async () => {
     await addCollaborator(email);
@@ -64,13 +64,15 @@ export const CollaboratorsDropdown = ({
                 <span className="text-sm truncate">
                   {collaborator.user.username}
                 </span>
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  onClick={() => removeCollaborator(collaborator.id)}
-                >
-                  <TrashIcon className="w-4 h-4 " />
-                </Button>
+                {isOwner && (
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    onClick={() => removeCollaborator(collaborator.id)}
+                  >
+                    <TrashIcon className="w-4 h-4 " />
+                  </Button>
+                )}
               </div>
             ))
           ) : (

@@ -29,6 +29,7 @@ export const DocumentHeader: React.FC<DocumentHeaderProps> = ({
   documentTitle,
   onCreateDocument,
   className,
+  isReadOnly,
   isCollaborator,
 }) => {
   return (
@@ -48,6 +49,7 @@ export const DocumentHeader: React.FC<DocumentHeaderProps> = ({
         docId={docId}
         documentTitle={documentTitle}
         onCreateDocument={onCreateDocument}
+        isReadOnly={isReadOnly}
         isCollaborator={isCollaborator}
       />
     </div>
