@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/prisma';
 
 export const slugIDtoFullID = async (slugId: string) => {
-  const doc = await prisma.document.findFirst({
+  const doc = await prisma.document.findUnique({
     where: {
-      id: { startsWith: slugId },
+      id: slugId,
     },
     select: {
       id: true,
