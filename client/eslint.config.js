@@ -10,6 +10,7 @@ import prettier from 'eslint-config-prettier';
 import eslintPluginPrettier from 'eslint-plugin-prettier';
 import checkFile from 'eslint-plugin-check-file';
 import importPlugin from 'eslint-plugin-import';
+import jsdoc from 'eslint-plugin-jsdoc';
 
 export default tseslint.config([
   // Global ignores
@@ -51,6 +52,7 @@ export default tseslint.config([
       'react-refresh': reactRefresh,
       'check-file': checkFile,
       import: importPlugin,
+      jsdoc: jsdoc,
       prettier: eslintPluginPrettier,
     },
     rules: {
@@ -132,6 +134,24 @@ export default tseslint.config([
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
+
+      // JSDoc policy: every export documented; params optional (types self-document)
+      'jsdoc/require-jsdoc': [
+        'warn',
+        {
+          require: {
+            FunctionDeclaration: true,
+            ClassDeclaration: true,
+            ArrowFunctionExpression: false,
+            FunctionExpression: false,
+          },
+          contexts: [
+            'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator',
+          ],
+          exemptEmptyFunctions: true,
+        },
+      ],
+      'jsdoc/require-param': 'off',
 
       // File naming conventions
       'check-file/filename-naming-convention': [
