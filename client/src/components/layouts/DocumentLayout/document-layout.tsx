@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Head } from '../ui/seo';
+import { Head } from '../../ui/seo';
 
 type layoutProps = {
   title: string;
