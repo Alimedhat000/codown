@@ -14,7 +14,7 @@ import importPlugin from 'eslint-plugin-import';
 export default tseslint.config([
   // Global ignores
   {
-    ignores: ['dist/**', 'build/**', 'node_modules/**', 'src/shared/**'],
+    ignores: ['dist/**', 'build/**', 'node_modules/**'],
   },
 
   // Base config for all files
@@ -137,8 +137,7 @@ export default tseslint.config([
       'check-file/filename-naming-convention': [
         'error',
         {
-          '**/*.{tsx}': 'PASCAL_CASE',
-          '**/*.{ts}': 'KEBAB_CASE',
+          '**/*.{ts,tsx}': 'KEBAB_CASE',
         },
         {
           ignoreMiddleExtensions: true,
