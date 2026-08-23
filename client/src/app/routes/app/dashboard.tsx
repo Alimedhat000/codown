@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
-import DashboardMain from '@/features/Dashboard/components/DashBoardMain/dashboard-main';
+import DashboardMain from '@/features/Dashboard/components/DashboardMain/dashboard-main';
 import { api } from '@/lib/api';
 import { Document } from '@/types/api';
 

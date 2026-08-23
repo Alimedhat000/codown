@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LuPlus as AddIcon } from 'react-icons/lu';
 
-import NewDocumentFormBody from '@/components/common/forms/NewDocumentFormBody';
+import NewDocumentFormBody from '@/components/common/NewDocumentFormBody';
 import { Button } from '@/components/ui/Button';
 import { Modal, ModalOverlay, ModalTrigger } from '@/components/ui/Modal';
 import type { CreateDocumentForm } from '@/types/api';

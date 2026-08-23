@@ -6,7 +6,7 @@ import { useAuth } from '@/context/auth';
 
 import { Alert } from '../../ui/Alert';
 import Header from '../../ui/Header/header';
-import { Head } from '../../ui/seo';
+import { Head } from '../../ui/Seo';
 
 type layoutProps = {
   title: string;

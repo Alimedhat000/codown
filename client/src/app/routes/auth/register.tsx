@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { AuthLayout } from '@/components/layouts/AuthLayout';
-import RegisterForm from '@/components/ui/auth/register-form';
+import RegisterForm from '@/components/ui/Auth/register-form';
 import { paths } from '@/config/paths';
 import { RegisterUser } from '@/lib/auth';
 import { type RegisterSchemaType } from '@/lib/auth';
