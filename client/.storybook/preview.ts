@@ -25,7 +25,7 @@ const preview: Preview = {
   },
   initialGlobals: {
     // 👇 Set the initial background color
-    backgrounds: { value: 'light' },
+    backgrounds: { value: 'dark' },
   },
 };
 

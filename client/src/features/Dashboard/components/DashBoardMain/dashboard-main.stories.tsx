@@ -93,30 +93,40 @@ const meta: Meta<typeof DashboardMain> = {
 export default meta;
 type Story = StoryObj<typeof DashboardMain>;
 
+const setDocuments = () => {};
+
 export const Default: Story = {
   args: {
-    documents: mockDocuments,
+    ownedDocs: mockDocuments,
+    collaboratedDocs: [],
     loading: false,
+    setDocuments,
   },
 };
 
 export const Loading: Story = {
   args: {
-    documents: [],
+    ownedDocs: [],
+    collaboratedDocs: [],
     loading: true,
+    setDocuments,
   },
 };
 
 export const OnlyPinned: Story = {
   args: {
-    documents: mockDocuments.filter((d) => d.pinned),
+    ownedDocs: mockDocuments.filter((d) => d.pinned),
+    collaboratedDocs: [],
     loading: false,
+    setDocuments,
   },
 };
 
 export const NoDocuments: Story = {
   args: {
-    documents: [],
+    ownedDocs: [],
+    collaboratedDocs: [],
     loading: false,
+    setDocuments,
   },
 };
