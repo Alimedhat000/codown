@@ -1,16 +1,16 @@
+import type { Element } from 'hast';
 import { useEffect } from 'react';
 import { LuMenu } from 'react-icons/lu';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
 import rehypeStringify from 'rehype-stringify';
 import remarkEmoji from 'remark-emoji';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
-import remarkMermaidPlugin from 'remark-mermaid-plugin';
-import { Pluggable } from 'unified';
 
 import {
   DropdownMenu,
@@ -20,9 +20,11 @@ import {
 import { dateFormat } from '@/utils/dateformat';
 
 import { MarkdownToc } from './markdown-toc';
+import { MermaidDiagram } from './MermaidDiagram';
 import { rehypeSupSub } from './rehype-subsuper';
 import { remarkTypographer } from './remark-typographer';
 import { rehypeTextDecorations } from './remarkDecorations';
+import { markdownSanitizeSchema } from './sanitize-schema';
 
 export function MarkdownPreview({
   content,
@@ -85,15 +87,34 @@ export function MarkdownPreview({
       <div className="prose prose-invert max-w-none">
         <ReactMarkdown
           children={content}
+          components={{
+            pre: ({ children, node }) => {
+              const codeEl = node?.children[0] as Element | undefined;
+              const className = codeEl?.properties?.className;
+              const isMermaid =
+                Array.isArray(className) &&
+                className.includes('language-mermaid');
+              const source = codeEl?.children[0];
+              if (
+                isMermaid &&
+                source &&
+                'value' in source &&
+                typeof source.value === 'string'
+              ) {
+                return <MermaidDiagram code={source.value} />;
+              }
+              return <pre>{children}</pre>;
+            },
+          }}
           remarkPlugins={[
             remarkTypographer,
             remarkGfm,
             remarkMath,
             remarkEmoji,
-            [remarkMermaidPlugin, { theme: 'dark' }] as Pluggable,
           ]}
           rehypePlugins={[
             rehypeRaw,
+            [rehypeSanitize, markdownSanitizeSchema],
             rehypeStringify,
             rehypeTextDecorations,
             rehypeSupSub,
