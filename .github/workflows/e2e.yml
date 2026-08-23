@@ -2,9 +2,9 @@ name: E2E
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, 'client-quality/**']
   pull_request:
-    branches: [main, develop]
+    branches: [main, develop, 'client-quality/**']
   workflow_dispatch:
 
 jobs:
