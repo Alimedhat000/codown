@@ -4,20 +4,20 @@ import { useForm } from 'react-hook-form';
 import { Link, useSearchParams } from 'react-router';
 
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Form/Input';
+import { Input } from '@/components/ui/Form';
 import { paths } from '@/config/paths';
-import type { LoginSchemaType } from '@/lib/auth';
-import { LoginSchema } from '@/lib/auth';
+import type { RegisterSchemaType } from '@/lib/auth';
+import { RegisterSchema } from '@/lib/auth';
 
-interface LoginFormProps {
-  onSubmit: (data: LoginSchemaType) => void | Promise<void>;
+interface RegisterFormProps {
+  onSubmit: (data: RegisterSchemaType) => void | Promise<void>;
   isLoading?: boolean;
 }
 
-export default function LoginForm({
+export default function RegisterForm({
   onSubmit,
   isLoading = false,
-}: LoginFormProps) {
+}: RegisterFormProps) {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('redirectTo');
 
@@ -25,20 +25,17 @@ export default function LoginForm({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginSchemaType>({
-    resolver: zodResolver(LoginSchema),
+  } = useForm<RegisterSchemaType>({
+    resolver: zodResolver(RegisterSchema),
   });
 
-  const handleFormSubmit = async (data: LoginSchemaType) => {
+  const handleFormSubmit = async (data: RegisterSchemaType) => {
     await onSubmit(data);
   };
 
   return (
     <div className="max-w-100 mx-auto">
-      <form
-        onSubmit={handleSubmit(handleFormSubmit)}
-        className="flex flex-col gap-8  px-10"
-      >
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
         <Input
           type="email"
           id="email"
@@ -50,33 +47,51 @@ export default function LoginForm({
         />
 
         <Input
+          type="text"
+          label="Username"
+          id="username"
+          placeholder="Enter your username"
+          registration={register('username')}
+          error={errors.username}
+          autoComplete="username"
+        />
+
+        <Input
+          type="text"
+          label="Full Name"
+          id="fullname"
+          placeholder="Enter your full name"
+          registration={register('fullName')}
+          error={errors.fullName}
+          autoComplete="name"
+        />
+
+        <Input
           type="password"
           id="password"
           label="Password"
           placeholder="Enter your password"
           registration={register('password')}
           error={errors.password}
-          autoComplete="current-password"
+          autoComplete="new-password"
         />
 
         <Button
           type="submit"
-          className="w-1/2 mx-auto"
+          className="w-full"
           isLoading={isLoading || isSubmitting}
           disabled={isLoading || isSubmitting}
-          size={'lg'}
         >
-          {isLoading || isSubmitting ? 'Signing in...' : 'Sign In'}
+          {isLoading || isSubmitting ? 'Creating account...' : 'Create Account'}
         </Button>
       </form>
-
       <div className="mt-8 flex text-muted-foreground-white items-center justify-center text-sm font-light">
-        <span className="mr-2">{'New to Co-Down?'}</span>
+        <span className="mr-2">{'Have an account?'}</span>
         <Link
-          to={paths.auth.register.getHref(redirectTo)}
+          to={paths.auth.login.getHref(redirectTo)}
           className="underline hover:text-foreground font-medium"
         >
-          Sign up
+          Sign in
         </Link>
       </div>
     </div>
