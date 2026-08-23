@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { Collaborator } from '@/types/api';
 
-export const useCollaborators = (docId?: string, isCollaborator?: boolean) => {
+export const useCollaborators = (docId?: string) => {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isCollaborator || !docId) return;
+    if (!docId) return;
 
     const fetchCollaborators = async () => {
       setLoading(true);
@@ -23,7 +23,7 @@ export const useCollaborators = (docId?: string, isCollaborator?: boolean) => {
     };
 
     fetchCollaborators();
-  }, [docId, isCollaborator]);
+  }, [docId]);
 
   const removeCollaborator = async (userId: string) => {
     if (!docId) return;

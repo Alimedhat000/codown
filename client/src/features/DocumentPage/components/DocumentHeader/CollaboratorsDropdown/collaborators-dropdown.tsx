@@ -14,22 +14,31 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/Dropdown';
 import { useCollaborators } from '@/hooks/useCollaborators';
+import { Collaborator } from '@/types/api';
 import { cn } from '@/utils/cn';
 
 interface CollaboratorsDropdownProps {
   docId?: string;
   className?: string;
-  isCollaborator?: boolean;
+  isOwner?: boolean;
+  /** Overrides fetched collaborators (Storybook/tests) */
+  collaborators?: Collaborator[];
 }
 
 export const CollaboratorsDropdown = ({
   docId,
   className,
-  isCollaborator,
+  isOwner,
+  collaborators,
 }: CollaboratorsDropdownProps) => {
   const [email, setEmail] = useState('');
-  const { collaborators, loading, addCollaborator, removeCollaborator } =
-    useCollaborators(docId, isCollaborator);
+  const {
+    collaborators: fetchedCollaborators,
+    loading,
+    addCollaborator,
+    removeCollaborator,
+  } = useCollaborators(docId);
+  const list = collaborators ?? fetchedCollaborators;
 
   const _handleAdd = async () => {
     await addCollaborator(email);
@@ -41,9 +50,7 @@ export const CollaboratorsDropdown = ({
       <DropdownMenuTrigger asChild className={className}>
         <Button variant="ghost" className="gap-1 flex px-2 ">
           <GroupIcon className="h-4 w-4" />
-          {collaborators.length > 0 && (
-            <span className="text-xs">{collaborators.length}</span>
-          )}
+          {list.length > 0 && <span className="text-xs">{list.length}</span>}
           <ChevronIcon
             className={cn('h-3 w-3 transition-transform', {
               'rotate-180': open,
@@ -55,8 +62,8 @@ export const CollaboratorsDropdown = ({
         <div className="space-y-2">
           {loading ? (
             <DropdownMenuItem disabled>Loading…</DropdownMenuItem>
-          ) : collaborators.length > 0 ? (
-            collaborators.map((collaborator, _index) => (
+          ) : list.length > 0 ? (
+            list.map((collaborator, _index) => (
               <div
                 key={collaborator.id}
                 className="flex items-center justify-between px-2 py-1 rounded hover:bg-muted gap-3"
@@ -64,13 +71,15 @@ export const CollaboratorsDropdown = ({
                 <span className="text-sm truncate">
                   {collaborator.user.username}
                 </span>
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  onClick={() => removeCollaborator(collaborator.id)}
-                >
-                  <TrashIcon className="w-4 h-4 " />
-                </Button>
+                {isOwner && (
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    onClick={() => removeCollaborator(collaborator.id)}
+                  >
+                    <TrashIcon className="w-4 h-4 " />
+                  </Button>
+                )}
               </div>
             ))
           ) : (
