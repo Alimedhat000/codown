@@ -90,6 +90,14 @@ export const RendersMermaidDiagrams: StoryObj<typeof MarkdownPreview> = {
       prose.querySelector('pre'),
       'no stray <pre> wrapper around diagrams',
     ).toBeNull();
+
+    const renderedText = prose.textContent ?? '';
+    for (const label of ['Start', 'Decision', 'End']) {
+      expect(
+        renderedText.includes(label),
+        `node label "${label}" must be visible inside the diagram`,
+      ).toBe(true);
+    }
   },
 };
 

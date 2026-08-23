@@ -1,4 +1,5 @@
 import DOMPurify from 'dompurify';
+import type { Config } from 'dompurify';
 import mermaid from 'mermaid';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -7,6 +8,42 @@ mermaid.initialize({
   securityLevel: 'strict',
   theme: 'dark',
 });
+
+const SVG_SANITIZE_CONFIG: Config = {
+  USE_PROFILES: { html: true, svg: true, svgFilters: true },
+  ADD_TAGS: ['foreignobject'],
+  HTML_INTEGRATION_POINTS: {
+    'annotation-xml': true,
+    foreignobject: true,
+  },
+  FORBID_CONTENTS: [
+    'annotation-xml',
+    'audio',
+    'colgroup',
+    'desc',
+    'head',
+    'iframe',
+    'math',
+    'mi',
+    'mn',
+    'mo',
+    'ms',
+    'mtext',
+    'noembed',
+    'noframes',
+    'noscript',
+    'plaintext',
+    'script',
+    'selectedcontent',
+    'style',
+    'svg',
+    'template',
+    'thead',
+    'title',
+    'video',
+    'xmp',
+  ],
+};
 
 export function MermaidDiagram({ code }: { code: string }) {
   const [svg, setSvg] = useState('');
@@ -25,9 +62,7 @@ export function MermaidDiagram({ code }: { code: string }) {
       .render(renderId, code)
       .then(({ svg }) => {
         if (cancelled) return;
-        const clean = DOMPurify.sanitize(svg, {
-          USE_PROFILES: { svg: true, svgFilters: true },
-        });
+        const clean = DOMPurify.sanitize(svg, SVG_SANITIZE_CONFIG);
         setSvg(clean);
       })
       .catch(() => {
