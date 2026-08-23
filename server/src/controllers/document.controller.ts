@@ -801,9 +801,35 @@ export const getCollaborators = asyncErrorWrapper(async (req: AuthenticatedReque
     documentId: id,
   });
   try {
+    const [doc, membership] = await Promise.all([
+      prisma.document.findUnique({ where: { id } }),
+      prisma.collaborator.findFirst({ where: { documentId: id, userId } }),
+    ]);
+
+    if (!doc || (doc.authorId !== userId && membership?.permission !== 'edit')) {
+      logger.warn('Get collaborators failed - unauthorized', {
+        action: 'GET_COLLABORATORS_UNAUTHORIZED',
+        ...clientInfo,
+        userId,
+        documentId: id,
+        documentExists: !!doc,
+        isOwner: doc?.authorId === userId,
+        hasEditAccess: membership?.permission === 'edit',
+      });
+
+      res.status(StatusCodes.FORBIDDEN).json({ error: 'Unauthorized' });
+      return;
+    }
+
     const collabs = await prisma.collaborator.findMany({
       where: { documentId: id },
-      include: { user: true },
+      select: {
+        id: true,
+        documentId: true,
+        userId: true,
+        permission: true,
+        user: { select: { id: true, username: true, fullName: true } },
+      },
     });
 
     res.json(collabs);

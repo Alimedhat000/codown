@@ -1,6 +1,74 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { Collaborator } from '@/types/api';
+
 import { CollaboratorsDropdown } from './collaborators-dropdown';
+
+const mockCollaborators: Collaborator[] = [
+  {
+    id: 'c1',
+    documentId: 'doc1',
+    userId: 'u1',
+    permission: 'edit',
+    user: {
+      id: 'u1',
+      username: 'alice',
+      email: 'alice@example.com',
+      fullName: 'Alice Johnson',
+    },
+  },
+  {
+    id: 'c2',
+    documentId: 'doc1',
+    userId: 'u2',
+    permission: 'view',
+    user: {
+      id: 'u2',
+      username: 'bob',
+      email: 'bob@example.com',
+      fullName: 'Bob Wilson',
+    },
+  },
+  {
+    id: 'c3',
+    documentId: 'doc1',
+    userId: 'u3',
+    permission: 'edit',
+    user: {
+      id: 'u3',
+      username: 'carol',
+      email: 'carol@example.com',
+      fullName: 'Carol Davis',
+    },
+  },
+];
+
+const longNameCollaborators: Collaborator[] = [
+  {
+    id: 'c1',
+    documentId: 'doc1',
+    userId: 'u1',
+    permission: 'edit',
+    user: {
+      id: 'u1',
+      username: 'dr.alexander.maximilian.richardson.the.third',
+      email: 'alex.richardson@example.com',
+      fullName: 'Dr. Alexander Maximilian Richardson III',
+    },
+  },
+  {
+    id: 'c2',
+    documentId: 'doc1',
+    userId: 'u2',
+    permission: 'view',
+    user: {
+      id: 'u2',
+      username: 'professor.elizabeth.worthington.smith',
+      email: 'liz.worthington@example.com',
+      fullName: 'Professor Elizabeth Catherine Worthington-Smith',
+    },
+  },
+];
 
 const meta: Meta = {
   title: 'DocumentPage/CollaboratorsDropdown',
@@ -14,66 +82,24 @@ export default meta;
 
 type Story = StoryObj;
 
-/**
- * Typical collaborator list.
- */
+// Without injected collaborators the component fetches via useCollaborators(docId),
+// which requires a running API — stories inject data through the `collaborators` prop.
 export const Default: Story = {
+  args: {},
+};
+
+export const OwnerWithCollaborators: Story = {
   args: {
-    collaborators: [],
+    isOwner: true,
+    collaborators: mockCollaborators,
   },
 };
 
-/**
- * Small collaborator set.
- */
-export const FewCollaborators: Story = {
+/** Non-owner sees the roster without remove buttons. */
+export const ViewOnlyCollaborators: Story = {
   args: {
-    collaborators: [
-      {
-        id: '1',
-        name: 'Alice Johnson',
-        avatarUrl:
-          'https://images.unsplash.com/photo-1494790108755-2616b612b48c?w=32&h=32&fit=crop&crop=face',
-      },
-      { id: '2', name: 'Bob Wilson' },
-    ],
-  },
-};
-
-/**
- * Large collaborator set.
- */
-export const ManyCollaborators: Story = {
-  args: {
-    collaborators: [
-      {
-        id: '1',
-        name: 'Alice Johnson',
-        avatarUrl:
-          'https://images.unsplash.com/photo-1494790108755-2616b612b48c?w=32&h=32&fit=crop&crop=face',
-      },
-      {
-        id: '2',
-        name: 'Bob Wilson',
-        avatarUrl:
-          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face',
-      },
-      { id: '3', name: 'Carol Davis' },
-      {
-        id: '4',
-        name: 'David Brown',
-        avatarUrl:
-          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=32&h=32&fit=crop&crop=face',
-      },
-      { id: '5', name: 'Emma Thompson' },
-      { id: '6', name: 'Frank Miller' },
-      {
-        id: '7',
-        name: 'Grace Lee',
-        avatarUrl:
-          'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face',
-      },
-    ],
+    isOwner: false,
+    collaborators: mockCollaborators,
   },
 };
 
@@ -82,9 +108,7 @@ export const ManyCollaborators: Story = {
  */
 export const LongNames: Story = {
   args: {
-    collaborators: [
-      { id: '1', name: 'Dr. Alexander Maximilian Richardson III' },
-      { id: '2', name: 'Professor Elizabeth Catherine Worthington-Smith' },
-    ],
+    isOwner: true,
+    collaborators: longNameCollaborators,
   },
 };

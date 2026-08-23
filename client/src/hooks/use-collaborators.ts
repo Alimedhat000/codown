@@ -8,19 +8,18 @@ import { Collaborator } from '@/types/api';
  * and error state.
  *
  * @param docId - Document id whose collaborators are managed; fetching
- *   is skipped while undefined.
- * @param isCollaborator - When true the viewer is already a collaborator,
- *   so the list is never fetched (management is owner-only).
+ *   is skipped while undefined. Mount gating (owner/editor-only UI) lives
+ *   in the caller; the fetch itself is allowed for any mounted docId.
  * @returns Collaborator list, loading/error flags and the add/remove
  *   actions.
  */
-export const useCollaborators = (docId?: string, isCollaborator?: boolean) => {
+export const useCollaborators = (docId?: string) => {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isCollaborator || !docId) return;
+    if (!docId) return;
 
     const fetchCollaborators = async () => {
       setLoading(true);
@@ -37,7 +36,7 @@ export const useCollaborators = (docId?: string, isCollaborator?: boolean) => {
     };
 
     fetchCollaborators();
-  }, [docId, isCollaborator]);
+  }, [docId]);
 
   const removeCollaborator = async (userId: string) => {
     if (!docId) return;
