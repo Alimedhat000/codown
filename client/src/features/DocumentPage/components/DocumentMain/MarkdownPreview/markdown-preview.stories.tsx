@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, waitFor } from 'storybook/test';
 
-import { MarkdownPreview } from './MarkdownPreview';
+import { MarkdownPreview } from './markdown-preview';
 
 const meta: Meta<typeof MarkdownPreview> = {
   component: MarkdownPreview,

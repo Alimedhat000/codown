@@ -9,14 +9,14 @@ import * as Y from 'yjs';
 
 import { useAuth } from '@/context/auth';
 import { cn } from '@/utils/cn';
-import { generateUserColor } from '@/utils/generateUserColor';
+import { generateUserColor } from '@/utils/generate-user-color';
 
-import { editorExtensions } from './EditorExtensions';
-import { MyTheme } from './EditorTheme';
-import { markdownCommands } from './KeyMapExtension';
+import { editorExtensions } from './editor-extensions';
+import { MyTheme } from './editor-theme';
+import { markdownCommands } from './key-map-extension';
 import { MarkdownStatusBar } from './MarkdownStatusBar';
 import { MarkdownToolbar } from './MarkdownToolbar';
-import { createAdvancedSpellcheckExtension } from './spellCheck';
+import { createAdvancedSpellcheckExtension } from './spell-check';
 
 const markdownKeymap = keymap.of([
   indentWithTab,

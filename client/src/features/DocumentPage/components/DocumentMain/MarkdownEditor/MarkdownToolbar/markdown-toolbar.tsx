@@ -4,7 +4,7 @@ import { cn } from '@/utils/cn';
 
 import { ToolbarButton } from './toolbar-button';
 import { toolbarButtons } from './toolbar-buttons';
-import { useMarkdownCommands } from './useMarkdownCommands';
+import { useMarkdownCommands } from './use-markdown-commands';
 
 export function MarkdownToolbar({
   view,

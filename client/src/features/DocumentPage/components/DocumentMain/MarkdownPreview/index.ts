@@ -1,1 +1,1 @@
-export * from './MarkdownPreview';
+export * from './markdown-preview';
