@@ -10,7 +10,7 @@
     "build:watch": "pnpm run build --watch",
     "dev:start": "nodemon dist/server.js",
     "dev:build": "esbuild src/server.ts --bundle --platform=node --packages=external --outfile=dist/server.js --format=esm --watch=forever",
-    "dev": "pnpm db:generate && run-p dev:build dev:start",
+    "dev": "pnpm db:generate && pnpm build && run-p dev:build dev:start",
     "dev:docker": "pnpm run build && node dist/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
