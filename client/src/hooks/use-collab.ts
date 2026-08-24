@@ -71,7 +71,7 @@ export function useCollab(
       providerRef.current = null;
       setIsReady(false);
     };
-  }, [docId]);
+  }, [docId, createProvider]);
 
   return {
     text,
