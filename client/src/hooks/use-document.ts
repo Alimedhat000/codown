@@ -3,6 +3,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
 import { DocumentData } from '@/types/api';
 
+/**
+ *
+ */
 export function useDocument(id?: string) {
   const [doc, setDoc] = useState<DocumentData | null>(null);
   const [editedDoc, setEditedDoc] = useState<DocumentData | null>(null);
@@ -13,6 +16,7 @@ export function useDocument(id?: string) {
     isCollaborator: boolean;
     permission: 'view' | 'edit';
   } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) {
@@ -21,6 +25,7 @@ export function useDocument(id?: string) {
     }
 
     setLoading(true);
+    setError(null);
 
     api
       .get(`/document/${id}`)
@@ -31,6 +36,7 @@ export function useDocument(id?: string) {
       })
       .catch((err) => {
         console.error('Failed to fetch document:', err);
+        setError('Failed to load document');
         setAccess(null); // ensure we don’t reuse old access
       })
       .finally(() => {
@@ -42,10 +48,12 @@ export function useDocument(id?: string) {
     if (!id) return;
     try {
       setSaving(true);
+      setError(null);
       await api.put(`/document/${id}`, editedDoc);
       setDoc(editedDoc);
     } catch (err) {
       console.error('Failed to save document:', err);
+      setError('Failed to save document');
     } finally {
       setSaving(false);
     }
@@ -59,5 +67,6 @@ export function useDocument(id?: string) {
     saving,
     handleSave,
     access,
+    error,
   };
 }

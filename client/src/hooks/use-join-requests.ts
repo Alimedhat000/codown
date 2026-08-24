@@ -22,14 +22,17 @@ export function useJoinRequests(
 ) {
   const [requests, setRequests] = useState<CollaborationRequest[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await getJoinRequests(docId!);
       setRequests(data);
     } catch (err) {
       console.error('Failed to fetch join requests:', err);
+      setError('Failed to load join requests');
     } finally {
       setLoading(false);
     }
@@ -59,6 +62,7 @@ export function useJoinRequests(
   return {
     requests,
     loading,
+    error,
     approve,
     reject,
     refetch: fetchRequests,
