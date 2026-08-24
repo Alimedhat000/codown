@@ -11,7 +11,8 @@ import { Collaborator } from '@/types/api';
  *   is skipped while undefined. Mount gating (owner/editor-only UI) lives
  *   in the caller; the fetch itself is allowed for any mounted docId.
  * @returns Collaborator list, loading/error flags and the add/remove
- *   actions.
+ *   actions. `addCollaborator` resolves to whether the collaborator was
+ *   added.
  */
 export const useCollaborators = (docId?: string) => {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
@@ -50,14 +51,16 @@ export const useCollaborators = (docId?: string) => {
   };
 
   const addCollaborator = async (email: string) => {
-    if (!docId || !email) return;
+    if (!docId || !email) return false;
     try {
       await api.post(`/document/${docId}/collaborators`, { email });
       const res = await api.get(`/document/${docId}/collaborators`);
       setCollaborators(res.data || []);
+      return true;
     } catch (err) {
       console.error('Failed to add collaborator:', err);
       setError('Failed to add collaborator');
+      return false;
     }
   };
 

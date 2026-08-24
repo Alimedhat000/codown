@@ -1,12 +1,14 @@
-import chalk from 'chalk';
 import { Response } from 'express';
 import asyncErrorWrapper from 'express-async-handler';
 import { StatusCodes } from 'http-status-codes';
 
+import { ConflictError } from '@/exceptions/ConflictError';
+import { NotFoundError } from '@/exceptions/NotFoundError';
 import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
 import { generateShareToken, verifyShareToken } from '@/lib/shareToken';
 import { getClientInfo } from '@/utils/getClientInfo';
+import { AddCollaboratorSchema } from '@/validations/addCollaborator.schema';
 
 export const createDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
   const clientInfo = getClientInfo(req);
@@ -404,7 +406,6 @@ export const getDocByToken = asyncErrorWrapper(async (req: AuthenticatedRequest,
 
   try {
     decoded = verifyShareToken(token);
-    console.log(chalk.bold.red('DECODED'), decoded);
   } catch (error) {
     logger.warn('Shared document access failed - token verification failed', {
       action: 'ACCESS_SHARED_DOCUMENT_TOKEN_VERIFICATION_FAILED',
@@ -850,7 +851,7 @@ export const getCollaborators = asyncErrorWrapper(async (req: AuthenticatedReque
 export const addCollaborator = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
   const clientInfo = getClientInfo(req);
   const { id } = req.params;
-  const { userId: newCollaboratorId, permission } = req.body;
+  const { email, permission } = req.body as AddCollaboratorSchema;
   const ownerId = req.user?.userId;
 
   logger.debug('Add collaborator attempt', {
@@ -858,7 +859,7 @@ export const addCollaborator = asyncErrorWrapper(async (req: AuthenticatedReques
     ...clientInfo,
     ownerId,
     documentId: id,
-    newCollaboratorId,
+    email,
     permission,
   });
 
@@ -871,7 +872,6 @@ export const addCollaborator = asyncErrorWrapper(async (req: AuthenticatedReques
         ...clientInfo,
         ownerId,
         documentId: id,
-        newCollaboratorId,
         documentExists: !!doc,
         isOwner: doc?.authorId === ownerId,
       });
@@ -880,8 +880,37 @@ export const addCollaborator = asyncErrorWrapper(async (req: AuthenticatedReques
       return;
     }
 
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      logger.warn('Add collaborator failed - unknown email', {
+        action: 'ADD_COLLABORATOR_UNKNOWN_EMAIL',
+        ...clientInfo,
+        ownerId,
+        documentId: id,
+      });
+
+      throw new NotFoundError('No user found with that email');
+    }
+
+    const existing = await prisma.collaborator.findUnique({
+      where: { documentId_userId: { documentId: id, userId: user.id } },
+    });
+
+    if (existing) {
+      logger.warn('Add collaborator failed - already a collaborator', {
+        action: 'ADD_COLLABORATOR_DUPLICATE',
+        ...clientInfo,
+        ownerId,
+        documentId: id,
+        newCollaboratorId: user.id,
+      });
+
+      throw new ConflictError('User is already a collaborator on this document');
+    }
+
     const collab = await prisma.collaborator.create({
-      data: { documentId: id, userId: newCollaboratorId, permission },
+      data: { documentId: id, userId: user.id, permission },
     });
 
     logger.debug('Collaborator added successfully', {
@@ -889,7 +918,7 @@ export const addCollaborator = asyncErrorWrapper(async (req: AuthenticatedReques
       ...clientInfo,
       ownerId,
       documentId: id,
-      newCollaboratorId,
+      newCollaboratorId: user.id,
       permission,
       collaboratorId: collab.id,
     });
@@ -901,7 +930,6 @@ export const addCollaborator = asyncErrorWrapper(async (req: AuthenticatedReques
       ...clientInfo,
       ownerId,
       documentId: id,
-      newCollaboratorId,
       permission,
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
@@ -961,8 +989,6 @@ export const removeCollaborator = asyncErrorWrapper(async (req: AuthenticatedReq
         documentId: collaborator.documentId,
       },
     });
-
-    console.log(chalk.red('HERE'), result, collaboratorId, id);
 
     logger.debug('Collaborator removed successfully', {
       action: 'REMOVE_COLLABORATOR_SUCCESS',
