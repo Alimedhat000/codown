@@ -176,4 +176,30 @@ export default tseslint.config([
       },
     },
   },
+
+  // Doc quality (components/hooks/features only): JSDoc blocks must carry a
+  // real description — no empty stubs. Member-level prop docs and param docs
+  // are conventions (see AGENTS.md), not mechanically enforceable.
+  {
+    files: [
+      'src/components/**/*.{ts,tsx}',
+      'src/features/**/*.{ts,tsx}',
+      'src/hooks/**/*.{ts,tsx}',
+    ],
+    ignores: ['**/*.stories.*'],
+    settings: { jsdoc: { mode: 'typescript' } },
+    rules: {
+      'jsdoc/require-description': 'error',
+    },
+  },
+
+  // Hook/helper params are documented via @param wherever a JSDoc block
+  // exists (component files stay exempt — props live on the Props interface).
+  {
+    files: ['src/features/**/*.ts', 'src/hooks/**/*.ts'],
+    settings: { jsdoc: { mode: 'typescript' } },
+    rules: {
+      'jsdoc/require-param': ['error', { checkDestructured: false }],
+    },
+  },
 ], storybook.configs["flat/recommended"]);
