@@ -137,7 +137,7 @@ export default tseslint.config([
 
       // JSDoc policy: every export documented; params optional (types self-document)
       'jsdoc/require-jsdoc': [
-        'warn',
+        'error',
         {
           require: {
             FunctionDeclaration: true,
@@ -146,7 +146,8 @@ export default tseslint.config([
             FunctionExpression: false,
           },
           contexts: [
-            'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator',
+            'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > ArrowFunctionExpression',
+            'ExportNamedDeclaration > FunctionDeclaration',
           ],
           exemptEmptyFunctions: true,
         },
