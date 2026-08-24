@@ -8,7 +8,9 @@ import { createAuthRateLimiter } from '@/middlewares/rate-limit.middleware';
 const buildApp = () => {
   const app = express();
   app.use(express.json());
-  app.post('/login', createAuthRateLimiter({ limit: 3, windowMs: 60_000 }), (_req, res) => {
+  // The shared limiter skips outside production (vitest runs with NODE_ENV=test),
+  // so the tests force it on via the factory's overrides.
+  app.post('/login', createAuthRateLimiter({ limit: 3, windowMs: 60_000, skip: () => false }), (_req, res) => {
     res.status(StatusCodes.OK).json({ ok: true });
   });
   return app;
