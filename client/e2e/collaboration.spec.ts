@@ -7,7 +7,7 @@ import {
 
 import { getSharePath, openDocumentEditor } from './utils';
 
-const API_URL = process.env.E2E_API_URL ?? 'http://localhost:5000';
+const API_URL = process.env.E2E_API_URL ?? 'http://localhost:5001';
 
 // The second user is created via the API: the registration form is already
 // covered by auth.spec.ts and proved flaky to drive from a second context.
