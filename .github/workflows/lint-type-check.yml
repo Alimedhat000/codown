@@ -2,9 +2,9 @@ name: Lint, Type Check and Test
 
 on:
   push:
-    branches: [main, develop, 'client-quality/**']
+    branches: [main, develop]
   pull_request:
-    branches: [main, develop, 'client-quality/**']
+    branches: [main, develop]
   workflow_dispatch:
 
 jobs:
