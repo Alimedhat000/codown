@@ -14,6 +14,9 @@ interface LoginFormProps {
   isLoading?: boolean;
 }
 
+/**
+ * Login form built on react-hook-form; validates credentials and delegates submission to onSubmit.
+ */
 export default function LoginForm({
   onSubmit,
   isLoading = false,

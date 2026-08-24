@@ -11,6 +11,9 @@ interface CreateDocumentButtonProps {
   className?: string;
 }
 
+/**
+ * Header button driving the shared create-document flow with pending/error handling.
+ */
 export const CreateDocumentButton = ({
   onCreateDocument,
   className,

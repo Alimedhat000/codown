@@ -5,6 +5,9 @@ import DashboardMain from '@/features/Dashboard/components/DashboardMain/dashboa
 import { api } from '@/lib/api';
 import { Document } from '@/types/api';
 
+/**
+ * Dashboard page listing owned documents alongside shared ones with view-mode controls.
+ */
 export default function Dashboard() {
   const [ownedDocs, setOwnedDocs] = useState<Document[]>([]);
   const [collaboratedDocs, setCollaboratedDocs] = useState<Document[]>([]);

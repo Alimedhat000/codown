@@ -22,6 +22,9 @@ interface CollaboratorsDropdownProps {
   isCollaborator?: boolean;
 }
 
+/**
+ * Avatar stack opening a dropdown listing collaborators with add/remove actions.
+ */
 export const CollaboratorsDropdown = ({
   docId,
   className,

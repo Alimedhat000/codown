@@ -31,6 +31,9 @@ type DashboardMainProps = {
   setDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
 };
 
+/**
+ * Return a sorted copy of the documents for the selected sort value.
+ */
 function sortDocuments(documents: Document[], sort: SortValue) {
   return [...documents].sort((a, b) => {
     switch (sort) {
@@ -52,6 +55,9 @@ function sortDocuments(documents: Document[], sort: SortValue) {
   });
 }
 
+/**
+ * Dashboard body: owned/shared sections, sorting, view toggle and card/list rendering.
+ */
 export default function DashboardMain({
   ownedDocs,
   collaboratedDocs,

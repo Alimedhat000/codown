@@ -18,6 +18,9 @@ export type SpinnerProps = {
   className?: string;
 };
 
+/**
+ * Loading spinner with sm/md/lg sizes that inherits currentColor.
+ */
 export const Spinner = ({
   size = 'md',
   variant = 'primary',

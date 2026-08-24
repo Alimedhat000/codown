@@ -2,6 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { api } from '@/lib/api';
 
+/**
+ * Fetches (and can refresh) a share link for a permission level; surfaces shareLink, loading and error.
+ */
 export const useShareLink = (
   docId?: string,
   permission?: 'view' | 'edit',

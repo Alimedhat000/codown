@@ -7,6 +7,7 @@ import { DocumentToolbar } from './document-toolbar';
 const meta: Meta = {
   title: 'DocumentPage/DocumentToolbar',
   component: DocumentToolbar,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
   },
@@ -30,12 +31,18 @@ export default meta;
 
 type Story = StoryObj;
 
+/**
+ * Toolbar with minimal props.
+ */
 export const ToolbarMinimal: Story = {
   args: {
     mode: 'both',
   },
 };
 
+/**
+ * Toolbar including user-specific controls.
+ */
 export const ToolbarWithUser: Story = {
   args: {
     mode: 'edit',
@@ -45,6 +52,9 @@ export const ToolbarWithUser: Story = {
   },
 };
 
+/**
+ * Fully populated toolbar.
+ */
 export const ToolbarComplete: Story = {
   args: {
     mode: 'both',

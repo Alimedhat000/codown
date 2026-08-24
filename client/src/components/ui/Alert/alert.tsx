@@ -37,6 +37,9 @@ const iconColors = {
   info: 'text-blue-500',
 };
 
+/**
+ * Themed notification banner with severity icon, optional title, message content and optional dismiss button.
+ */
 export function Alert({
   variant = 'info',
   title,

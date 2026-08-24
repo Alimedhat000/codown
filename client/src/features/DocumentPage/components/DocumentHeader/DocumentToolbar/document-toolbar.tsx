@@ -21,6 +21,9 @@ interface DocumentToolbarProps {
   isCollaborator?: boolean;
 }
 
+/**
+ * Header toolbar switching contents between edit and view modes.
+ */
 export const DocumentToolbar = ({
   mode,
   setMode,

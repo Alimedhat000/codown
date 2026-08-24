@@ -27,6 +27,9 @@ const markdownKeymap = keymap.of([
   { key: 'Mod-e', run: markdownCommands.insertCode },
 ]);
 
+/**
+ * CodeMirror 6 editor bound to Yjs collaborative types; routes local edits into ytext and applies remote updates.
+ */
 export function MarkdownEditor({
   ytext,
   provider,

@@ -10,6 +10,9 @@ type layoutProps = {
   children: React.ReactNode;
 };
 
+/**
+ * Authenticated app shell: top Header with user menu plus routed outlet; sends still-loading or signed-out users to login.
+ */
 export const DashboardLayout = ({ children, title }: layoutProps) => {
   const { user, loading, logout } = useAuth();
 

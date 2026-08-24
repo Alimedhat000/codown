@@ -14,6 +14,9 @@ type Props = {
   isOwned?: boolean;
 };
 
+/**
+ * Render documents as grid cards or table rows according to the active view.
+ */
 export function DocumentList({
   documents,
   view,

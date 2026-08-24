@@ -12,6 +12,9 @@ interface DeleteDocumentModalProps {
   onDocumentDeleted?: (documentId: string) => void;
 }
 
+/**
+ * Confirmation modal for deleting a document.
+ */
 export function DeleteDocumentModal({
   document,
   open,

@@ -32,6 +32,9 @@ interface DocumentCardDropdownProps {
   onDocumentDeleted?: (documentId: string) => void;
 }
 
+/**
+ * Per-card action menu: rename, delete and related document operations.
+ */
 export function DocumentCardDropdown({
   triggerClassname,
   document,

@@ -1,3 +1,6 @@
+/**
+ * Deterministically pick an avatar color from a fixed palette based on userId.
+ */
 export function generateUserColor(userId: string): string {
   const colors = [
     '#FF6B6B',

@@ -29,6 +29,9 @@ type Props = {
   isCollaborator?: boolean;
 };
 
+/**
+ * Share flow trigger managing permission selection and the share dialog state.
+ */
 export const ShareButton = ({ className, docId, isCollaborator }: Props) => {
   const [permission, setPermission] = useState<'view' | 'edit'>('view');
   const [toast, setToast] = useState(false);

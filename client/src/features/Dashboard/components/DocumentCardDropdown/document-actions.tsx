@@ -4,6 +4,9 @@ import { NavigateFunction } from 'react-router';
 import { paths } from '@/config/paths';
 import { Document } from '@/types/api';
 
+/**
+ * Bundles rename/delete flows (modals included) for a single document.
+ */
 export function useDocumentActions(
   document: Document,
   navigate: NavigateFunction,

@@ -81,6 +81,7 @@ const mockDocuments: Document[] = [
 const meta: Meta<typeof DashboardMain> = {
   title: 'Dashboard/DashboardMain',
   component: DashboardMain,
+  tags: ['autodocs'],
   decorators: [
     (Story) => (
       <MemoryRouter>
@@ -95,6 +96,9 @@ type Story = StoryObj<typeof DashboardMain>;
 
 const setDocuments = () => {};
 
+/**
+ * Dashboard populated with owned and shared documents.
+ */
 export const Default: Story = {
   args: {
     ownedDocs: mockDocuments,
@@ -104,6 +108,9 @@ export const Default: Story = {
   },
 };
 
+/**
+ * Skeleton placeholders while data loads.
+ */
 export const Loading: Story = {
   args: {
     ownedDocs: [],
@@ -113,6 +120,9 @@ export const Loading: Story = {
   },
 };
 
+/**
+ * Only pinned documents displayed.
+ */
 export const OnlyPinned: Story = {
   args: {
     ownedDocs: mockDocuments.filter((d) => d.pinned),
@@ -122,6 +132,9 @@ export const OnlyPinned: Story = {
   },
 };
 
+/**
+ * Empty state with no documents.
+ */
 export const NoDocuments: Story = {
   args: {
     ownedDocs: [],

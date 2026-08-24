@@ -13,6 +13,9 @@ test.describe('Document Sharing', () => {
     await expect(page).toHaveURL(/.*\/app\/doc\/.+/);
   });
 
+  /**
+   * Open the share dialog for the current document.
+   */
   async function openShareMenu(page: Page) {
     await page.getByRole('button', { name: 'Share' }).click();
 

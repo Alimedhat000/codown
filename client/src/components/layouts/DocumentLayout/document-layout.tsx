@@ -7,6 +7,9 @@ type layoutProps = {
   children: React.ReactNode;
 };
 
+/**
+ * Minimal document page shell: head metadata plus a titled main region wrapping children.
+ */
 export const DocumentLayout = ({ title, children }: layoutProps) => {
   return (
     <>

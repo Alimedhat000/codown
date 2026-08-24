@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 
+/**
+ * Live boolean match state for a CSS media query string.
+ */
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(
     () => window.matchMedia(query).matches,

@@ -14,6 +14,9 @@ type layoutProps = {
   error: string | null;
 };
 
+/**
+ * Card layout for unauthenticated pages: centered column with optional title and error alert.
+ */
 export const AuthLayout = ({ children, title, error }: layoutProps) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

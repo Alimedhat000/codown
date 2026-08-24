@@ -3,6 +3,9 @@ import { undo, redo } from '@codemirror/commands';
 import { EditorSelection } from '@codemirror/state';
 import { EditorView } from 'codemirror';
 
+/**
+ * Runs named markdown formatting commands against the editor view.
+ */
 export function useMarkdownCommands(view: EditorView | null) {
   const runCommand = (
     before: string,

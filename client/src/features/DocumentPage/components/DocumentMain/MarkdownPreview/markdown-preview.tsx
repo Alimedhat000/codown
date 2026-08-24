@@ -26,6 +26,10 @@ import { rehypeTextDecorations } from './remark-decorations';
 import { remarkTypographer } from './remark-typographer';
 import { markdownSanitizeSchema } from './sanitize-schema';
 
+/**
+ * Sanitized markdown renderer: unified pipeline with GFM, math, mermaid,
+ * syntax highlighting and copy-code buttons over a hardened allow-list.
+ */
 export function MarkdownPreview({
   content,
   lastUpdated,

@@ -4,6 +4,9 @@ import * as Y from 'yjs';
 
 import { env } from '@/config/env';
 
+/**
+ * Yjs collaboration session for a document id: creates a Y.Doc plus HocuspocusProvider, mirrors ytext into React text state, and destroys everything on docId change/unmount.
+ */
 export function useCollab(docId: string | undefined) {
   const [text, setText] = useState('');
   const [isReady, setIsReady] = useState(false);

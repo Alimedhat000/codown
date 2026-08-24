@@ -14,6 +14,9 @@ interface RegisterFormProps {
   isLoading?: boolean;
 }
 
+/**
+ * Registration form built on react-hook-form; validates input and delegates account creation to onSubmit.
+ */
 export default function RegisterForm({
   onSubmit,
   isLoading = false,

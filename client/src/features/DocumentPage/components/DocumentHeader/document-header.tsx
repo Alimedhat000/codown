@@ -19,6 +19,9 @@ export interface DocumentHeaderProps {
   isCollaborator?: boolean;
 }
 
+/**
+ * Composes the document top bar: title, collaborators, share, view-mode and options controls.
+ */
 export const DocumentHeader: React.FC<DocumentHeaderProps> = ({
   mode,
   setMode,

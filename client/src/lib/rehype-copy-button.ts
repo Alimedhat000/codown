@@ -1,6 +1,10 @@
 import type { Root, Element } from 'hast';
 import { visit } from 'unist-util-visit';
 
+/**
+ * Rehype plugin that appends a 🔗 button to every heading that has an id;
+ * the button copies `<page url>#<heading id>` to the clipboard on click.
+ */
 export function rehypeCopyHeadingLinks() {
   return (tree: Root) => {
     visit(tree, 'element', (node) => {

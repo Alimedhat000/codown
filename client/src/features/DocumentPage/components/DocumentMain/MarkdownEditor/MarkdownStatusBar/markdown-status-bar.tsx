@@ -15,6 +15,9 @@ export interface MarkdownStatusBarProps {
   setSpellcheck: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+/**
+ * Word/character/status readout derived from the editor view.
+ */
 export const MarkdownStatusBar = ({
   className,
   view,

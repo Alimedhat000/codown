@@ -29,4 +29,7 @@ const createEnv = () => {
   return parsedEnv.data;
 };
 
+/**
+ * Validated client environment parsed from VITE_APP_* vars (API_URL, Socket_URL); throws at import time when invalid.
+ */
 export const env = createEnv();

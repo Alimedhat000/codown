@@ -1,5 +1,8 @@
 import { Skeleton } from '@/components/ui/Skeleton';
 
+/**
+ * Loading placeholders shaped to the current dashboard view.
+ */
 export function DocumentSkeletonLoader({
   view,
   count,

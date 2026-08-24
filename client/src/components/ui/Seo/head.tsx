@@ -7,6 +7,9 @@ type HeadProps = {
 
 const helmetData = new HelmetData({});
 
+/**
+ * Sets document title and meta description through react-helmet-async.
+ */
 export const Head = ({ title = '', description = '' }: HeadProps = {}) => {
   return (
     <Helmet

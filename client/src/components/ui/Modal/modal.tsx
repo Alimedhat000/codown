@@ -11,6 +11,9 @@ type ModalContextProps = {
   children: ReactNode;
 };
 
+/**
+ * Dialog root managing controlled open/onOpenChange state.
+ */
 function Modal({ open, onOpenChange, children }: ModalContextProps) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -25,6 +28,9 @@ type ModalTriggerProps = ComponentProps<typeof Dialog.Trigger> & {
   className?: string;
 };
 
+/**
+ * Element that opens the modal; forwards props to Radix Trigger.
+ */
 function ModalTrigger({ children, className, ...props }: ModalTriggerProps) {
   return (
     <Dialog.Trigger asChild className={className} {...props}>
@@ -39,6 +45,9 @@ type ModalPortalProps = {
   container?: HTMLElement;
 };
 
+/**
+ * Portals modal subtree to the document body (or custom container).
+ */
 function ModalPortal({ children, container }: ModalPortalProps) {
   return <Dialog.Portal container={container}>{children}</Dialog.Portal>;
 }
@@ -48,6 +57,9 @@ type ModalOverlayProps = ComponentProps<typeof Dialog.Overlay> & {
   className?: string;
 };
 
+/**
+ * Dimmed backdrop behind the modal panel.
+ */
 function ModalOverlay({ className, ...props }: ModalOverlayProps) {
   return (
     <Dialog.Overlay
@@ -90,6 +102,9 @@ type ModalContentProps = ComponentProps<typeof Dialog.Content> & {
   children: ReactNode;
 };
 
+/**
+ * Positioned panel with size, slide direction and animation props; focus-managed by Radix.
+ */
 function ModalContent({
   className,
   size = 'md',
@@ -178,6 +193,9 @@ type ModalHeaderProps = {
   children: ReactNode;
 };
 
+/**
+ * Header row leaving room for the close affordance.
+ */
 function ModalHeader({ className, children }: ModalHeaderProps) {
   return (
     <div
@@ -194,6 +212,9 @@ type ModalTitleProps = ComponentProps<typeof Dialog.Title> & {
   children: ReactNode;
 };
 
+/**
+ * Accessible dialog title.
+ */
 function ModalTitle({ className, children, ...props }: ModalTitleProps) {
   return (
     <Dialog.Title
@@ -214,6 +235,9 @@ type ModalDescriptionProps = ComponentProps<typeof Dialog.Description> & {
   children: ReactNode;
 };
 
+/**
+ * Muted supporting text beneath the title.
+ */
 function ModalDescription({
   className,
   children,
@@ -235,6 +259,9 @@ type ModalBodyProps = {
   children: ReactNode;
 };
 
+/**
+ * Padded content region.
+ */
 function ModalBody({ className, children }: ModalBodyProps) {
   return <div className={cn('p-6', className)}>{children}</div>;
 }
@@ -245,6 +272,9 @@ type ModalFooterProps = {
   children: ReactNode;
 };
 
+/**
+ * Action row pinned to the footer.
+ */
 function ModalFooter({ className, children }: ModalFooterProps) {
   return (
     <div
@@ -265,6 +295,9 @@ type ModalCloseProps = ComponentProps<typeof Dialog.Close> & {
   showIcon?: boolean;
 };
 
+/**
+ * Element that closes the modal; forwards props to Radix Close.
+ */
 function ModalClose({
   className,
   children,
@@ -327,6 +360,9 @@ type SimpleModalProps = {
   bodyClassName?: string;
 };
 
+/**
+ * Convenience wrapper assembling a complete simple confirmation modal.
+ */
 function SimpleModal({
   open,
   onOpenChange,

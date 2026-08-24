@@ -7,6 +7,9 @@ interface DocumentTitleProps {
   className?: string;
 }
 
+/**
+ * Inline document title in the header; renders nothing when title is absent.
+ */
 export const DocumentTitle = ({ title, className }: DocumentTitleProps) => {
   if (!title) return null;
 

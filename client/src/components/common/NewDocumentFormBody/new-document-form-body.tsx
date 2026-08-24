@@ -21,6 +21,10 @@ type Props = {
   onSubmit: (data: { title: string }) => Promise<void>;
 };
 
+/**
+ * Shared create-document form body rendered inside modals by both the Dashboard NewDocumentModal and DocumentPage CreateDocumentButton.
+ * Must be mounted inside a <Modal> ancestor: it emits ModalContent/Header/Footer parts directly.
+ */
 export default function NewDocumentFormBody({
   title = 'Create New Item',
   description = 'Provide a title to get started.',

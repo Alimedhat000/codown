@@ -1,3 +1,6 @@
+/**
+ * Central registry of internal route paths and href builders used by links and redirects.
+ */
 export const paths = {
   landing: {
     path: '/',

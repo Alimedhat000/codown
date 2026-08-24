@@ -34,6 +34,9 @@ interface CollapsibleProps {
   children: React.ReactNode;
 }
 
+/**
+ * Local collapsible trigger primitive.
+ */
 function CollapsibleTrigger({
   children,
   onClick,
@@ -57,6 +60,9 @@ function CollapsibleTrigger({
   );
 }
 
+/**
+ * Local collapsible content primitive.
+ */
 function CollapsibleContent({
   children,
   className = '',
@@ -69,6 +75,9 @@ function CollapsibleContent({
   );
 }
 
+/**
+ * Local open-state container for the TOC groups.
+ */
 function Collapsible({
   open = false,
   onOpenChange,
@@ -106,6 +115,9 @@ function Collapsible({
 }
 
 // Extract headings from markdown content
+/**
+ * Parse ATX markdown headings into flat TOC entries.
+ */
 function extractHeadings(markdown: string): TocHeading[] {
   const headingRegex = /^(#{1,6})\s+(.+)$/gm;
   const headings: TocHeading[] = [];
@@ -132,6 +144,9 @@ function extractHeadings(markdown: string): TocHeading[] {
 }
 
 // Build a nested tree structure from flat headings array
+/**
+ * Nest flat heading entries into a level-based tree.
+ */
 function buildHeadingTree(headings: TocHeading[]): TocHeading[] {
   const root: TocHeading[] = [];
   const stack: TocHeading[] = [];
@@ -155,6 +170,9 @@ function buildHeadingTree(headings: TocHeading[]): TocHeading[] {
 }
 
 // Individual TOC item component
+/**
+ * Recursive TOC node renderer with anchor links.
+ */
 function TocItem({
   heading,
   onHeadingClick,
@@ -221,6 +239,9 @@ function TocItem({
 }
 
 // Main TOC component
+/**
+ * Table-of-contents panel extracted from the document headings.
+ */
 export function MarkdownToc({
   content,
   className = '',

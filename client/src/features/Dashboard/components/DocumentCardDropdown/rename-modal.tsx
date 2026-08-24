@@ -12,6 +12,9 @@ interface RenameDocumentModalProps {
   onDocumentUpdated?: (updatedDocument: Document) => void;
 }
 
+/**
+ * Modal form for renaming a document.
+ */
 export function RenameDocumentModal({
   document,
   open,

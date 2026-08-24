@@ -12,6 +12,9 @@ type DocumentGridCardProps = {
   isOwned?: boolean;
 };
 
+/**
+ * Grid-style document card linking to the editor with its action menu.
+ */
 export function DocumentGridCard({
   document,
   onDocumentUpdated,

@@ -6,6 +6,10 @@ import { useAuth } from '@/context/auth';
 
 import { api } from './api';
 
+/**
+ * Zod schema validating registration input: valid email, username (min 3
+ * characters), password (min 8 characters), and optional full name.
+ */
 export const RegisterSchema = z.object({
   email: z.string().email(),
   username: z.string().min(3),
@@ -13,6 +17,9 @@ export const RegisterSchema = z.object({
   fullName: z.string().optional(),
 });
 
+/**
+ * zod schema validating login credentials (email format + required password).
+ */
 export const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
@@ -21,6 +28,10 @@ export const LoginSchema = z.object({
 export type RegisterSchemaType = z.infer<typeof RegisterSchema>;
 export type LoginSchemaType = z.infer<typeof LoginSchema>;
 
+/**
+ * Registers a user by POSTing the data to /auth/register. Resolves true on
+ * success, false on failure (the error is logged, not thrown).
+ */
 export const RegisterUser = async (
   data: RegisterSchemaType,
 ): Promise<boolean> => {
@@ -33,6 +44,10 @@ export const RegisterUser = async (
   }
 };
 
+/**
+ * Logs a user in by POSTing credentials to /auth/login and resolving with the
+ * response payload (access/refresh tokens and user); rethrows on failure.
+ */
 export const LoginUser = async (data: LoginSchemaType) => {
   try {
     const res = await api.post('/auth/login', data);
@@ -43,6 +58,9 @@ export const LoginUser = async (data: LoginSchemaType) => {
   }
 };
 
+/**
+ * Route guard redirecting unauthenticated users away from protected children.
+ */
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const auth = useAuth();
   const location = useLocation();

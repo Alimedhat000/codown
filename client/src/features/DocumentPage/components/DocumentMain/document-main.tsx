@@ -11,6 +11,9 @@ import { cn } from '@/utils/cn';
 import { MarkdownEditor } from './MarkdownEditor';
 import { MarkdownPreview } from './MarkdownPreview';
 
+/**
+ * Wires collaboration state into either MarkdownEditor or MarkdownPreview per view mode.
+ */
 export function DocumentMain({
   docId,
   mode,

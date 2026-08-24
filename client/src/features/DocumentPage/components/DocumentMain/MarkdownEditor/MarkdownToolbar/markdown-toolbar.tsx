@@ -6,6 +6,9 @@ import { ToolbarButton } from './toolbar-button';
 import { toolbarButtons } from './toolbar-buttons';
 import { useMarkdownCommands } from './use-markdown-commands';
 
+/**
+ * Formatting button row dispatching commands into the CodeMirror view.
+ */
 export function MarkdownToolbar({
   view,
   className,

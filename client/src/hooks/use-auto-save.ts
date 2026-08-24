@@ -2,6 +2,9 @@ import { useEffect } from 'react';
 
 import { DocumentData } from '@/types/api';
 
+/**
+ * Interval autosave hook. NOTE: the effect re-runs on every doc/saveFn identity change, resetting the timer — saves fire intervalMs after the last change.
+ */
 export function useAutoSave(
   saveFn: () => void,
   doc: DocumentData,

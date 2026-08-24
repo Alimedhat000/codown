@@ -6,6 +6,9 @@ import {
 
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/ToggleGroup';
 
+/**
+ * Grid/list switcher wired to the dashboard view state.
+ */
 export default function DashboardViewToggle({
   setView,
 }: {

@@ -13,6 +13,9 @@ import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { paths } from '@/config/paths';
 import { api } from '@/lib/api';
 
+/**
+ * Public share entry point: consumes the URL token to grant access, then routes into the document.
+ */
 export default function Share() {
   const { token } = useParams(); // Now getting token from URL params directly
   const navigate = useNavigate();

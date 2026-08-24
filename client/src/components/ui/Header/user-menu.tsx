@@ -23,6 +23,9 @@ export type UserMenuProps = {
   className?: string;
 };
 
+/**
+ * Avatar-triggered dropdown exposing account actions such as logout.
+ */
 export function UserMenu({
   username,
   avatarUrl,

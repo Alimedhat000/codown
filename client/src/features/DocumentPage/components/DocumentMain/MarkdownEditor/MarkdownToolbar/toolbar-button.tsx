@@ -1,5 +1,8 @@
 import React from 'react';
 
+/**
+ * Icon button wrapper for a single toolbar command.
+ */
 export function ToolbarButton({
   icon: Icon,
   title,

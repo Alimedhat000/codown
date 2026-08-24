@@ -2,6 +2,9 @@ import { StateEffect } from '@codemirror/state';
 import { EditorView } from 'codemirror';
 import { useEffect, useState } from 'react';
 
+/**
+ * Derives live editor status (counts, cursor info) from a CodeMirror view.
+ */
 export function useEditorStatus(view: EditorView | null) {
   const [status, setStatus] = useState({
     line: 1,

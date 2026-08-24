@@ -14,6 +14,9 @@ interface ViewModeSelectorProps {
   className?: string;
 }
 
+/**
+ * Toggle between editing and preview modes.
+ */
 export const ViewModeSelector: React.FC<ViewModeSelectorProps> = ({
   mode,
   setMode,

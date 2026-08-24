@@ -17,6 +17,9 @@ type Props = {
   className?: string;
 };
 
+/**
+ * Kebab menu exposing additional document actions.
+ */
 export const MoreOptionsDropdown = ({ className }: Props) => {
   return (
     <DropdownMenu>

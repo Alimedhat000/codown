@@ -2,6 +2,9 @@ export type ErrorProps = {
   errorMessage?: string | null;
 };
 
+/**
+ * Inline validation error text; renders nothing when errorMessage is absent.
+ */
 export const Error = ({ errorMessage }: ErrorProps) => {
   if (!errorMessage) return null;
 

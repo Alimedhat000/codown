@@ -3,6 +3,9 @@ import { visit } from 'unist-util-visit';
 
 const supersubRegex = /(\^([^\s^]+)\^)|(_([^\s_]+)_)/g;
 
+/**
+ * Rehype plugin adding superscript/subscript handling to the preview pipeline.
+ */
 export const rehypeSupSub: Plugin = () => {
   return (tree: any) => {
     visit(tree, 'text', (node: any, index, parent) => {

@@ -17,6 +17,9 @@ export type FieldWrapperPassThroughProps = Omit<
   'className' | 'children'
 >;
 
+/**
+ * Composes label, form control and error message around a single field.
+ */
 export const FieldWrapper = ({
   label,
   id,

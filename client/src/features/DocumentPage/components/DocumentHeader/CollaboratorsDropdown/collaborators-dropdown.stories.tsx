@@ -5,6 +5,7 @@ import { CollaboratorsDropdown } from './collaborators-dropdown';
 const meta: Meta = {
   title: 'DocumentPage/CollaboratorsDropdown',
   component: CollaboratorsDropdown,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
   },
@@ -13,12 +14,18 @@ export default meta;
 
 type Story = StoryObj;
 
+/**
+ * Typical collaborator list.
+ */
 export const Default: Story = {
   args: {
     collaborators: [],
   },
 };
 
+/**
+ * Small collaborator set.
+ */
 export const FewCollaborators: Story = {
   args: {
     collaborators: [
@@ -33,6 +40,9 @@ export const FewCollaborators: Story = {
   },
 };
 
+/**
+ * Large collaborator set.
+ */
 export const ManyCollaborators: Story = {
   args: {
     collaborators: [
@@ -67,6 +77,9 @@ export const ManyCollaborators: Story = {
   },
 };
 
+/**
+ * Long display names truncation.
+ */
 export const LongNames: Story = {
   args: {
     collaborators: [

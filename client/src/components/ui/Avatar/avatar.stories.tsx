@@ -12,6 +12,9 @@ export default meta;
 
 type Story = StoryObj<typeof Avatar>;
 
+/**
+ * Standard avatar with image source.
+ */
 export const WithImage: Story = {
   render: () => (
     <Avatar>
@@ -21,6 +24,9 @@ export const WithImage: Story = {
   ),
 };
 
+/**
+ * Fallback rendering when no image is provided.
+ */
 export const WithFallbackOnly: Story = {
   render: () => (
     <Avatar>
@@ -29,6 +35,9 @@ export const WithFallbackOnly: Story = {
   ),
 };
 
+/**
+ * Fallback shown when the image fails to load.
+ */
 export const BrokenImage: Story = {
   render: () => (
     <Avatar>
@@ -38,6 +47,9 @@ export const BrokenImage: Story = {
   ),
 };
 
+/**
+ * Non-default size.
+ */
 export const CustomSize: Story = {
   render: () => (
     <Avatar className="h-16 w-16">

@@ -4,6 +4,9 @@ import { Link } from 'react-router';
 
 import { paths } from '@/config/paths';
 
+/**
+ * Static workspace label rendered in the header.
+ */
 export const WorkspaceInfo: React.FC = () => {
   return (
     <Link

@@ -19,6 +19,9 @@ export default meta;
 
 type Story = StoryObj<typeof ToggleGroup>;
 
+/**
+ * Item selection group demonstrating single-select behavior.
+ */
 export const Default: Story = {
   render: () => (
     <ToggleGroup

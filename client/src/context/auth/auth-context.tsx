@@ -11,6 +11,9 @@ export interface AuthContextType {
   loading: boolean;
 }
 
+/**
+ * Context carrying the auth session: user, accessToken, isAuthenticated, loading, login and logout.
+ */
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined,
 );

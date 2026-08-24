@@ -12,6 +12,9 @@ type DocumentRowProps = {
   isOwned?: boolean;
 };
 
+/**
+ * List-view document row linking to the editor with its action menu.
+ */
 export function DocumentRow({
   document,
   onDocumentUpdated,

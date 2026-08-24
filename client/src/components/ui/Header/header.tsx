@@ -6,6 +6,9 @@ import { paths } from '@/config/paths';
 
 import { UserMenu } from './user-menu'; // Adjust path
 
+/**
+ * Application top bar: brand link plus the user menu when supplied user info.
+ */
 export default function Header({
   username,
   logout,

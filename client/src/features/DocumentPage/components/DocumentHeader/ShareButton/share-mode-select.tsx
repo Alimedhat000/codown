@@ -11,6 +11,9 @@ const options = [
   { label: 'Edit mode', value: 'edit' },
 ];
 
+/**
+ * Select between view/edit permission for a share link.
+ */
 export function ShareModeSelect({
   onChange,
   value,

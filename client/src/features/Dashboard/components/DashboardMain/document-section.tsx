@@ -9,6 +9,9 @@ type Props = {
   children: ReactNode;
 };
 
+/**
+ * Collapsible titled section (icon + count) grouping related documents.
+ */
 export function DocumentSection({ title, icon, count, children }: Props) {
   const [isOpen, setIsOpen] = useState(true);
 

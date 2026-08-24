@@ -6,6 +6,7 @@ import Header from './header';
 
 const meta: Meta<typeof Header> = {
   component: Header,
+  tags: ['autodocs'],
   title: 'Layout/Header',
   args: {
     logout: fn(),
@@ -23,12 +24,18 @@ export default meta;
 
 type Story = StoryObj<typeof Header>;
 
+/**
+ * Logged-out header.
+ */
 export const Default: Story = {
   args: {
     username: undefined,
   },
 };
 
+/**
+ * Header with authenticated user avatar menu.
+ */
 export const LoggedIn: Story = {
   args: {
     username: 'Ali Medhat',
@@ -36,6 +43,9 @@ export const LoggedIn: Story = {
   },
 };
 
+/**
+ * Authenticated header with fallback avatar (no image URL).
+ */
 export const LoggedInWithoutImage: Story = {
   args: {
     username: 'Ali Medhat',

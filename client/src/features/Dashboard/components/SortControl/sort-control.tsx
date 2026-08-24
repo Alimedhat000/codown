@@ -24,6 +24,9 @@ export interface SortControlProps {
   className?: string;
 }
 
+/**
+ * Controlled select for document sort order (value + onChange).
+ */
 export function SortControl({
   value,
   onChange,

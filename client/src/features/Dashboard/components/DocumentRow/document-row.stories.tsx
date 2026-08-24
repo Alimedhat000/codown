@@ -12,6 +12,9 @@ export default meta;
 
 type Story = StoryObj<typeof DocumentRow>;
 
+/**
+ * Row rendering with title, timestamps and actions.
+ */
 export const Default: Story = {
   render: () => (
     <DocumentRow
