@@ -18,12 +18,27 @@ async function main() {
     },
   });
 
-  // Start every e2e run with a clean dashboard for the test user
+  // Start every e2e run with a clean dashboard for the test user.
+  // Collaborator rows referencing the documents must go first or the
+  // document delete fails on the collaborators_documentId_fkey constraint.
+  const testDocs = await prisma.document.findMany({
+    where: { authorId: user.id },
+    select: { id: true },
+  });
+  const testDocIds = testDocs.map(d => d.id);
+  const { count: removedCollaborators } = await prisma.collaborator.deleteMany({
+    where: { documentId: { in: testDocIds } },
+  });
+  const { count: removedRequests } = await prisma.collaborationRequest.deleteMany({
+    where: { documentId: { in: testDocIds } },
+  });
   const { count } = await prisma.document.deleteMany({
     where: { authorId: user.id },
   });
-  if (count > 0) {
-    console.log(`🧹 Removed ${count} leftover test document(s)`);
+  if (count > 0 || removedCollaborators > 0 || removedRequests > 0) {
+    console.log(
+      `🧹 Removed ${count} leftover test document(s), ${removedCollaborators} collaborator link(s) and ${removedRequests} collaboration request(s)`
+    );
   }
 
   // Remove throwaway accounts created by the registration specs in past runs
