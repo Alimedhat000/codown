@@ -4,7 +4,7 @@ import { LuCheck, LuX } from 'react-icons/lu';
 
 import { cn } from '@/utils/cn';
 
-import { useEditorStatus } from './useEditorStatus';
+import { useEditorStatus } from './use-editor-status';
 
 export interface MarkdownStatusBarProps {
   className?: string;

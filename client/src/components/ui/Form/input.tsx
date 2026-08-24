@@ -5,8 +5,7 @@ import { LuEye, LuEyeOff, LuTriangleAlert } from 'react-icons/lu';
 
 import { cn } from '@/utils/cn';
 
-import { FieldWrapper, FieldWrapperPassThroughProps } from '../field-wrapper';
-
+import { FieldWrapper, FieldWrapperPassThroughProps } from './field-wrapper';
 import { inputVariants } from './variants';
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement> &

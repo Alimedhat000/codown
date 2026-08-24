@@ -19,8 +19,8 @@ import {
   ToastClose,
   ToastProvider,
 } from '@/components/ui/Toast';
-import { useJoinRequests } from '@/hooks/useJoinRequests';
-import { useShareLink } from '@/hooks/useShareLink';
+import { useJoinRequests } from '@/hooks/use-join-requests';
+import { useShareLink } from '@/hooks/use-share-link';
 
 import { ShareModeSelect } from './share-mode-select';
 type Props = {

@@ -20,10 +20,10 @@ import {
 import { dateFormat } from '@/utils/dateformat';
 
 import { MarkdownToc } from './markdown-toc';
-import { MermaidDiagram } from './MermaidDiagram';
+import { MermaidDiagram } from './mermaid-diagram';
 import { rehypeSupSub } from './rehype-subsuper';
+import { rehypeTextDecorations } from './remark-decorations';
 import { remarkTypographer } from './remark-typographer';
-import { rehypeTextDecorations } from './remarkDecorations';
 import { markdownSanitizeSchema } from './sanitize-schema';
 
 export function MarkdownPreview({

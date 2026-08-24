@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Form/Input';
+import { Input } from '@/components/ui/Form';
 import {
   ModalBody,
   ModalFooter,

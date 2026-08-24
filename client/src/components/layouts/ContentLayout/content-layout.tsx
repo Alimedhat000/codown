@@ -1,4 +1,4 @@
-import { Head } from '../ui/seo';
+import { Head } from '../../ui/Seo';
 
 export default function ContentLayout({
   title,

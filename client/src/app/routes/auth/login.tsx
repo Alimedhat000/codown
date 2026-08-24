@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 
 import { AuthLayout } from '@/components/layouts/AuthLayout';
-import LoginForm from '@/components/ui/auth/login-form';
+import LoginForm from '@/components/ui/Auth/login-form';
 import { paths } from '@/config/paths';
 import { useAuth } from '@/context/auth';
 import { api } from '@/lib/api';

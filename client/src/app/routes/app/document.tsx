@@ -6,8 +6,8 @@ import { Spinner } from '@/components/ui/Spinner';
 import { paths } from '@/config/paths';
 import { DocumentHeader } from '@/features/DocumentPage/components/DocumentHeader';
 import { DocumentMain } from '@/features/DocumentPage/components/DocumentMain';
-import { useDocument } from '@/hooks/useDocument';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useDocument } from '@/hooks/use-document';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 export default function DocumentPage() {
   const { id } = useParams();

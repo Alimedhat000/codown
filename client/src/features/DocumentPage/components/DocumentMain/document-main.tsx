@@ -4,7 +4,7 @@ import { LuLink, LuUnlink } from 'react-icons/lu';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import { Spinner } from '@/components/ui/Spinner';
-import { useCollab } from '@/hooks/useCollab';
+import { useCollab } from '@/hooks/use-collab';
 import { DocumentData } from '@/types/api';
 import { cn } from '@/utils/cn';
 

@@ -2,8 +2,8 @@ import React from 'react';
 
 import { useAuth } from '@/context/auth';
 
-import Header from '../ui/Header/header';
-import { Head } from '../ui/seo';
+import Header from '../../ui/Header/header';
+import { Head } from '../../ui/Seo';
 
 type layoutProps = {
   title: string;

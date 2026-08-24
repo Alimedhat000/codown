@@ -1,1 +1,1 @@
-export * from './DocumentMain';
+export * from './document-main';

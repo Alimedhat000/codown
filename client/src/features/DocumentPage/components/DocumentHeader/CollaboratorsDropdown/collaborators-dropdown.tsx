@@ -13,7 +13,7 @@ import {
   // DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/Dropdown';
-import { useCollaborators } from '@/hooks/useCollaborators';
+import { useCollaborators } from '@/hooks/use-collaborators';
 import { cn } from '@/utils/cn';
 
 interface CollaboratorsDropdownProps {
