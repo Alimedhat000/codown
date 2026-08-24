@@ -6,6 +6,7 @@ import { SortControl } from './sort-control';
 const meta: Meta = {
   title: 'Dashboard/SortControl',
   component: SortControl,
+  tags: ['autodocs'],
 };
 export default meta;
 
@@ -18,6 +19,9 @@ const sortOptions = [
   { label: 'Z to A', value: 'za' },
 ];
 
+/**
+ * Dropdown controlling dashboard sort order.
+ */
 export const Default: Story = {
   render: () => {
     const [value, setValue] = useState('newest');

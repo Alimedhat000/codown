@@ -21,6 +21,9 @@ export default meta;
 
 type Story = StoryObj;
 
+/**
+ * Single toast with action and auto-dismiss duration.
+ */
 export const DefaultToast: Story = {
   render: () => {
     const [open, setOpen] = React.useState(true);
@@ -49,6 +52,9 @@ export const DefaultToast: Story = {
   },
 };
 
+/**
+ * Variant showcase including destructive.
+ */
 export const Variants: Story = {
   render: () => {
     const [openVariant, setOpenVariant] = React.useState<

@@ -25,12 +25,19 @@ const sortOptions = [
 type SortValue = (typeof sortOptions)[number]['value'];
 
 type DashboardMainProps = {
+  /** Documents owned by the current user, shown in "Your Notes". */
   ownedDocs: Document[];
+  /** Documents shared with the current user, shown as "Shared Notes". */
   collaboratedDocs: Document[];
+  /** Renders skeleton loaders instead of sections while fetching. */
   loading: boolean;
+  /** State setter used to apply card-level updates and deletions. */
   setDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
 };
 
+/**
+ * Return a sorted copy of the documents for the selected sort value.
+ */
 function sortDocuments(documents: Document[], sort: SortValue) {
   return [...documents].sort((a, b) => {
     switch (sort) {
@@ -52,6 +59,9 @@ function sortDocuments(documents: Document[], sort: SortValue) {
   });
 }
 
+/**
+ * Dashboard body: owned/shared sections, sorting, view toggle and card/list rendering.
+ */
 export default function DashboardMain({
   ownedDocs,
   collaboratedDocs,

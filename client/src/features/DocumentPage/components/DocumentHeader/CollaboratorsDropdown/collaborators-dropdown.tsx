@@ -17,11 +17,17 @@ import { useCollaborators } from '@/hooks/use-collaborators';
 import { cn } from '@/utils/cn';
 
 interface CollaboratorsDropdownProps {
+  /** ID of the document whose collaborators are listed. */
   docId?: string;
+  /** Extra classes merged onto the trigger button. */
   className?: string;
+  /** Switches the hook to read-only collaborator access. */
   isCollaborator?: boolean;
 }
 
+/**
+ * Avatar stack opening a dropdown listing collaborators with add/remove actions.
+ */
 export const CollaboratorsDropdown = ({
   docId,
   className,

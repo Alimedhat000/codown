@@ -3,6 +3,9 @@ import type { Options } from 'rehype-sanitize';
 
 const HIGHLIGHT_CLASS_PATTERN = /^(hljs(-[\w-]+)?|language-[\w-]+)$/;
 
+/**
+ * Allow-list schema extending hast-util-sanitize defaults for the preview pipeline.
+ */
 export const markdownSanitizeSchema: Options = {
   ...defaultSchema,
   attributes: {

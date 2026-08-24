@@ -31,6 +31,9 @@ const meta: Meta<typeof Button> = {
 export default meta;
 type Story = StoryObj<typeof Button>;
 
+/**
+ * Default variant and size.
+ */
 export const Default: Story = {
   args: {
     children: 'Default Button',
@@ -39,6 +42,9 @@ export const Default: Story = {
   },
 };
 
+/**
+ * Destructive variant for irreversible actions.
+ */
 export const Destructive: Story = {
   args: {
     children: 'Delete',
@@ -46,6 +52,9 @@ export const Destructive: Story = {
   },
 };
 
+/**
+ * Outline variant.
+ */
 export const Outline: Story = {
   args: {
     children: 'Outline',
@@ -53,6 +62,9 @@ export const Outline: Story = {
   },
 };
 
+/**
+ * Secondary variant.
+ */
 export const Secondary: Story = {
   args: {
     children: 'Secondary',
@@ -60,6 +72,9 @@ export const Secondary: Story = {
   },
 };
 
+/**
+ * Ghost variant.
+ */
 export const Ghost: Story = {
   args: {
     children: 'Ghost',
@@ -67,6 +82,9 @@ export const Ghost: Story = {
   },
 };
 
+/**
+ * Link-styled variant.
+ */
 export const Link: Story = {
   args: {
     children: 'Link Button',
@@ -74,6 +92,9 @@ export const Link: Story = {
   },
 };
 
+/**
+ * Small size preset.
+ */
 export const Small: Story = {
   args: {
     children: 'Small',
@@ -81,6 +102,9 @@ export const Small: Story = {
   },
 };
 
+/**
+ * Large size preset.
+ */
 export const Large: Story = {
   args: {
     children: 'Large',
@@ -88,6 +112,9 @@ export const Large: Story = {
   },
 };
 
+/**
+ * Icon-only ghost button using size='icon'.
+ */
 export const IconButton: Story = {
   args: {
     children: '🔔',

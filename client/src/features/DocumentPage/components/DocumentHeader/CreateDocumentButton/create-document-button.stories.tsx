@@ -6,6 +6,7 @@ import { CreateDocumentButton } from './create-document-button';
 const meta: Meta = {
   title: 'DocumentPage/CreateDocumentButton',
   component: CreateDocumentButton,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
   },
@@ -17,10 +18,16 @@ export default meta;
 
 type Story = StoryObj;
 
+/**
+ * Button opening the create-document modal.
+ */
 export const Default: Story = {
   args: {},
 };
 
+/**
+ * Pending state while creation resolves.
+ */
 export const WithSlowCreation: Story = {
   args: {
     onCreateDocument: fn().mockImplementation(
@@ -30,6 +37,9 @@ export const WithSlowCreation: Story = {
   },
 };
 
+/**
+ * Error surfaced when creation fails.
+ */
 export const WithError: Story = {
   args: {
     onCreateDocument: fn().mockRejectedValue(

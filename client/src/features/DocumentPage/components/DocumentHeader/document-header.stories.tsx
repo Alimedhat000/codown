@@ -7,6 +7,7 @@ import { DocumentHeader } from './document-header';
 const meta: Meta<typeof DocumentHeader> = {
   title: 'DocumentPage/DocumentHeader',
   component: DocumentHeader,
+  tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
   },
@@ -29,12 +30,18 @@ const meta: Meta<typeof DocumentHeader> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/**
+ * Header with minimal props.
+ */
 export const Default: Story = {
   args: {
     mode: 'both',
   },
 };
 
+/**
+ * Header with authenticated user present.
+ */
 export const WithUser: Story = {
   args: {
     mode: 'edit',
@@ -44,6 +51,9 @@ export const WithUser: Story = {
   },
 };
 
+/**
+ * Header bound to a document.
+ */
 export const WithDocument: Story = {
   args: {
     mode: 'view',
@@ -61,6 +71,9 @@ export const WithDocument: Story = {
   },
 };
 
+/**
+ * Dense collaborator avatar stack.
+ */
 export const WithManyCollaborators: Story = {
   args: {
     mode: 'both',
@@ -91,6 +104,9 @@ export const WithManyCollaborators: Story = {
   },
 };
 
+/**
+ * Long document title truncation.
+ */
 export const LongDocumentTitle: Story = {
   args: {
     mode: 'edit',
@@ -101,6 +117,9 @@ export const LongDocumentTitle: Story = {
   },
 };
 
+/**
+ * Collaborator UI hidden when the list is empty.
+ */
 export const NoCollaborators: Story = {
   args: {
     mode: 'both',
@@ -110,6 +129,9 @@ export const NoCollaborators: Story = {
   },
 };
 
+/**
+ * Toolbar in edit mode.
+ */
 export const EditMode: Story = {
   args: {
     mode: 'edit',
@@ -118,6 +140,9 @@ export const EditMode: Story = {
   },
 };
 
+/**
+ * Toolbar in view mode.
+ */
 export const ViewMode: Story = {
   args: {
     mode: 'view',

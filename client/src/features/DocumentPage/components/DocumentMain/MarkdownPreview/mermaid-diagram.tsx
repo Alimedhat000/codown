@@ -45,7 +45,15 @@ const SVG_SANITIZE_CONFIG: Config = {
   ],
 };
 
-export function MermaidDiagram({ code }: { code: string }) {
+/**
+ * Renders fenced mermaid code to SVG asynchronously.
+ */
+export function MermaidDiagram({
+  code,
+}: {
+  /** Mermaid diagram source to render. */
+  code: string;
+}) {
   const [svg, setSvg] = useState('');
   const [failed, setFailed] = useState(false);
   const renderId = useMemo(

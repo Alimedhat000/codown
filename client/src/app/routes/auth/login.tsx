@@ -8,6 +8,9 @@ import { useAuth } from '@/context/auth';
 import { api } from '@/lib/api';
 import { type LoginSchemaType } from '@/lib/auth';
 
+/**
+ * Login page wiring LoginForm to the auth context and post-login navigation.
+ */
 export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

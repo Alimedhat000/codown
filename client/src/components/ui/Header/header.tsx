@@ -6,13 +6,19 @@ import { paths } from '@/config/paths';
 
 import { UserMenu } from './user-menu'; // Adjust path
 
+/**
+ * Application top bar: brand link plus the user menu when supplied user info.
+ */
 export default function Header({
   username,
   logout,
   avatarUrl,
 }: {
+  /** Signed-in display name shown in the user menu. */
   username?: string;
+  /** Profile image source for the menu avatar. */
   avatarUrl?: string;
+  /** Sign-out handler run from the menu's Logout item. */
   logout?: () => void;
 }) {
   return (

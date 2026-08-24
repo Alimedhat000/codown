@@ -14,9 +14,13 @@ import {
 } from '@/components/ui/Dropdown';
 
 type Props = {
+  /** Extra classes merged onto the kebab-menu trigger button. */
   className?: string;
 };
 
+/**
+ * Kebab menu exposing additional document actions.
+ */
 export const MoreOptionsDropdown = ({ className }: Props) => {
   return (
     <DropdownMenu>

@@ -6,6 +6,9 @@ import { lineNumbers, gutter } from '@codemirror/view';
 import { EditorView, keymap, highlightActiveLine } from '@codemirror/view';
 // import { githubMarkdown } from "@codemirror/lang-markdown"; // optional preset
 
+/**
+ * CodeMirror extension list composing the markdown language, keymap and editor behavior plugins.
+ */
 export const editorExtensions = [
   markdown({
     base: markdownLanguage,

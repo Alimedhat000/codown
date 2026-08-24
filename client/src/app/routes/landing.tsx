@@ -4,6 +4,9 @@ import { Head } from '@/components/ui/Seo';
 import { paths } from '@/config/paths';
 import { useAuth } from '@/context/auth';
 
+/**
+ * Marketing landing page; call-to-action adapts to authentication state.
+ */
 export default function Landing() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();

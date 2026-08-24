@@ -11,6 +11,9 @@ import { cn } from '@/utils/cn';
 import { MarkdownEditor } from './MarkdownEditor';
 import { MarkdownPreview } from './MarkdownPreview';
 
+/**
+ * Wires collaboration state into either MarkdownEditor or MarkdownPreview per view mode.
+ */
 export function DocumentMain({
   docId,
   mode,
@@ -19,11 +22,17 @@ export function DocumentMain({
   className,
   isReadOnly,
 }: {
+  /** ID of the document to collaborate on; renders a spinner while absent. */
   docId: string | undefined;
+  /** Active editor layout: edit-only, split, or view-only. */
   mode: EditorMode;
+  /** Loaded document metadata; content is kept in sync with the editor. */
   doc: DocumentData | null;
+  /** Persists editor text back into the parent's document state. */
   setDoc: (doc: DocumentData) => void;
+  /** Extra classes merged onto the layout container. */
   className?: string;
+  /** Renders the editor as read-only when true. */
   isReadOnly?: boolean;
 }) {
   const { text, isReady, ydoc, ytext, provider } = useCollab(docId);

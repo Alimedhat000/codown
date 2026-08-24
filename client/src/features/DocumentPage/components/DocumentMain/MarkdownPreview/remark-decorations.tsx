@@ -4,6 +4,9 @@ import { visit } from 'unist-util-visit';
 // Regex patterns for text decorations
 const textDecorationRegex = /(\+\+([^+]+)\+\+)|(==([^=]+)==)/g;
 
+/**
+ * Rehype plugin applying extra inline text decorations during preview rendering.
+ */
 export const rehypeTextDecorations: Plugin = () => {
   return (tree: any) => {
     visit(tree, 'text', (node: any, index, parent) => {

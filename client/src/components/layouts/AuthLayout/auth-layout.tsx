@@ -9,11 +9,17 @@ import Header from '../../ui/Header/header';
 import { Head } from '../../ui/Seo';
 
 type layoutProps = {
+  /** Large page heading, reused as the document title. */
   title: string;
+  /** Centered page content rendered beneath the heading. */
   children: React.ReactNode;
+  /** Warning banner shown above the heading; null hides it. */
   error: string | null;
 };
 
+/**
+ * Card layout for unauthenticated pages: centered column with optional title and error alert.
+ */
 export const AuthLayout = ({ children, title, error }: layoutProps) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

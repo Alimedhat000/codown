@@ -26,6 +26,10 @@ import { rehypeTextDecorations } from './remark-decorations';
 import { remarkTypographer } from './remark-typographer';
 import { markdownSanitizeSchema } from './sanitize-schema';
 
+/**
+ * Sanitized markdown renderer: unified pipeline with GFM, math, mermaid,
+ * syntax highlighting and copy-code buttons over a hardened allow-list.
+ */
 export function MarkdownPreview({
   content,
   lastUpdated,
@@ -33,10 +37,15 @@ export function MarkdownPreview({
   onScroll,
   syncScroll,
 }: {
+  /** Raw markdown source to render. */
   content: string;
+  /** Ref receiving the scrollable container for scroll syncing. */
   previewScrollRef?: React.RefObject<HTMLDivElement | null>;
+  /** Scroll handler attached while synced scrolling is enabled. */
   onScroll?: () => void;
+  /** Attaches the parent's scroll handler when true. */
   syncScroll?: boolean;
+  /** ISO timestamp shown as "Last Edited"; falls back to "Unknown". */
   lastUpdated?: string;
 }) {
   useEffect(() => {

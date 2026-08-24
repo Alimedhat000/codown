@@ -13,6 +13,9 @@ import {
 import Typo from 'typo-js';
 
 // Dictionary manager class
+/**
+ * Singleton hunspell dictionary loader/cache keyed by language.
+ */
 class DictionaryManager {
   private static instance: DictionaryManager;
   private dictionaries: Map<string, Typo> = new Map();
@@ -223,6 +226,9 @@ class DictionaryManager {
 }
 
 // Suggestion widget for displaying spelling corrections
+/**
+ * CodeMirror widget rendering inline correction suggestions.
+ */
 class SuggestionWidget extends WidgetType {
   constructor(
     private suggestions: string[],
@@ -469,6 +475,11 @@ const spellcheckTheme = EditorView.theme({
 });
 
 // Main spellcheck extension factory
+/**
+ * Assembles the spellcheck extension: misspelling decorations plus suggestion widgets.
+ * @param language - Hunspell dictionary locale to load. Defaults to 'en_US'.
+ * @returns CodeMirror extensions applying decorations and styling.
+ */
 export function createAdvancedSpellcheckExtension(
   language: string = 'en_US',
 ): Extension {
@@ -476,6 +487,9 @@ export function createAdvancedSpellcheckExtension(
 }
 
 // Custom word management
+/**
+ * Global custom-word store for words the user added to the dictionary.
+ */
 export class SpellcheckManager {
   private static customWords: Set<string> = new Set();
 

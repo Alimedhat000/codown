@@ -27,6 +27,9 @@ const markdownKeymap = keymap.of([
   { key: 'Mod-e', run: markdownCommands.insertCode },
 ]);
 
+/**
+ * CodeMirror 6 editor bound to Yjs collaborative types; routes local edits into ytext and applies remote updates.
+ */
 export function MarkdownEditor({
   ytext,
   provider,
@@ -35,11 +38,17 @@ export function MarkdownEditor({
   syncScroll,
   isReadOnly,
 }: {
+  /** Shared Yjs text bound to the CodeMirror view. */
   ytext: Y.Text | null;
+  /** Collaboration provider supplying awareness state. */
   provider: any;
+  /** Ref receiving the scrollable editor element for scroll syncing. */
   editorScrollRef?: React.RefObject<HTMLDivElement | null>;
+  /** Scroll handler attached while synced scrolling is enabled. */
   onScroll: () => void;
+  /** Attaches the parent's scroll handler when true. */
   syncScroll?: boolean;
+  /** Disables editing and hides toolbar/status controls when true. */
   isReadOnly?: boolean;
 }) {
   const { user } = useAuth(); // Get current user

@@ -6,10 +6,15 @@ import Header from '../../ui/Header/header';
 import { Head } from '../../ui/Seo';
 
 type layoutProps = {
+  /** Document title set via Head. */
   title: string;
+  /** Routed page content rendered under the header. */
   children: React.ReactNode;
 };
 
+/**
+ * Authenticated app shell: top Header with user menu plus routed outlet; sends still-loading or signed-out users to login.
+ */
 export const DashboardLayout = ({ children, title }: layoutProps) => {
   const { user, loading, logout } = useAuth();
 

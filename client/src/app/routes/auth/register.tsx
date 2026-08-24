@@ -7,6 +7,9 @@ import { paths } from '@/config/paths';
 import { RegisterUser } from '@/lib/auth';
 import { type RegisterSchemaType } from '@/lib/auth';
 
+/**
+ * Registration page wiring RegisterForm to the auth flow and redirect after signup.
+ */
 export default function Register() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);

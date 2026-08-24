@@ -10,10 +10,15 @@ import type { RegisterSchemaType } from '@/lib/auth';
 import { RegisterSchema } from '@/lib/auth';
 
 interface RegisterFormProps {
+  /** Called with validated form data on successful submit. */
   onSubmit: (data: RegisterSchemaType) => void | Promise<void>;
+  /** Overrides pending UI while an outer operation runs. Defaults to false. */
   isLoading?: boolean;
 }
 
+/**
+ * Registration form built on react-hook-form; validates input and delegates account creation to onSubmit.
+ */
 export default function RegisterForm({
   onSubmit,
   isLoading = false,

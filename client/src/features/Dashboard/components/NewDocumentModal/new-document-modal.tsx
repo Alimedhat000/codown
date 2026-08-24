@@ -8,9 +8,13 @@ import { api } from '@/lib/api';
 import type { CreateDocumentForm, Document } from '@/types/api';
 
 type Props = {
+  /** State setter that receives the newly created document. */
   setDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
 };
 
+/**
+ * Modal hosting the shared NewDocumentFormBody; creates the document via API and prepends it to the list.
+ */
 export default function NewDocumentModal({ setDocuments }: Props) {
   const [open, setOpen] = useState(false);
 

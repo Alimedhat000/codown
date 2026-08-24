@@ -2,6 +2,7 @@ import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { EditorView } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
 
+/** Dracula palette and metric values driving the theme and highlight style. */
 const config = {
   name: 'dracula',
   dark: true,
@@ -30,6 +31,7 @@ const config = {
   invalid: '#FF5555',
   regexp: '#F1FA8C',
 };
+/** Editor-chrome theme (gutters, tooltips, selections) in the Dracula palette. */
 const draculaTheme = EditorView.theme(
   {
     '&': {
@@ -95,6 +97,7 @@ const draculaTheme = EditorView.theme(
   },
   { dark: config.dark },
 );
+/** Syntax highlight rules mapping code/markdown tags to palette colors. */
 const draculaHighlightStyle = HighlightStyle.define([
   { tag: tags.keyword, color: config.keyword },
   {
@@ -150,6 +153,7 @@ const draculaHighlightStyle = HighlightStyle.define([
   { tag: tags.invalid, color: config.invalid },
   { tag: tags.strikethrough, textDecoration: 'line-through' },
 ]);
+/** Combined theme + highlighting extension list consumed by MarkdownEditor. */
 const MyTheme = [draculaTheme, syntaxHighlighting(draculaHighlightStyle)];
 
 export { config, MyTheme, draculaHighlightStyle, draculaTheme };

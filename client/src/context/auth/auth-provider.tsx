@@ -6,6 +6,9 @@ import { setAccessToken as storeToken, clearAccessToken } from '@/utils/token';
 
 import { AuthContext } from './auth-context';
 
+/**
+ * Session bootstrap: refreshes the token cookie on mount, exposes login/logout and mirrors the token into api defaults and module storage.
+ */
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);

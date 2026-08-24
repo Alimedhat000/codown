@@ -9,6 +9,9 @@ import { DocumentMain } from '@/features/DocumentPage/components/DocumentMain';
 import { useDocument } from '@/hooks/use-document';
 import { useMediaQuery } from '@/hooks/use-media-query';
 
+/**
+ * Editor page: resolves the :id param and wires the document header, collaboration and editor/preview panes.
+ */
 export default function DocumentPage() {
   const { id } = useParams();
   const { doc, editedDoc, setEditedDoc, loading, /*handleSave,*/ access } =

@@ -6,11 +6,17 @@ import { cn } from '@/utils/cn';
 
 // Base Modal Context Provider
 type ModalContextProps = {
+  /** Controlled visibility; omit for uncontrolled usage. */
   open?: boolean;
+  /** Called when the dialog requests to open or close. */
   onOpenChange?: (open: boolean) => void;
+  /** Modal parts composing the dialog. */
   children: ReactNode;
 };
 
+/**
+ * Dialog root managing controlled open/onOpenChange state.
+ */
 function Modal({ open, onOpenChange, children }: ModalContextProps) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -25,6 +31,9 @@ type ModalTriggerProps = ComponentProps<typeof Dialog.Trigger> & {
   className?: string;
 };
 
+/**
+ * Element that opens the modal; forwards props to Radix Trigger.
+ */
 function ModalTrigger({ children, className, ...props }: ModalTriggerProps) {
   return (
     <Dialog.Trigger asChild className={className} {...props}>
@@ -39,6 +48,9 @@ type ModalPortalProps = {
   container?: HTMLElement;
 };
 
+/**
+ * Portals modal subtree to the document body (or custom container).
+ */
 function ModalPortal({ children, container }: ModalPortalProps) {
   return <Dialog.Portal container={container}>{children}</Dialog.Portal>;
 }
@@ -48,6 +60,9 @@ type ModalOverlayProps = ComponentProps<typeof Dialog.Overlay> & {
   className?: string;
 };
 
+/**
+ * Dimmed backdrop behind the modal panel.
+ */
 function ModalOverlay({ className, ...props }: ModalOverlayProps) {
   return (
     <Dialog.Overlay
@@ -65,7 +80,9 @@ function ModalOverlay({ className, ...props }: ModalOverlayProps) {
 // Modal Content
 type ModalContentProps = ComponentProps<typeof Dialog.Content> & {
   className?: string;
+  /** Max-width preset for the panel. Defaults to 'md'. */
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  /** Fixed placement of the panel on screen. Defaults to 'center'. */
   position?:
     | 'center'
     | 'top'
@@ -76,6 +93,7 @@ type ModalContentProps = ComponentProps<typeof Dialog.Content> & {
     | 'top-right'
     | 'bottom-left'
     | 'bottom-right';
+  /** Direction the panel slides in/out from; falls back to position. */
   slideFrom?:
     | 'center'
     | 'top'
@@ -86,10 +104,14 @@ type ModalContentProps = ComponentProps<typeof Dialog.Content> & {
     | 'top-right'
     | 'bottom-left'
     | 'bottom-right';
+  /** Enter/exit motion style. Defaults to 'slide'. */
   animationType?: 'slide' | 'zoom' | 'fade' | 'none';
   children: ReactNode;
 };
 
+/**
+ * Positioned panel with size, slide direction and animation props; focus-managed by Radix.
+ */
 function ModalContent({
   className,
   size = 'md',
@@ -178,6 +200,9 @@ type ModalHeaderProps = {
   children: ReactNode;
 };
 
+/**
+ * Header row leaving room for the close affordance.
+ */
 function ModalHeader({ className, children }: ModalHeaderProps) {
   return (
     <div
@@ -194,6 +219,9 @@ type ModalTitleProps = ComponentProps<typeof Dialog.Title> & {
   children: ReactNode;
 };
 
+/**
+ * Accessible dialog title.
+ */
 function ModalTitle({ className, children, ...props }: ModalTitleProps) {
   return (
     <Dialog.Title
@@ -214,6 +242,9 @@ type ModalDescriptionProps = ComponentProps<typeof Dialog.Description> & {
   children: ReactNode;
 };
 
+/**
+ * Muted supporting text beneath the title.
+ */
 function ModalDescription({
   className,
   children,
@@ -235,6 +266,9 @@ type ModalBodyProps = {
   children: ReactNode;
 };
 
+/**
+ * Padded content region.
+ */
 function ModalBody({ className, children }: ModalBodyProps) {
   return <div className={cn('p-6', className)}>{children}</div>;
 }
@@ -245,6 +279,9 @@ type ModalFooterProps = {
   children: ReactNode;
 };
 
+/**
+ * Action row pinned to the footer.
+ */
 function ModalFooter({ className, children }: ModalFooterProps) {
   return (
     <div
@@ -262,9 +299,13 @@ function ModalFooter({ className, children }: ModalFooterProps) {
 type ModalCloseProps = ComponentProps<typeof Dialog.Close> & {
   className?: string;
   children?: ReactNode;
+  /** Renders the X glyph in the built-in close button. Defaults to true. */
   showIcon?: boolean;
 };
 
+/**
+ * Element that closes the modal; forwards props to Radix Close.
+ */
 function ModalClose({
   className,
   children,
@@ -293,12 +334,19 @@ function ModalClose({
 
 // Convenience compound component with sensible defaults
 type SimpleModalProps = {
+  /** Controls visibility of the dialog. */
   open: boolean;
+  /** Open-state change callback. */
   onOpenChange: (open: boolean) => void;
+  /** Header title text. */
   title?: string;
+  /** Muted supporting line under the title. */
   description?: string;
+  /** Content rendered in the padded body. */
   children: ReactNode;
+  /** Panel max-width preset. Defaults to 'md'. */
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  /** Screen placement preset. Defaults to 'top'. */
   position?:
     | 'center'
     | 'top'
@@ -309,6 +357,7 @@ type SimpleModalProps = {
     | 'top-right'
     | 'bottom-left'
     | 'bottom-right';
+  /** Slide origin direction. Defaults to 'top'. */
   slideFrom?:
     | 'center'
     | 'top'
@@ -319,14 +368,23 @@ type SimpleModalProps = {
     | 'top-right'
     | 'bottom-left'
     | 'bottom-right';
+  /** Motion style. Defaults to 'slide'. */
   animationType?: 'slide' | 'zoom' | 'fade' | 'none';
+  /** Renders the close X in the header. Defaults to true. */
   showClose?: boolean;
+  /** Extra classes for the backdrop overlay. */
   overlayClassName?: string;
+  /** Extra classes for the panel content. */
   contentClassName?: string;
+  /** Extra classes for the header row. */
   headerClassName?: string;
+  /** Extra classes for the body region. */
   bodyClassName?: string;
 };
 
+/**
+ * All-in-one modal wiring portal, overlay, titled header and body with sensible defaults.
+ */
 function SimpleModal({
   open,
   onOpenChange,

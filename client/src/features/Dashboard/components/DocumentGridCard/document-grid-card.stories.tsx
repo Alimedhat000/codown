@@ -12,6 +12,9 @@ export default meta;
 
 type Story = StoryObj<typeof DocumentGridCard>;
 
+/**
+ * Card rendering with title, snippet and metadata.
+ */
 export const Default: Story = {
   render: () => (
     <DocumentGridCard

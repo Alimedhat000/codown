@@ -21,6 +21,7 @@ Avatar.displayName = AvatarPrimitive.Root.displayName;
 const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image> & {
+    /** Delay before the image fades in; masks slow loads. Defaults to 1500. */
     delayMS?: number;
   }
 >(({ className, delayMS = 1500, ...props }, ref) => {

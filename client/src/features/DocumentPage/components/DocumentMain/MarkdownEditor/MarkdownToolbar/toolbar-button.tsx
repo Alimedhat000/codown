@@ -1,12 +1,18 @@
 import React from 'react';
 
+/**
+ * Icon button wrapper for a single toolbar command.
+ */
 export function ToolbarButton({
   icon: Icon,
   title,
   onClick,
 }: {
+  /** Icon component rendered inside the button. */
   icon: React.ElementType;
+  /** Native tooltip and accessible name of the button. */
   title: string;
+  /** Invoked when the button is clicked. */
   onClick: () => void;
 }) {
   return (

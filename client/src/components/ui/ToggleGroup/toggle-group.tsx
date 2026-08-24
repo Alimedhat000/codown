@@ -8,6 +8,7 @@ const ToggleGroup = ToggleGroupPrimitive.Root;
 const ToggleGroupItem = React.forwardRef<
   React.ElementRef<typeof ToggleGroupPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Item> & {
+    /** Mirrors Dropdown's inset option; currently applies no styles. */
     inset?: boolean;
   }
 >(({ className, inset, ...props }, ref) => (

@@ -24,11 +24,17 @@ import { useShareLink } from '@/hooks/use-share-link';
 
 import { ShareModeSelect } from './share-mode-select';
 type Props = {
+  /** Extra classes merged onto the share trigger button. */
   className?: string;
+  /** ID of the document being shared. */
   docId?: string;
+  /** Switches hooks to read-only collaborator access. */
   isCollaborator?: boolean;
 };
 
+/**
+ * Share flow trigger managing permission selection and the share dialog state.
+ */
 export const ShareButton = ({ className, docId, isCollaborator }: Props) => {
   const [permission, setPermission] = useState<'view' | 'edit'>('view');
   const [toast, setToast] = useState(false);

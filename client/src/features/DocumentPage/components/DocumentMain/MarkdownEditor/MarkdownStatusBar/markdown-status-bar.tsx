@@ -7,14 +7,23 @@ import { cn } from '@/utils/cn';
 import { useEditorStatus } from './use-editor-status';
 
 export interface MarkdownStatusBarProps {
+  /** Extra classes merged onto the status bar container. */
   className?: string;
+  /** Editor view whose cursor/document stats are displayed. */
   view: EditorView | null;
+  /** Whether tab indentation is enabled (vs 4 spaces). */
   useTabs: boolean;
+  /** Toggles tab indentation from the bar. */
   setUseTabs: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Whether spellcheck highlighting is enabled. */
   spellcheck: boolean;
+  /** Toggles spellcheck from the bar. */
   setSpellcheck: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+/**
+ * Word/character/status readout derived from the editor view.
+ */
 export const MarkdownStatusBar = ({
   className,
   view,

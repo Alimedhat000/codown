@@ -1,5 +1,8 @@
 import { EditorView } from 'codemirror';
 
+/**
+ * Named markdown formatting commands (toggle bold, italic, etc.) used by toolbar and shortcuts.
+ */
 export const markdownCommands = {
   toggleBold: (view: EditorView) => {
     const { state } = view;

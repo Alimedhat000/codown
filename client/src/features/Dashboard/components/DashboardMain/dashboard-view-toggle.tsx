@@ -6,9 +6,13 @@ import {
 
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/ToggleGroup';
 
+/**
+ * Grid/list switcher wired to the dashboard view state.
+ */
 export default function DashboardViewToggle({
   setView,
 }: {
+  /** Setter for the active dashboard view; also persisted to localStorage. */
   setView: React.Dispatch<React.SetStateAction<'grid' | 'row'>>;
 }) {
   useEffect(() => {

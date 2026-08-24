@@ -4,6 +4,9 @@ import { cn } from '@/utils/cn';
 
 type SkeletonProps = React.HTMLAttributes<HTMLDivElement>;
 
+/**
+ * Shimmering placeholder block for loading states; shaped entirely via className.
+ */
 export function Skeleton({ className, ...props }: SkeletonProps) {
   return (
     <div
