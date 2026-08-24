@@ -53,6 +53,45 @@ test.describe('Document Sharing', () => {
     expect(new URL(clipboard).pathname).toBe(sharePath);
   });
 
+  /**
+   * Decode the permission claim from a share-link JWT.
+   */
+  function tokenPermission(shareUrl: string): string {
+    const token = new URL(shareUrl).pathname.split('/').pop() ?? '';
+    const payload = JSON.parse(
+      Buffer.from(token.split('.')[1], 'base64url').toString(),
+    );
+    return payload.permission;
+  }
+
+  test('should copy an edit-mode link right after switching permission', async ({
+    page,
+  }) => {
+    // Slow down share-link responses so the copy lands while the
+    // post-switch refetch is still in flight (exposes stale-link races)
+    await page.route('**/share-link*', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await route.continue();
+    });
+
+    await openShareMenu(page); // initial view-mode link loaded
+
+    const menu = page.getByRole('menu');
+    await menu.getByRole('combobox').click();
+    await page.getByRole('option', { name: 'Edit mode' }).click();
+
+    const copyButton = menu.getByRole('button').first();
+    await expect(copyButton).toBeEnabled();
+    await copyButton.click({ force: true }); // skip radix open-animation checks
+
+    await expect(page.getByRole('status')).toContainText(/cop{2}ied|copied/i);
+
+    const clipboard = await page.evaluate(() => navigator.clipboard.readText());
+    expect(new URL(clipboard).pathname).toContain('/app/doc/share/');
+    // The copied token must match the newly selected mode, not the previous one
+    expect(tokenPermission(clipboard)).toBe('edit');
+  });
+
   test('should grant access through the share link', async ({ page }) => {
     const sharePath = await openShareMenu(page);
 
