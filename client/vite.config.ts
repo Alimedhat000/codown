@@ -34,6 +34,9 @@ export default defineConfig({
         ],
         test: {
           name: 'storybook',
+          // One browser instance already stretches CI runners; parallel
+          // files alongside the server suite starves vitest's runner.
+          fileParallelism: false,
           browser: {
             enabled: true,
             headless: true,

@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "generate": "plop",
+    "test": "vitest run",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test:e2e": "pnpm --filter server run seed:test && playwright test"
