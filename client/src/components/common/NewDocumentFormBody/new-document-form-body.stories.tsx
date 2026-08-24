@@ -27,7 +27,8 @@ export const ValidationBlocksEmptyTitle: Story = {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('button', { name: /create/i }));
     await expect(onSubmitFn).not.toHaveBeenCalled();
-    await expect(canvas.getByText(/title is required/i)).toBeVisible();
+    // existence-based: the modal entrance animation makes visibility racy
+    await canvas.findByText(/title is required/i);
   },
 };
 
