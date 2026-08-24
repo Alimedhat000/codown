@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import { Response } from 'express';
 import asyncErrorWrapper from 'express-async-handler';
 import { StatusCodes } from 'http-status-codes';
@@ -404,7 +403,6 @@ export const getDocByToken = asyncErrorWrapper(async (req: AuthenticatedRequest,
 
   try {
     decoded = verifyShareToken(token);
-    console.log(chalk.bold.red('DECODED'), decoded);
   } catch (error) {
     logger.warn('Shared document access failed - token verification failed', {
       action: 'ACCESS_SHARED_DOCUMENT_TOKEN_VERIFICATION_FAILED',
@@ -961,8 +959,6 @@ export const removeCollaborator = asyncErrorWrapper(async (req: AuthenticatedReq
         documentId: collaborator.documentId,
       },
     });
-
-    console.log(chalk.red('HERE'), result, collaboratorId, id);
 
     logger.debug('Collaborator removed successfully', {
       action: 'REMOVE_COLLABORATOR_SUCCESS',
