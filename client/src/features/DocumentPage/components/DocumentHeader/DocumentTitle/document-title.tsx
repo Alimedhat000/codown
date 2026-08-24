@@ -3,7 +3,9 @@ import React from 'react';
 import { cn } from '@/utils/cn';
 
 interface DocumentTitleProps {
+  /** Title text; when absent the component renders nothing. */
   title?: string;
+  /** Extra classes merged onto the title element. */
   className?: string;
 }
 

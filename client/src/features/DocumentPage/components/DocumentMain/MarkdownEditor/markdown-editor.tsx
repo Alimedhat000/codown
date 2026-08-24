@@ -38,11 +38,17 @@ export function MarkdownEditor({
   syncScroll,
   isReadOnly,
 }: {
+  /** Shared Yjs text bound to the CodeMirror view. */
   ytext: Y.Text | null;
+  /** Collaboration provider supplying awareness state. */
   provider: any;
+  /** Ref receiving the scrollable editor element for scroll syncing. */
   editorScrollRef?: React.RefObject<HTMLDivElement | null>;
+  /** Scroll handler attached while synced scrolling is enabled. */
   onScroll: () => void;
+  /** Attaches the parent's scroll handler when true. */
   syncScroll?: boolean;
+  /** Disables editing and hides toolbar/status controls when true. */
   isReadOnly?: boolean;
 }) {
   const { user } = useAuth(); // Get current user

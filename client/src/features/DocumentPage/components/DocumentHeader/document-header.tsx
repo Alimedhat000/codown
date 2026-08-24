@@ -6,16 +6,27 @@ import { DocumentToolbar } from './DocumentToolbar/document-toolbar';
 import { WorkspaceInfo } from './WorkspaceInfo';
 
 export interface DocumentHeaderProps {
+  /** Active editor layout: edit-only, split, or view-only. */
   mode: 'edit' | 'both' | 'view';
+  /** Called with the selected layout when it changes. */
   setMode: (mode: 'edit' | 'both' | 'view') => void;
+  /** Signed-in username shown in the toolbar. */
   username?: string;
+  /** Signed-in user's avatar image URL. */
   avatarUrl?: string;
+  /** Signs the user out from the account menu. */
   logout?: () => void;
+  /** Title of the open document. */
   documentTitle?: string;
+  /** Creates a document with the given title from the header actions. */
   onCreateDocument?: (title: string) => Promise<void>;
+  /** Extra classes merged onto the header container. */
   className?: string;
+  /** ID of the open document; enables document-scoped controls. */
   docId?: string;
+  /** Disables editing controls for read-only viewers. */
   isReadOnly?: boolean;
+  /** Unlocks collaborator-level controls on shared documents. */
   isCollaborator?: boolean;
 }
 

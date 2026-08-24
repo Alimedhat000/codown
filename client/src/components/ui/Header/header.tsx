@@ -14,8 +14,11 @@ export default function Header({
   logout,
   avatarUrl,
 }: {
+  /** Signed-in display name shown in the user menu. */
   username?: string;
+  /** Profile image source for the menu avatar. */
   avatarUrl?: string;
+  /** Sign-out handler run from the menu's Logout item. */
   logout?: () => void;
 }) {
   return (

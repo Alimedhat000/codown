@@ -25,9 +25,13 @@ const sortOptions = [
 type SortValue = (typeof sortOptions)[number]['value'];
 
 type DashboardMainProps = {
+  /** Documents owned by the current user, shown in "Your Notes". */
   ownedDocs: Document[];
+  /** Documents shared with the current user, shown as "Shared Notes". */
   collaboratedDocs: Document[];
+  /** Renders skeleton loaders instead of sections while fetching. */
   loading: boolean;
+  /** State setter used to apply card-level updates and deletions. */
   setDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
 };
 

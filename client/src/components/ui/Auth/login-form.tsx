@@ -10,7 +10,9 @@ import type { LoginSchemaType } from '@/lib/auth';
 import { LoginSchema } from '@/lib/auth';
 
 interface LoginFormProps {
+  /** Called with validated credentials on successful submit. */
   onSubmit: (data: LoginSchemaType) => void | Promise<void>;
+  /** Overrides pending UI while an outer operation runs. Defaults to false. */
   isLoading?: boolean;
 }
 

@@ -6,7 +6,9 @@ import Header from '../../ui/Header/header';
 import { Head } from '../../ui/Seo';
 
 type layoutProps = {
+  /** Document title set via Head. */
   title: string;
+  /** Routed page content rendered under the header. */
   children: React.ReactNode;
 };
 

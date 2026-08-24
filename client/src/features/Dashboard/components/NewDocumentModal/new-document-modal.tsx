@@ -8,6 +8,7 @@ import { api } from '@/lib/api';
 import type { CreateDocumentForm, Document } from '@/types/api';
 
 type Props = {
+  /** State setter that receives the newly created document. */
   setDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
 };
 

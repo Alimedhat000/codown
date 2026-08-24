@@ -13,13 +13,15 @@ const variants = {
 };
 
 export type SpinnerProps = {
+  /** Diameter preset. Defaults to 'md'. */
   size?: keyof typeof sizes;
+  /** Stroke color token ('light' white, 'primary' slate). Defaults to 'primary'. */
   variant?: keyof typeof variants;
   className?: string;
 };
 
 /**
- * Loading spinner with sm/md/lg sizes that inherits currentColor.
+ * Loading spinner sized sm–xl whose color follows currentColor tokens.
  */
 export const Spinner = ({
   size = 'md',

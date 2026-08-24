@@ -117,6 +117,8 @@ function Collapsible({
 // Extract headings from markdown content
 /**
  * Parse ATX markdown headings into flat TOC entries.
+ * @param markdown - Raw markdown source to scan.
+ * @returns Headings nested into a level-based tree.
  */
 function extractHeadings(markdown: string): TocHeading[] {
   const headingRegex = /^(#{1,6})\s+(.+)$/gm;
@@ -248,9 +250,13 @@ export function MarkdownToc({
   onHeadingClick,
   collapsible = true,
 }: {
+  /** Raw markdown source headings are extracted from. */
   content: string;
+  /** Extra classes merged onto the TOC panel. */
   className?: string;
+  /** Notifies parents when a TOC entry is selected. */
   onHeadingClick?: (id: string) => void;
+  /** Wraps entries in an expandable group. Defaults to true. */
   collapsible?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(true);

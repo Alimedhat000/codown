@@ -23,6 +23,7 @@ ToastViewport.displayName = ToastPrimitive.Viewport.displayName;
 const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitive.Root> & {
+    /** Color scheme preset. Defaults to 'default'. */
     variant?: 'default' | 'destructive' | 'success' | 'warning';
   }
 >(({ className, variant = 'default', ...props }, ref) => {
@@ -51,6 +52,7 @@ Toast.displayName = ToastPrimitive.Root.displayName;
 const ToastAction = React.forwardRef<
   React.ElementRef<typeof ToastPrimitive.Action>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitive.Action> & {
+    /** Button style preset. Defaults to 'default'. */
     variant?: 'default' | 'outline';
   }
 >(({ className, variant = 'default', ...props }, ref) => {

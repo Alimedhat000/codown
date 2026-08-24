@@ -12,6 +12,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/ToggleGroup';
 export default function DashboardViewToggle({
   setView,
 }: {
+  /** Setter for the active dashboard view; also persisted to localStorage. */
   setView: React.Dispatch<React.SetStateAction<'grid' | 'row'>>;
 }) {
   useEffect(() => {

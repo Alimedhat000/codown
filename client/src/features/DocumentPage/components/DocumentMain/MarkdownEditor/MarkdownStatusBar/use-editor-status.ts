@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 
 /**
  * Derives live editor status (counts, cursor info) from a CodeMirror view.
+ * @param view - Editor view to observe; status stays static while null.
+ * @returns Current line/column position, line total and document length.
  */
 export function useEditorStatus(view: EditorView | null) {
   const [status, setStatus] = useState({

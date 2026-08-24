@@ -22,6 +22,7 @@ const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 const DropdownMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
+    /** Adds left padding to align with selectable items. */
     inset?: boolean;
   }
 >(({ className, inset, children, ...props }, ref) => (
@@ -79,6 +80,7 @@ DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 const DropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
+    /** Adds left padding to align with selectable items. */
     inset?: boolean;
   }
 >(({ className, inset, ...props }, ref) => (
@@ -121,6 +123,7 @@ DropdownMenuCheckboxItem.displayName =
 const DropdownMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem> & {
+    /** Node replacing the default dot indicator. */
     customIndicator?: React.ReactNode;
   }
 >(({ className, children, customIndicator, ...props }, ref) => (
@@ -145,6 +148,7 @@ DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 const DropdownMenuLabel = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> & {
+    /** Adds left padding to align with selectable items. */
     inset?: boolean;
   }
 >(({ className, inset, ...props }, ref) => (

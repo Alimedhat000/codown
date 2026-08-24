@@ -3,9 +3,13 @@ import { ReactNode, useState } from 'react';
 import { LuChevronDown as ChevronIcon } from 'react-icons/lu';
 
 type Props = {
+  /** Heading text shown beside the section icon. */
   title: string;
+  /** Icon shown while open; replaced by the collapse chevron on hover. */
   icon: ReactNode;
+  /** Document count rendered after the title. */
   count: number;
+  /** Section body, hidden while the section is collapsed. */
   children: ReactNode;
 };
 

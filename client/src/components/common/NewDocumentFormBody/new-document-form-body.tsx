@@ -15,9 +15,13 @@ import {
 import { CreateDocumentForm } from '@/types/api';
 
 type Props = {
+  /** Heading text for the modal title. Defaults to 'Create New Item'. */
   title?: string;
+  /** Copy under the title; defaults to 'Provide a title to get started.' */
   description?: string;
+  /** Submit button label while idle. Defaults to 'Create'. */
   submittingLabel?: string;
+  /** Handler receiving the entered title; form resets after it resolves. */
   onSubmit: (data: { title: string }) => Promise<void>;
 };
 

@@ -4,7 +4,13 @@ import { api } from '@/lib/api';
 import { DocumentData } from '@/types/api';
 
 /**
- * Fetches a document into doc plus an editedDoc draft, exposes save (handleSave), permission flags (access) and loading/saving/error state.
+ * Fetches a document into doc plus an editedDoc draft, exposes save
+ * (handleSave), permission flags (access) and loading/saving/error state.
+ *
+ * @param id - Document id to load; refetches whenever it changes and
+ *   skips loading entirely when undefined.
+ * @returns Server doc, editable draft with setter, save action, access
+ *   flags and loading/saving/error state.
  */
 export function useDocument(id?: string) {
   const [doc, setDoc] = useState<DocumentData | null>(null);

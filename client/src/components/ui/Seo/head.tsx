@@ -1,7 +1,9 @@
 import { Helmet, HelmetData } from 'react-helmet-async';
 
 type HeadProps = {
+  /** Document title; empty string falls back to 'Codown'. */
   title?: string;
+  /** Content for the meta description tag. */
   description?: string;
 };
 

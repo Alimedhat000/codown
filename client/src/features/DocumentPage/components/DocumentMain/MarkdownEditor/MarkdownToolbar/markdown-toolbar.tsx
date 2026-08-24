@@ -13,7 +13,9 @@ export function MarkdownToolbar({
   view,
   className,
 }: {
+  /** Editor view the formatting commands dispatch into. */
   view: EditorView | null;
+  /** Extra classes merged onto the toolbar container. */
   className?: string;
 }) {
   const { handleUndo, handleRedo, runCommand, runOrderedListCommand } =

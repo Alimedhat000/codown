@@ -10,14 +10,23 @@ import { ShareButton } from '../ShareButton/share-button';
 import { ViewModeSelector } from '../ViewModeSelector';
 
 interface DocumentToolbarProps {
+  /** Active editor layout: edit-only, split, or view-only. */
   mode: 'edit' | 'both' | 'view';
+  /** Called with the selected layout when it changes. */
   setMode: (mode: 'edit' | 'both' | 'view') => void;
+  /** Signed-in username shown in the user menu. */
   username?: string;
+  /** Signed-in user's avatar image URL. */
   avatarUrl?: string;
+  /** Signs the user out from the account menu. */
   logout?: () => void;
+  /** Title of the open document. */
   documentTitle?: string;
+  /** Creates a document with the given title from the header actions. */
   onCreateDocument?: (title: string) => Promise<void>;
+  /** ID of the open document; enables document-scoped controls. */
   docId?: string;
+  /** Hides owner-only controls (share/options) for collaborators. */
   isCollaborator?: boolean;
 }
 

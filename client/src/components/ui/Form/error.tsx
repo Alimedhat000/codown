@@ -1,4 +1,5 @@
 export type ErrorProps = {
+  /** Message shown in the alert row; falsy renders nothing. */
   errorMessage?: string | null;
 };
 

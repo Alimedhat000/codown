@@ -40,6 +40,9 @@ export function useJoinRequests(
 
   /**
    * Approves a request by id and removes it from the local list.
+   *
+   * @param requestId - Join request id to approve; removed from the
+   *   local list once the API call resolves.
    */
   const approve = async (requestId: string) => {
     await approveJoinRequest(docId!, requestId);
@@ -48,6 +51,9 @@ export function useJoinRequests(
 
   /**
    * Rejects a request by id and removes it from the local list.
+   *
+   * @param requestId - Join request id to reject; removed from the
+   *   local list once the API call resolves.
    */
   const reject = async (requestId: string) => {
     await rejectJoinRequest(docId!, requestId);

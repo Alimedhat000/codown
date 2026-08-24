@@ -8,8 +8,11 @@ export function ToolbarButton({
   title,
   onClick,
 }: {
+  /** Icon component rendered inside the button. */
   icon: React.ElementType;
+  /** Native tooltip and accessible name of the button. */
   title: string;
+  /** Invoked when the button is clicked. */
   onClick: () => void;
 }) {
   return (

@@ -9,9 +9,13 @@ import {
 import { cn } from '@/utils/cn';
 
 interface AlertProps {
+  /** Severity preset driving colors and icon. Defaults to 'info'. */
   variant?: 'error' | 'success' | 'warning' | 'info';
+  /** Optional bold heading above the message. */
   title?: string;
+  /** Message content beside the severity icon. */
   children: React.ReactNode;
+  /** Shows an X button that calls this on click. */
   onDismiss?: () => void;
   className?: string;
 }

@@ -13,6 +13,7 @@ export type InputProps = React.InputHTMLAttributes<HTMLInputElement> &
   VariantProps<typeof inputVariants> & {
     className?: string;
     id?: string;
+    /** react-hook-form register() return spread onto the input. */
     registration: Partial<UseFormRegisterReturn>;
   };
 

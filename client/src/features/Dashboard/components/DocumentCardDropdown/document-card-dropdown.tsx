@@ -26,9 +26,13 @@ import { RenameDocumentModal } from './rename-modal';
 const DropdownMenuItemClassname = 'space-x-2 focus:bg-popover-border';
 
 interface DocumentCardDropdownProps {
+  /** Extra classes merged onto the kebab-menu trigger button. */
   triggerClassname?: string;
+  /** Document whose actions the menu exposes. */
   document: Document;
+  /** Called with the updated document after a successful rename. */
   onDocumentUpdated?: (updatedDocument: Document) => void;
+  /** Called after a successful delete so parents can drop the document. */
   onDocumentDeleted?: (documentId: string) => void;
 }
 

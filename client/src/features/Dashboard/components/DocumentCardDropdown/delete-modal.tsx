@@ -6,9 +6,13 @@ import { api } from '@/lib/api';
 import { Document } from '@/types/api';
 
 interface DeleteDocumentModalProps {
+  /** Document the confirmation dialog targets. */
   document: Document;
+  /** Controls modal visibility. */
   open: boolean;
+  /** Called with the next visibility whenever the modal opens or closes. */
   onOpenChange: (open: boolean) => void;
+  /** Called after a successful delete so parents can drop the document. */
   onDocumentDeleted?: (documentId: string) => void;
 }
 

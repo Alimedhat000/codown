@@ -4,7 +4,15 @@ import { api } from '@/lib/api';
 import { Collaborator } from '@/types/api';
 
 /**
- * Collaborator management: fetch, add by email and remove, with loading and error state.
+ * Collaborator management: fetch, add by email and remove, with loading
+ * and error state.
+ *
+ * @param docId - Document id whose collaborators are managed; fetching
+ *   is skipped while undefined.
+ * @param isCollaborator - When true the viewer is already a collaborator,
+ *   so the list is never fetched (management is owner-only).
+ * @returns Collaborator list, loading/error flags and the add/remove
+ *   actions.
  */
 export const useCollaborators = (docId?: string, isCollaborator?: boolean) => {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);

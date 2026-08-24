@@ -9,8 +9,11 @@ import Header from '../../ui/Header/header';
 import { Head } from '../../ui/Seo';
 
 type layoutProps = {
+  /** Large page heading, reused as the document title. */
   title: string;
+  /** Centered page content rendered beneath the heading. */
   children: React.ReactNode;
+  /** Warning banner shown above the heading; null hides it. */
   error: string | null;
 };
 

@@ -10,7 +10,9 @@ import type { RegisterSchemaType } from '@/lib/auth';
 import { RegisterSchema } from '@/lib/auth';
 
 interface RegisterFormProps {
+  /** Called with validated form data on successful submit. */
   onSubmit: (data: RegisterSchemaType) => void | Promise<void>;
+  /** Overrides pending UI while an outer operation runs. Defaults to false. */
   isLoading?: boolean;
 }
 

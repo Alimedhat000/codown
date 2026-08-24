@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/Dropdown';
 
 type Props = {
+  /** Extra classes merged onto the kebab-menu trigger button. */
   className?: string;
 };
 

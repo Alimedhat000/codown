@@ -3,7 +3,9 @@ import React from 'react';
 import { Head } from '../../ui/Seo';
 
 type layoutProps = {
+  /** Document title set via Head. */
   title: string;
+  /** Full-height document workspace filling the shell. */
   children: React.ReactNode;
 };
 

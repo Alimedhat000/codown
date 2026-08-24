@@ -6,8 +6,11 @@ import { cn } from '@/utils/cn';
 
 // Base Modal Context Provider
 type ModalContextProps = {
+  /** Controlled visibility; omit for uncontrolled usage. */
   open?: boolean;
+  /** Called when the dialog requests to open or close. */
   onOpenChange?: (open: boolean) => void;
+  /** Modal parts composing the dialog. */
   children: ReactNode;
 };
 
@@ -77,7 +80,9 @@ function ModalOverlay({ className, ...props }: ModalOverlayProps) {
 // Modal Content
 type ModalContentProps = ComponentProps<typeof Dialog.Content> & {
   className?: string;
+  /** Max-width preset for the panel. Defaults to 'md'. */
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  /** Fixed placement of the panel on screen. Defaults to 'center'. */
   position?:
     | 'center'
     | 'top'
@@ -88,6 +93,7 @@ type ModalContentProps = ComponentProps<typeof Dialog.Content> & {
     | 'top-right'
     | 'bottom-left'
     | 'bottom-right';
+  /** Direction the panel slides in/out from; falls back to position. */
   slideFrom?:
     | 'center'
     | 'top'
@@ -98,6 +104,7 @@ type ModalContentProps = ComponentProps<typeof Dialog.Content> & {
     | 'top-right'
     | 'bottom-left'
     | 'bottom-right';
+  /** Enter/exit motion style. Defaults to 'slide'. */
   animationType?: 'slide' | 'zoom' | 'fade' | 'none';
   children: ReactNode;
 };
@@ -292,6 +299,7 @@ function ModalFooter({ className, children }: ModalFooterProps) {
 type ModalCloseProps = ComponentProps<typeof Dialog.Close> & {
   className?: string;
   children?: ReactNode;
+  /** Renders the X glyph in the built-in close button. Defaults to true. */
   showIcon?: boolean;
 };
 
@@ -326,12 +334,19 @@ function ModalClose({
 
 // Convenience compound component with sensible defaults
 type SimpleModalProps = {
+  /** Controls visibility of the dialog. */
   open: boolean;
+  /** Open-state change callback. */
   onOpenChange: (open: boolean) => void;
+  /** Header title text. */
   title?: string;
+  /** Muted supporting line under the title. */
   description?: string;
+  /** Content rendered in the padded body. */
   children: ReactNode;
+  /** Panel max-width preset. Defaults to 'md'. */
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  /** Screen placement preset. Defaults to 'top'. */
   position?:
     | 'center'
     | 'top'
@@ -342,6 +357,7 @@ type SimpleModalProps = {
     | 'top-right'
     | 'bottom-left'
     | 'bottom-right';
+  /** Slide origin direction. Defaults to 'top'. */
   slideFrom?:
     | 'center'
     | 'top'
@@ -352,16 +368,22 @@ type SimpleModalProps = {
     | 'top-right'
     | 'bottom-left'
     | 'bottom-right';
+  /** Motion style. Defaults to 'slide'. */
   animationType?: 'slide' | 'zoom' | 'fade' | 'none';
+  /** Renders the close X in the header. Defaults to true. */
   showClose?: boolean;
+  /** Extra classes for the backdrop overlay. */
   overlayClassName?: string;
+  /** Extra classes for the panel content. */
   contentClassName?: string;
+  /** Extra classes for the header row. */
   headerClassName?: string;
+  /** Extra classes for the body region. */
   bodyClassName?: string;
 };
 
 /**
- * Convenience wrapper assembling a complete simple confirmation modal.
+ * All-in-one modal wiring portal, overlay, titled header and body with sensible defaults.
  */
 function SimpleModal({
   open,

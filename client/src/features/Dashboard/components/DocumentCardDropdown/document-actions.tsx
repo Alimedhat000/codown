@@ -6,6 +6,9 @@ import { Document } from '@/types/api';
 
 /**
  * Bundles rename/delete flows (modals included) for a single document.
+ * @param document - Document the actions operate on.
+ * @param navigate - Router navigator used to open the document.
+ * @returns Copy-link state plus view/copy handlers for dropdown wiring.
  */
 export function useDocumentActions(
   document: Document,

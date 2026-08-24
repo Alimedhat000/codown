@@ -7,7 +7,9 @@ import { Modal, ModalOverlay, ModalTrigger } from '@/components/ui/Modal';
 import type { CreateDocumentForm } from '@/types/api';
 
 interface CreateDocumentButtonProps {
+  /** Creates a document with the submitted title; closes the modal on success. */
   onCreateDocument?: (title: string) => Promise<void>;
+  /** Extra classes merged onto the trigger button. */
   className?: string;
 }
 

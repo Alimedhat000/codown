@@ -16,9 +16,13 @@ import {
 import { cn } from '@/utils/cn';
 
 export type UserMenuProps = {
+  /** Name used for avatar fallback, alt text and menu label. */
   username: string;
+  /** Optional profile image shown in the trigger. */
   avatarUrl?: string;
+  /** Invoked by the Logout menu item. */
   logout: () => void;
+  /** Toggles the chevron next to the avatar. Defaults to true. */
   showChevron?: boolean;
   className?: string;
 };

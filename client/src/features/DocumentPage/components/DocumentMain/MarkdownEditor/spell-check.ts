@@ -477,6 +477,8 @@ const spellcheckTheme = EditorView.theme({
 // Main spellcheck extension factory
 /**
  * Assembles the spellcheck extension: misspelling decorations plus suggestion widgets.
+ * @param language - Hunspell dictionary locale to load. Defaults to 'en_US'.
+ * @returns CodeMirror extensions applying decorations and styling.
  */
 export function createAdvancedSpellcheckExtension(
   language: string = 'en_US',

@@ -7,7 +7,9 @@ export function DocumentSkeletonLoader({
   view,
   count,
 }: {
+  /** Layout preset; skeletons are shaped like grid cards or rows. */
   view: 'grid' | 'row';
+  /** Number of skeleton placeholders to render. */
   count: number;
 }) {
   const gridClass =

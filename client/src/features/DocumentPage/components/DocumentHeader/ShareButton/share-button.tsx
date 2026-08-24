@@ -24,8 +24,11 @@ import { useShareLink } from '@/hooks/use-share-link';
 
 import { ShareModeSelect } from './share-mode-select';
 type Props = {
+  /** Extra classes merged onto the share trigger button. */
   className?: string;
+  /** ID of the document being shared. */
   docId?: string;
+  /** Switches hooks to read-only collaborator access. */
   isCollaborator?: boolean;
 };
 

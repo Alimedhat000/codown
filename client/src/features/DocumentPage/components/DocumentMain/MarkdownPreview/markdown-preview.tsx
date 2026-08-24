@@ -37,10 +37,15 @@ export function MarkdownPreview({
   onScroll,
   syncScroll,
 }: {
+  /** Raw markdown source to render. */
   content: string;
+  /** Ref receiving the scrollable container for scroll syncing. */
   previewScrollRef?: React.RefObject<HTMLDivElement | null>;
+  /** Scroll handler attached while synced scrolling is enabled. */
   onScroll?: () => void;
+  /** Attaches the parent's scroll handler when true. */
   syncScroll?: boolean;
+  /** ISO timestamp shown as "Last Edited"; falls back to "Unknown". */
   lastUpdated?: string;
 }) {
   useEffect(() => {
