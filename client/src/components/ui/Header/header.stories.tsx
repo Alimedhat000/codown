@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { MemoryRouter } from 'react-router'; // FIX: wrap with router
 import { fn } from 'storybook/test';
 
 import Header from './header';
@@ -11,13 +10,6 @@ const meta: Meta<typeof Header> = {
   args: {
     logout: fn(),
   },
-  decorators: [
-    (Story) => (
-      <MemoryRouter>
-        <Story />
-      </MemoryRouter>
-    ),
-  ],
 };
 
 export default meta;

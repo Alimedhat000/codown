@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { MemoryRouter } from 'react-router';
 import { fn } from 'storybook/test';
 
 import { DocumentHeader } from './document-header';
@@ -13,11 +12,9 @@ const meta: Meta<typeof DocumentHeader> = {
   },
   decorators: [
     (Story) => (
-      <MemoryRouter>
-        <div className="min-h-screen bg-background">
-          <Story />
-        </div>
-      </MemoryRouter>
+      <div className="min-h-screen bg-background">
+        <Story />
+      </div>
     ),
   ],
   args: {
