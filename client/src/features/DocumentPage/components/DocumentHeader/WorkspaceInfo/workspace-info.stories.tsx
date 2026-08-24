@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { MemoryRouter } from 'react-router';
 
 import { WorkspaceInfo } from './workspace-info';
 
@@ -10,11 +9,7 @@ const meta: Meta = {
   parameters: {
     layout: 'centered',
   },
-  decorators: (Story) => (
-    <MemoryRouter>
-      <Story />
-    </MemoryRouter>
-  ),
+  decorators: (Story) => <Story />,
 };
 export default meta;
 

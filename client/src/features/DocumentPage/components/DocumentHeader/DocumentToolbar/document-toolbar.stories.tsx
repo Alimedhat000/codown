@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { MemoryRouter } from 'react-router';
 import { fn } from 'storybook/test';
 
 import { DocumentToolbar } from './document-toolbar';
@@ -13,11 +12,9 @@ const meta: Meta = {
   },
   decorators: [
     (Story) => (
-      <MemoryRouter>
-        <div className="w-full max-w-4xl">
-          <Story />
-        </div>
-      </MemoryRouter>
+      <div className="w-full max-w-4xl">
+        <Story />
+      </div>
     ),
   ],
   args: {

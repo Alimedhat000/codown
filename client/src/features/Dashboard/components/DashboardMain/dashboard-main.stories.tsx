@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { MemoryRouter } from 'react-router';
 
 import type { Document } from '@/types/api';
 
@@ -82,13 +81,7 @@ const meta: Meta<typeof DashboardMain> = {
   title: 'Dashboard/DashboardMain',
   component: DashboardMain,
   tags: ['autodocs'],
-  decorators: [
-    (Story) => (
-      <MemoryRouter>
-        <Story />
-      </MemoryRouter>
-    ),
-  ],
+  decorators: [(Story) => <Story />],
 };
 
 export default meta;
