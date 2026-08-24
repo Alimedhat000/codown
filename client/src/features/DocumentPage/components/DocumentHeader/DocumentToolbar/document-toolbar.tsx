@@ -1,4 +1,5 @@
 import React from 'react';
+import { LuEye } from 'react-icons/lu';
 
 import { UserMenu } from '@/components/ui/Header/user-menu';
 
@@ -26,6 +27,8 @@ interface DocumentToolbarProps {
   onCreateDocument?: (title: string) => Promise<void>;
   /** ID of the open document; enables document-scoped controls. */
   docId?: string;
+  /** Renders read-only affordances (View-only badge instead of roster controls). */
+  isReadOnly?: boolean;
   /** Hides owner-only controls (share/options) for collaborators. */
   isCollaborator?: boolean;
 }
@@ -42,8 +45,11 @@ export const DocumentToolbar = ({
   docId,
   documentTitle,
   onCreateDocument,
+  isReadOnly,
   isCollaborator,
 }: DocumentToolbarProps) => {
+  const isOwner = !isCollaborator;
+  const canViewRoster = !isCollaborator || !isReadOnly;
   return (
     <div className="w-full flex flex-wrap md:flex-nowrap items-center gap-3">
       <div className="order-2 md:order-1 flex items-center">
@@ -60,11 +66,16 @@ export const DocumentToolbar = ({
       </div>
 
       <div className="order-3 md:order-4 flex items-center gap-2">
-        {!isCollaborator && (
-          <CollaboratorsDropdown
-            docId={docId}
-            isCollaborator={isCollaborator}
-          />
+        {canViewRoster ? (
+          <CollaboratorsDropdown docId={docId} isOwner={isOwner} />
+        ) : (
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground"
+            title="You have view access — ask the document owner to share editing rights"
+          >
+            <LuEye className="h-3.5 w-3.5" />
+            View only
+          </span>
         )}
         {username && logout && (
           <UserMenu
