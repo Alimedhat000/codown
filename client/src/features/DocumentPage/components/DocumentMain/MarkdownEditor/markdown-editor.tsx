@@ -55,16 +55,14 @@ export function MarkdownEditor({
 
   const [spellcheck, setSpellcheck] = useState(false);
   const [useTabs, setUseTabs] = useState(true);
+  // Held in state (not a ref): toolbar/status bar receive the view as a prop,
+  // and ref writes don't re-render — a ref here would hand them null until an
+  // unrelated re-render happened.
+  const [view, setView] = useState<EditorView | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
-  const viewRef = useRef<EditorView | null>(null);
 
   useEffect(() => {
     if (!editorRef.current || !ytext || !provider) return;
-
-    // Clean up previous editor if remounting
-    if (viewRef.current) {
-      viewRef.current.destroy();
-    }
 
     if (user && provider.awareness) {
       provider.awareness.setLocalStateField('user', {
@@ -106,7 +104,7 @@ export function MarkdownEditor({
       parent: editorRef.current,
     });
 
-    viewRef.current = view;
+    setView(view);
 
     if (editorScrollRef) {
       editorScrollRef.current = editorRef.current;
@@ -114,6 +112,7 @@ export function MarkdownEditor({
 
     return () => {
       view.destroy();
+      setView(null);
     };
   }, [ytext, provider, useTabs, spellcheck, editorScrollRef, isReadOnly, user]); // Add spellcheck to dependencies
 
@@ -135,7 +134,7 @@ export function MarkdownEditor({
     <div className={cn('relative w-full flex-1', { 'py-10': !isReadOnly })}>
       {!isReadOnly && (
         <MarkdownToolbar
-          view={viewRef.current}
+          view={view}
           className="absolute top-0 left-0 w-full z-9"
         />
       )}
@@ -145,7 +144,7 @@ export function MarkdownEditor({
         ref={editorRef}
       />
       <MarkdownStatusBar
-        view={viewRef.current}
+        view={view}
         className="absolute bottom-0 left-0 w-full z-9"
         useTabs={useTabs}
         setUseTabs={setUseTabs}

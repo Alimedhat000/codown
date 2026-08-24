@@ -4,7 +4,7 @@ import { LuLink, LuUnlink } from 'react-icons/lu';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import { Spinner } from '@/components/ui/Spinner';
-import { useCollab } from '@/hooks/use-collab';
+import { useCollab, type CollabProviderFactory } from '@/hooks/use-collab';
 import { DocumentData } from '@/types/api';
 import { cn } from '@/utils/cn';
 
@@ -21,6 +21,7 @@ export function DocumentMain({
   setDoc,
   className,
   isReadOnly,
+  createProvider,
 }: {
   /** ID of the document to collaborate on; renders a spinner while absent. */
   docId: string | undefined;
@@ -34,8 +35,13 @@ export function DocumentMain({
   className?: string;
   /** Renders the editor as read-only when true. */
   isReadOnly?: boolean;
+  /** Provider factory override for tests/stories; live websocket by default. */
+  createProvider?: CollabProviderFactory;
 }) {
-  const { text, isReady, ydoc, ytext, provider } = useCollab(docId);
+  const { text, isReady, ydoc, ytext, provider } = useCollab(
+    docId,
+    createProvider,
+  );
   const editorScrollRef = useRef<HTMLDivElement>(null);
   const previewScrollRef = useRef<HTMLDivElement>(null);
   const isSyncingRef = useRef(false);

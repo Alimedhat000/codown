@@ -12,29 +12,32 @@ export default meta;
 
 type Story = StoryObj<typeof LoginForm>;
 
-const onSubmitFn = fn();
+// Per-story fn() — a shared module-scope mock makes .not.toHaveBeenCalled()
+// order-dependent (breaks under filtered reruns/retries).
 
 export const Default: Story = {
-  args: { onSubmit: onSubmitFn },
+  args: { onSubmit: fn() },
 };
 
 export const ValidationBlocksEmptySubmit: Story = {
-  args: { onSubmit: onSubmitFn },
-  play: async ({ canvasElement }) => {
+  args: { onSubmit: fn() },
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('button', { name: /sign in/i }));
-    await expect(onSubmitFn).not.toHaveBeenCalled();
+    // DOM proof, not just callback absence:
+    await canvas.findByText(/invalid email/i);
+    await expect(args.onSubmit).not.toHaveBeenCalled();
   },
 };
 
 export const SuccessfulSubmission: Story = {
-  args: { onSubmit: onSubmitFn },
-  play: async ({ canvasElement }) => {
+  args: { onSubmit: fn() },
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     await userEvent.type(canvas.getByLabelText('Email'), 'user@test.com');
     await userEvent.type(canvas.getByLabelText('Password'), 'secret123');
     await userEvent.click(canvas.getByRole('button', { name: /sign in/i }));
-    await expect(onSubmitFn).toHaveBeenCalledWith({
+    await expect(args.onSubmit).toHaveBeenCalledWith({
       email: 'user@test.com',
       password: 'secret123',
     });
@@ -42,5 +45,5 @@ export const SuccessfulSubmission: Story = {
 };
 
 export const Loading: Story = {
-  args: { onSubmit: onSubmitFn, isLoading: true },
+  args: { onSubmit: fn(), isLoading: true },
 };

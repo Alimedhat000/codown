@@ -81,7 +81,6 @@ const meta: Meta<typeof DashboardMain> = {
   title: 'Dashboard/DashboardMain',
   component: DashboardMain,
   tags: ['autodocs'],
-  decorators: [(Story) => <Story />],
 };
 
 export default meta;

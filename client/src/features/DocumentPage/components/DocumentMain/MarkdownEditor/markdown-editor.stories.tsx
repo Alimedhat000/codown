@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 import * as Y from 'yjs';
 
 import { MarkdownEditor } from './markdown-editor';
@@ -37,6 +38,15 @@ export const Editable: Story = {
       />
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // Status bar must reflect the live view (non-zero length) — guards
+    // against the toolbar/status receiving a stale null view on mount.
+    await canvas.findByText(/3 lines/i);
+    await expect(canvas.getByText(/length:/i).textContent).toMatch(
+      /length: (?!0\b)\d+/i,
+    );
+  },
 };
 
 export const ReadOnly: Story = {

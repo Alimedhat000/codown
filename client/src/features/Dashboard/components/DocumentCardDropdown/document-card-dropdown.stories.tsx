@@ -39,11 +39,10 @@ export const OpensMenuWithActions: Story = {
     onDocumentDeleted: onDocumentDeletedFn,
     onDocumentUpdated: onDocumentUpdatedFn,
   },
-  play: async ({ canvasElement, canvas }) => {
+  play: async ({ canvas }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'options' }));
     // Radix portals menu content to document.body, outside the story canvas
     const body = within(document.body);
-    void canvasElement;
     await expect(body.findByText(/open in view mode/i)).resolves.toBeDefined();
     await expect(body.findByText(/^pin$/i)).resolves.toBeDefined();
     await expect(body.findByText(/rename/i)).resolves.toBeDefined();

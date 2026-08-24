@@ -17,6 +17,9 @@ type Story = StoryObj<typeof MarkdownToolbar>;
 
 let currentView: EditorView | null = null;
 const makeView = (doc: string) => {
+  // Stories remount without unmounting the previous one — destroy the old
+  // unattached view or it leaks for the rest of the browser session.
+  currentView?.destroy();
   currentView = new EditorView({
     // history() is part of basicSetup in the real editor; required for undo
     state: EditorState.create({ doc, extensions: [history()] }),
@@ -60,7 +63,11 @@ export const NullViewRendersInert: Story = {
   render: () => <MarkdownToolbar view={null} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    // Buttons exist but clicking them must not throw without a view
-    await userEvent.click(canvas.getByTitle('Bold'));
+    const bold = canvas.getByTitle('Bold');
+    // Buttons render enabled but clicking must be a no-op without a view —
+    // no throw, and the toolbar stays mounted and interactive.
+    await userEvent.click(bold);
+    await expect(bold).toBeEnabled();
+    await expect(canvas.getByTitle('Italic')).toBeEnabled();
   },
 };

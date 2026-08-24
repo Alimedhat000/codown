@@ -9,7 +9,6 @@ const meta: Meta = {
   parameters: {
     layout: 'centered',
   },
-  decorators: (Story) => <Story />,
 };
 export default meta;
 

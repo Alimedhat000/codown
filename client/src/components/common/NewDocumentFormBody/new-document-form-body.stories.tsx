@@ -15,33 +15,36 @@ export default meta;
 
 type Story = StoryObj<typeof NewDocumentFormBody>;
 
-const onSubmitFn = fn();
+// Per-story fn() — a shared module-scope mock makes .not.toHaveBeenCalled()
+// order-dependent (breaks under filtered reruns/retries).
 
 export const Default: Story = {
-  args: { onSubmit: onSubmitFn },
+  args: { onSubmit: fn() },
 };
 
 export const ValidationBlocksEmptyTitle: Story = {
-  args: { onSubmit: onSubmitFn },
-  play: async ({ canvasElement }) => {
+  args: { onSubmit: fn() },
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('button', { name: /create/i }));
-    await expect(onSubmitFn).not.toHaveBeenCalled();
-    // existence-based: the modal entrance animation makes visibility racy
+    await expect(args.onSubmit).not.toHaveBeenCalled();
+    // existence-based: robust against Radix open/close animation timing
     await canvas.findByText(/title is required/i);
   },
 };
 
 export const SuccessfulSubmission: Story = {
-  args: { onSubmit: onSubmitFn },
-  play: async ({ canvasElement }) => {
+  args: { onSubmit: fn() },
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     await userEvent.type(
       canvas.getByLabelText('Document Title'),
       'Meeting notes',
     );
     await userEvent.click(canvas.getByRole('button', { name: /^create$/i }));
-    await expect(onSubmitFn).toHaveBeenCalledWith({ title: 'Meeting notes' });
+    await expect(args.onSubmit).toHaveBeenCalledWith({
+      title: 'Meeting notes',
+    });
   },
 };
 

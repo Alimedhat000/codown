@@ -10,7 +10,6 @@ const meta: Meta<typeof Header> = {
   args: {
     logout: fn(),
   },
-  decorators: [(Story) => <Story />],
 };
 
 export default meta;
