@@ -26,6 +26,7 @@ export default defineConfig({
     // browser mid-run and fails imports ("Failed to fetch dynamically
     // imported module"). Keep in sync with heavy deps used by stories.
     include: [
+      'react-dom/client',
       '@hocuspocus/provider',
       'yjs',
       'y-codemirror.next',
