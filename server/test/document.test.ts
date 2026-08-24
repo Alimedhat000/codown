@@ -108,6 +108,39 @@ describe('Document Routes', () => {
     expect(res.status).toBe(StatusCodes.NO_CONTENT);
   });
 
+  it('should delete a document that has collaborators and join requests', async () => {
+    const created = await prisma.document.create({
+      data: {
+        title: 'Shared ToDelete',
+        authorId: userId,
+        content: '',
+      },
+    });
+
+    const otherUser = await prisma.user.create({
+      data: {
+        email: 'shared-collab@test.dev',
+        username: 'sharedcollab',
+        password: 'hashedpass',
+      },
+    });
+
+    await prisma.collaborator.create({
+      data: { documentId: created.id, userId: otherUser.id },
+    });
+
+    await prisma.collaborationRequest.create({
+      data: { documentId: created.id, userId: otherUser.id },
+    });
+
+    const res = await request(app).delete(`/api/document/${created.id}`).set('Authorization', `Bearer ${token}`);
+    expect(res.status).toBe(StatusCodes.NO_CONTENT);
+
+    expect(await prisma.document.findUnique({ where: { id: created.id } })).toBeNull();
+    expect(await prisma.collaborator.count({ where: { documentId: created.id } })).toBe(0);
+    expect(await prisma.collaborationRequest.count({ where: { documentId: created.id } })).toBe(0);
+  });
+
   it('should update document settings (allowSelfJoin)', async () => {
     const created = await prisma.document.create({
       data: {
