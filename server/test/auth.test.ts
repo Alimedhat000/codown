@@ -80,6 +80,35 @@ describe('Auth Routes', () => {
     });
   });
 
+  it('should not leak which field collided when registration fails (#83)', async () => {
+    await request(app).post('/api/auth/register').send({
+      email: 'enum-email@test.dev',
+      username: 'enumuser',
+      password: 'secure123',
+    });
+
+    const dupEmail = await request(app).post('/api/auth/register').send({
+      email: 'enum-email@test.dev',
+      username: 'unusedname',
+      password: 'secure123',
+    });
+
+    const dupUsername = await request(app).post('/api/auth/register').send({
+      email: 'unused@test.dev',
+      username: 'enumuser',
+      password: 'secure123',
+    });
+
+    expect(dupEmail.status).toBe(StatusCodes.CONFLICT);
+    expect(dupUsername.status).toBe(StatusCodes.CONFLICT);
+    // Uniform response regardless of which field collided
+    expect(dupEmail.body).toEqual(dupUsername.body);
+    expect(typeof dupEmail.body.error).toBe('string');
+    expect(dupEmail.body.error).not.toMatch(/email/i);
+    expect(dupEmail.body.error).not.toMatch(/username/i);
+    expect(dupEmail.body.error).not.toMatch(/exists/i);
+  });
+
   it('should reject login with invalid password', async () => {
     await request(app).post('/api/auth/register').send({
       email: 'test@test.dev',
@@ -102,6 +131,32 @@ describe('Auth Routes', () => {
     });
 
     expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
+  });
+
+  it('should not distinguish unknown user from invalid password on login (#83)', async () => {
+    await request(app).post('/api/auth/register').send({
+      email: 'loginenum@test.dev',
+      username: 'loginenum',
+      password: 'secure123',
+    });
+
+    const badPassword = await request(app).post('/api/auth/login').send({
+      email: 'loginenum@test.dev',
+      password: 'wrongpass',
+    });
+
+    const unknownUser = await request(app).post('/api/auth/login').send({
+      email: 'ghost@test.dev',
+      password: 'anypassword',
+    });
+
+    expect(badPassword.status).toBe(StatusCodes.UNAUTHORIZED);
+    expect(unknownUser.status).toBe(StatusCodes.UNAUTHORIZED);
+    // Identical responses so probing cannot tell whether the account exists
+    expect(unknownUser.body).toEqual(badPassword.body);
+    // And the response carries an actual message (not the legacy empty `{}`)
+    expect(typeof unknownUser.body.error).toBe('string');
+    expect(unknownUser.body.error.length).toBeGreaterThan(0);
   });
 
   it('should reject registration with invalid email format', async () => {

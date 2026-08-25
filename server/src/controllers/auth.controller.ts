@@ -10,6 +10,12 @@ import { getClientInfo } from '@/utils/getClientInfo';
 import { LoginUserSchema } from '@/validations/login.schema';
 import { RegisterUserSchema } from '@/validations/register.schema';
 
+/**
+ * Fixed bcrypt hash used to equalize timing when login is attempted for an
+ * unknown email (#83): one bcrypt compare runs in both failure paths.
+ */
+const DUMMY_PASSWORD_HASH = '$2b$10$lZKU2EGQLmnz9Fi65/t3GO/coz9zBl6zMMvDyd0EOBgeU1Y28ESHG';
+
 export const registerUser = asyncErrorWrapper(async (req: Request, res: Response) => {
   const clientInfo = getClientInfo(req);
 
@@ -48,7 +54,7 @@ export const registerUser = asyncErrorWrapper(async (req: Request, res: Response
         username,
         existingField: existing.email === email ? 'email' : 'username',
       });
-      res.status(StatusCodes.CONFLICT).json({ error: 'Username or email already exists' });
+      res.status(StatusCodes.CONFLICT).json({ error: 'Registration failed' });
       return;
     }
 
@@ -112,13 +118,15 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
+      await bcrypt.compare(password, DUMMY_PASSWORD_HASH);
+
       logger.warn('Login failed - user not found', {
         action: 'LOGIN_USER_NOT_FOUND',
         ...clientInfo,
         email,
       });
 
-      res.status(StatusCodes.UNAUTHORIZED).json({ error: result.error });
+      res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email or password' });
       return;
     }
 
@@ -133,7 +141,7 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
         username: user.username,
       });
 
-      res.status(StatusCodes.UNAUTHORIZED).json({ error: result.error });
+      res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email or password' });
       return;
     }
 
