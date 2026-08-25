@@ -124,6 +124,26 @@ describe('Auth Routes', () => {
     expect(res.status).toBe(StatusCodes.BAD_REQUEST);
   });
 
+  it('should reject registration with a 6-character password', async () => {
+    const res = await request(app).post('/api/auth/register').send({
+      email: 'shortpass@test.dev',
+      username: 'shortpass',
+      password: 'abcdef',
+    });
+
+    expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it('should reject registration with a username containing spaces', async () => {
+    const res = await request(app).post('/api/auth/register').send({
+      email: 'spaceuser@test.dev',
+      username: 'bad name',
+      password: 'secure123',
+    });
+
+    expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
   it('should reject registration with missing fields', async () => {
     const res = await request(app).post('/api/auth/register').send({
       email: 'newuser@test.dev',

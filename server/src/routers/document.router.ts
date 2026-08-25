@@ -19,26 +19,43 @@ import {
 import { authenticate } from '@/middlewares/auth.middleware';
 import { validate } from '@/middlewares/validation.middleware';
 import { AddCollaboratorSchema } from '@/validations/addCollaborator.schema';
+import { CreateDocumentSchema } from '@/validations/createDocument.schema';
+import {
+  CollaboratorParamsSchema,
+  IdParamsSchema,
+  RequestIdParamsSchema,
+  ShareLinkQuerySchema,
+} from '@/validations/documentParams.schema';
+import { UpdateDocSettingsSchema } from '@/validations/updateDocSettings.schema';
+import { UpdateDocumentSchema } from '@/validations/updateDocument.schema';
 
 export const docRouter = express.Router();
 
 docRouter.use(authenticate);
 docRouter.get('/share/:token', getDocByToken);
 
-docRouter.post('/', createDoc);
+docRouter.post('/', validate({ body: CreateDocumentSchema }), createDoc);
 docRouter.get('/', getDocs);
-docRouter.get('/:id', getDoc);
-docRouter.put('/:id', updateDoc);
-docRouter.delete('/:id', deleteDoc);
+docRouter.get('/:id', validate({ params: IdParamsSchema }), getDoc);
+docRouter.put('/:id', validate({ params: IdParamsSchema, body: UpdateDocumentSchema }), updateDoc);
+docRouter.delete('/:id', validate({ params: IdParamsSchema }), deleteDoc);
 
-docRouter.patch('/:id/settings', updateDocSettings); // Used to toggle allowSelfJoin for the document // !Owner only access
+docRouter.patch(
+  '/:id/settings',
+  validate({ params: IdParamsSchema, body: UpdateDocSettingsSchema }),
+  updateDocSettings
+); // Used to toggle allowSelfJoin for the document // !Owner only access
 
-docRouter.get('/:id/share-link', getShareLink); // get the document share link with the share token
+docRouter.get('/:id/share-link', validate({ params: IdParamsSchema, query: ShareLinkQuerySchema }), getShareLink); // get the document share link with the share token
 
-docRouter.get('/:id/collaborators', getCollaborators); // returns list
-docRouter.post('/:id/collaborators', validate({ body: AddCollaboratorSchema }), addCollaborator); // adds a new one by email //!Owner only access
-docRouter.delete('/:id/collaborators/:userId', removeCollaborator); // optional
+docRouter.get('/:id/collaborators', validate({ params: IdParamsSchema }), getCollaborators); // returns list
+docRouter.post(
+  '/:id/collaborators',
+  validate({ params: IdParamsSchema, body: AddCollaboratorSchema }),
+  addCollaborator
+); // adds a new one by email //!Owner only access
+docRouter.delete('/:id/collaborators/:userId', validate({ params: CollaboratorParamsSchema }), removeCollaborator); // optional
 
-docRouter.get('/:id/requests', getRequests); // !Owner only access
-docRouter.post('/:id/requests/:requestId/approve', approveRequest);
-docRouter.delete('/:id/requests/:requestId/reject', rejectRequest);
+docRouter.get('/:id/requests', validate({ params: IdParamsSchema }), getRequests); // !Owner only access
+docRouter.post('/:id/requests/:requestId/approve', validate({ params: RequestIdParamsSchema }), approveRequest);
+docRouter.delete('/:id/requests/:requestId/reject', validate({ params: RequestIdParamsSchema }), rejectRequest);

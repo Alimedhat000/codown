@@ -49,6 +49,7 @@ export default function LoginForm({
           id="email"
           label="Email"
           placeholder="Enter your email"
+          maxLength={254}
           registration={register('email')}
           error={errors.email}
           autoComplete="email"
@@ -59,6 +60,7 @@ export default function LoginForm({
           id="password"
           label="Password"
           placeholder="Enter your password"
+          maxLength={128}
           registration={register('password')}
           error={errors.password}
           autoComplete="current-password"

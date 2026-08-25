@@ -64,6 +64,7 @@ export default function NewDocumentFormBody({
               type="text"
               label="Document Title"
               placeholder="New document title"
+              maxLength={200}
               error={errors.title}
               registration={register('title', {
                 required: 'Title is required',

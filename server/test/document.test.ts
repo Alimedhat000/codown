@@ -550,6 +550,99 @@ describe('Document Routes', () => {
   });
 });
 
+describe('Document request validation (#52)', () => {
+  it('should reject creating a document with a missing title', async () => {
+    const res = await request(app).post('/api/document').set('Authorization', `Bearer ${token}`).send({});
+
+    expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it('should reject creating a document with a non-string title', async () => {
+    const res = await request(app).post('/api/document').set('Authorization', `Bearer ${token}`).send({ title: 123 });
+
+    expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it('should reject creating a document with an oversized title', async () => {
+    const res = await request(app)
+      .post('/api/document')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'x'.repeat(201) });
+
+    expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it('should reject creating a document with oversized content', async () => {
+    const res = await request(app)
+      .post('/api/document')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'Ok', content: 'x'.repeat(1_000_001) });
+
+    // A >1MB body trips express.json's 100kb payload limit first (413);
+    // CreateDocumentSchema's content cap remains as defense-in-depth.
+    expect([StatusCodes.BAD_REQUEST, StatusCodes.REQUEST_TOO_LONG]).toContain(res.status);
+  });
+
+  it('should reject updating a document with a non-boolean isPublic', async () => {
+    const created = await prisma.document.create({
+      data: { title: 'Bool Check', authorId: userId, content: '' },
+    });
+
+    const res = await request(app)
+      .put(`/api/document/${created.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'Still Ok', isPublic: 'yes' });
+
+    expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it('should reject a settings update with a non-boolean allowSelfJoin', async () => {
+    const created = await prisma.document.create({
+      data: { title: 'Settings Validation', authorId: userId, content: '' },
+    });
+
+    const res = await request(app)
+      .patch(`/api/document/${created.id}/settings`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ allowSelfJoin: 'yes' });
+
+    expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it('should return 400 instead of 500 when getting a document with a non-uuid id', async () => {
+    const res = await request(app).get('/api/document/not-a-uuid').set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it('should return 400 instead of 500 when updating a document with a non-uuid id', async () => {
+    const res = await request(app)
+      .put('/api/document/not-a-uuid')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'Nope' });
+
+    expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it('should return 400 instead of 500 when deleting a document with a non-uuid id', async () => {
+    const res = await request(app).delete('/api/document/not-a-uuid').set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it('should reject share-link generation with an invalid permission', async () => {
+    const created = await prisma.document.create({
+      data: { title: 'Share Perm', authorId: userId, content: '' },
+    });
+
+    const res = await request(app)
+      .get(`/api/document/${created.id}/share-link?permission=admin`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+});
+
 describe('Collaboration request decision scoping (#46)', () => {
   async function createOwnedDocument(title: string) {
     return prisma.document.create({
