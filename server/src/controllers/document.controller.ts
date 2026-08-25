@@ -544,7 +544,8 @@ export const getShareLink = asyncErrorWrapper(async (req: AuthenticatedRequest, 
   const clientInfo = getClientInfo(req);
   const userId = req.user?.userId;
   const { id } = req.params;
-  const { permission = 'view' } = req.query;
+  // Validated + defaulted by ShareLinkQuerySchema on the route
+  const { permission } = req.query as { permission: 'view' | 'edit' };
 
   logger.debug('Share link generation attempt', {
     action: 'GENERATE_SHARE_LINK_ATTEMPT',
@@ -553,19 +554,6 @@ export const getShareLink = asyncErrorWrapper(async (req: AuthenticatedRequest, 
     documentId: id,
     permission,
   });
-
-  if (!['view', 'edit'].includes(permission as string)) {
-    logger.warn('Share link generation failed - invalid permission', {
-      action: 'GENERATE_SHARE_LINK_INVALID_PERMISSION',
-      ...clientInfo,
-      userId,
-      documentId: id,
-      permission,
-    });
-
-    res.status(StatusCodes.BAD_REQUEST).json({ error: 'Invalid permission' });
-    return;
-  }
 
   try {
     const doc = await prisma.document.findUnique({ where: { id } });
@@ -584,7 +572,7 @@ export const getShareLink = asyncErrorWrapper(async (req: AuthenticatedRequest, 
       return;
     }
 
-    const token = generateShareToken(doc.shareId, permission as 'view' | 'edit');
+    const token = generateShareToken(doc.shareId, permission);
     // Updated URL structure - token is now in the path
     const url = `${process.env.CLIENT_BASE}/app/doc/share/${token}`;
 

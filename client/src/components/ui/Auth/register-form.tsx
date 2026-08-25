@@ -46,6 +46,7 @@ export default function RegisterForm({
           id="email"
           label="Email"
           placeholder="Enter your email"
+          maxLength={254}
           registration={register('email')}
           error={errors.email}
           autoComplete="email"
@@ -56,6 +57,7 @@ export default function RegisterForm({
           label="Username"
           id="username"
           placeholder="Enter your username"
+          maxLength={50}
           registration={register('username')}
           error={errors.username}
           autoComplete="username"
@@ -66,6 +68,7 @@ export default function RegisterForm({
           label="Full Name"
           id="fullname"
           placeholder="Enter your full name"
+          maxLength={100}
           registration={register('fullName')}
           error={errors.fullName}
           autoComplete="name"
@@ -76,6 +79,7 @@ export default function RegisterForm({
           id="password"
           label="Password"
           placeholder="Enter your password"
+          maxLength={128}
           registration={register('password')}
           error={errors.password}
           autoComplete="new-password"
