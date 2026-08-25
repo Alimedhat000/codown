@@ -50,7 +50,6 @@ export const ShareButton = ({ className, docId, isCollaborator }: Props) => {
     shareLink,
     loading: linkLoading,
     error,
-    refresh,
   } = useShareLink(docId, permission, isCollaborator);
 
   const handleCopy = async () => {
@@ -59,9 +58,7 @@ export const ShareButton = ({ className, docId, isCollaborator }: Props) => {
   };
 
   const handlePermissionChange = (value: 'view' | 'edit') => {
-    console.log('changed permission to', value);
-    setPermission(value);
-    refresh(); // This will use the new `permission` from state
+    setPermission(value); // the hook refetches on permission change
   };
 
   return (
@@ -84,7 +81,7 @@ export const ShareButton = ({ className, docId, isCollaborator }: Props) => {
               size="icon"
               variant="outline"
               onClick={handleCopy}
-              disabled={!shareLink}
+              disabled={!shareLink || linkLoading}
             >
               <CopyIcon />
             </Button>
