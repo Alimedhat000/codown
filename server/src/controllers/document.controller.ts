@@ -712,8 +712,44 @@ export const approveRequest = asyncErrorWrapper(async (req: AuthenticatedRequest
     }
 
     // Get the request to extract the requester user ID
-    const request = await prisma.collaborationRequest.update({
+    const request = await prisma.collaborationRequest.findUnique({
       where: { id: requestId },
+    });
+
+    if (!request || request.documentId !== documentId) {
+      logger.warn('Collaboration request approval failed - request not found on document', {
+        action: 'APPROVE_COLLABORATION_REQUEST_NOT_FOUND',
+        ...clientInfo,
+        userId,
+        documentId,
+        requestId,
+        requestExists: !!request,
+        belongsToDocument: request?.documentId === documentId,
+      });
+
+      res.status(StatusCodes.NOT_FOUND).json({ error: 'Request not found' });
+
+      return;
+    }
+
+    if (request.status !== 'pending') {
+      logger.warn('Collaboration request approval failed - request already decided', {
+        action: 'APPROVE_COLLABORATION_REQUEST_ALREADY_DECIDED',
+        ...clientInfo,
+        userId,
+        documentId,
+        requestId,
+        status: request.status,
+      });
+
+      res.status(StatusCodes.CONFLICT).json({ error: 'Request already decided' });
+
+      return;
+    }
+
+    // Scoped update as defense-in-depth against races between read and write
+    await prisma.collaborationRequest.updateMany({
+      where: { id: requestId, documentId, status: 'pending' },
       data: { status: 'approved' },
     });
 
@@ -786,7 +822,44 @@ export const rejectRequest = asyncErrorWrapper(async (req: AuthenticatedRequest,
     return;
   }
 
-  await prisma.collaborationRequest.update({ where: { id: requestId }, data: { status: 'rejected' } });
+  const request = await prisma.collaborationRequest.findUnique({
+    where: { id: requestId },
+  });
+
+  if (!request || request.documentId !== id) {
+    logger.warn('Collaboration request rejection failed - request not found on document', {
+      action: 'REJECT_COLLABORATION_REQUEST_NOT_FOUND',
+      ...clientInfo,
+      userId,
+      documentId: id,
+      requestId,
+      requestExists: !!request,
+      belongsToDocument: request?.documentId === id,
+    });
+
+    res.status(StatusCodes.NOT_FOUND).json({ error: 'Request not found' });
+    return;
+  }
+
+  if (request.status !== 'pending') {
+    logger.warn('Collaboration request rejection failed - request already decided', {
+      action: 'REJECT_COLLABORATION_REQUEST_ALREADY_DECIDED',
+      ...clientInfo,
+      userId,
+      documentId: id,
+      requestId,
+      status: request.status,
+    });
+
+    res.status(StatusCodes.CONFLICT).json({ error: 'Request already decided' });
+    return;
+  }
+
+  // Scoped update as defense-in-depth against races between read and write
+  await prisma.collaborationRequest.updateMany({
+    where: { id: requestId, documentId: id, status: 'pending' },
+    data: { status: 'rejected' },
+  });
 
   res.json({ message: 'Rejected' });
 });
