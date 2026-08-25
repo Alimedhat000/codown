@@ -388,3 +388,107 @@ describe('Document Routes', () => {
     expect(res.status).toBe(StatusCodes.FORBIDDEN);
   });
 });
+
+describe('Collaboration request decision scoping (#46)', () => {
+  async function createOwnedDocument(title: string) {
+    return prisma.document.create({
+      data: { title, authorId: userId, content: '' },
+    });
+  }
+
+  async function createPendingRequest(documentId: string, suffix: string) {
+    const requester = await prisma.user.create({
+      data: {
+        email: `requester-${suffix}@test.dev`,
+        username: `requester-${suffix}`,
+        password: 'hashedpw',
+      },
+    });
+
+    return prisma.collaborationRequest.create({
+      data: { userId: requester.id, documentId },
+    });
+  }
+
+  it('should not approve a request belonging to a different document', async () => {
+    const otherDoc = await createOwnedDocument('Other Doc');
+    const collabRequest = await createPendingRequest(otherDoc.id, 'a');
+    const targetDoc = await createOwnedDocument('Target Doc');
+
+    const res = await request(app)
+      .post(`/api/document/${targetDoc.id}/requests/${collabRequest.id}/approve`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.NOT_FOUND);
+
+    const untouched = await prisma.collaborationRequest.findUnique({ where: { id: collabRequest.id } });
+    expect(untouched?.status).toBe('pending');
+  });
+
+  it('should not reject a request belonging to a different document', async () => {
+    const otherDoc = await createOwnedDocument('Other Doc');
+    const collabRequest = await createPendingRequest(otherDoc.id, 'b');
+    const targetDoc = await createOwnedDocument('Target Doc');
+
+    const res = await request(app)
+      .delete(`/api/document/${targetDoc.id}/requests/${collabRequest.id}/reject`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.NOT_FOUND);
+
+    const untouched = await prisma.collaborationRequest.findUnique({ where: { id: collabRequest.id } });
+    expect(untouched?.status).toBe('pending');
+  });
+
+  it('should return 404 when approving a nonexistent request', async () => {
+    const doc = await createOwnedDocument('Target Doc');
+
+    const res = await request(app)
+      .post(`/api/document/${doc.id}/requests/00000000-0000-4000-8000-000000000000/approve`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.NOT_FOUND);
+  });
+
+  it('should return 404 when rejecting a nonexistent request', async () => {
+    const doc = await createOwnedDocument('Target Doc');
+
+    const res = await request(app)
+      .delete(`/api/document/${doc.id}/requests/00000000-0000-4000-8000-000000000000/reject`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.NOT_FOUND);
+  });
+
+  it('should return 409 when approving an already-approved request', async () => {
+    const doc = await createOwnedDocument('Target Doc');
+    const collabRequest = await createPendingRequest(doc.id, 'c');
+
+    const first = await request(app)
+      .post(`/api/document/${doc.id}/requests/${collabRequest.id}/approve`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(first.status).toBe(StatusCodes.OK);
+
+    const second = await request(app)
+      .post(`/api/document/${doc.id}/requests/${collabRequest.id}/approve`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(second.status).toBe(StatusCodes.CONFLICT);
+  });
+
+  it('should return 409 when rejecting an already-rejected request', async () => {
+    const doc = await createOwnedDocument('Target Doc');
+    const collabRequest = await createPendingRequest(doc.id, 'd');
+
+    const first = await request(app)
+      .delete(`/api/document/${doc.id}/requests/${collabRequest.id}/reject`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(first.status).toBe(StatusCodes.OK);
+
+    const second = await request(app)
+      .delete(`/api/document/${doc.id}/requests/${collabRequest.id}/reject`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(second.status).toBe(StatusCodes.CONFLICT);
+  });
+});
