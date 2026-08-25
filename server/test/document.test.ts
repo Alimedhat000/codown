@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -323,6 +324,47 @@ describe('Document Routes', () => {
       .send({ email: 'not-an-email' });
 
     expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it('should return 409 when a concurrent duplicate insert loses the race (P2002)', async () => {
+    const doc = await prisma.document.create({
+      data: { title: 'Race Collab', authorId: userId, content: '' },
+    });
+
+    const newUser = await prisma.user.create({
+      data: {
+        email: 'racecollab@test.dev',
+        username: 'racecollab',
+        password: 'hashedpass',
+      },
+    });
+
+    // Simulate the losing insert of two concurrent adds that both passed the
+    // pre-check: the unique constraint on (documentId, userId) rejects it.
+    const p2002 = new Prisma.PrismaClientKnownRequestError(
+      'Unique constraint failed on the fields: (`documentId`,`userId`)',
+      { code: 'P2002', clientVersion: '6.12.0' }
+    );
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const originalFindUnique = prisma.collaborator.findUnique;
+    const originalCreate = prisma.collaborator.create;
+    (prisma.collaborator as any).findUnique = async () => null;
+    (prisma.collaborator as any).create = async () => {
+      throw p2002;
+    };
+
+    try {
+      const res = await request(app)
+        .post(`/api/document/${doc.id}/collaborators`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ email: newUser.email });
+
+      expect(res.status).toBe(StatusCodes.CONFLICT);
+    } finally {
+      (prisma.collaborator as any).findUnique = originalFindUnique;
+      (prisma.collaborator as any).create = originalCreate;
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+    }
   });
 
   it('should forbid non-owners from listing collaborators', async () => {

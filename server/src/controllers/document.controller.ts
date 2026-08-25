@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { Response } from 'express';
 import asyncErrorWrapper from 'express-async-handler';
 import { StatusCodes } from 'http-status-codes';
@@ -909,9 +910,29 @@ export const addCollaborator = asyncErrorWrapper(async (req: AuthenticatedReques
       throw new ConflictError('User is already a collaborator on this document');
     }
 
-    const collab = await prisma.collaborator.create({
-      data: { documentId: id, userId: user.id, permission },
-    });
+    let collab;
+
+    try {
+      collab = await prisma.collaborator.create({
+        data: { documentId: id, userId: user.id, permission },
+      });
+    } catch (error) {
+      // Safety net for the check-then-create race above: two concurrent adds
+      // can both pass the pre-check and the loser hits the unique constraint.
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        logger.warn('Add collaborator failed - concurrent duplicate insert', {
+          action: 'ADD_COLLABORATOR_RACE_DUPLICATE',
+          ...clientInfo,
+          ownerId,
+          documentId: id,
+          newCollaboratorId: user.id,
+        });
+
+        throw new ConflictError('User is already a collaborator on this document');
+      }
+
+      throw error;
+    }
 
     logger.debug('Collaborator added successfully', {
       action: 'ADD_COLLABORATOR_SUCCESS',
