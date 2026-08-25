@@ -1,0 +1,46 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
+
+import Header from './header';
+
+const meta: Meta<typeof Header> = {
+  component: Header,
+  tags: ['autodocs'],
+  title: 'Layout/Header',
+  args: {
+    logout: fn(),
+  },
+};
+
+export default meta;
+
+type Story = StoryObj<typeof Header>;
+
+/**
+ * Logged-out header.
+ */
+export const Default: Story = {
+  args: {
+    username: undefined,
+  },
+};
+
+/**
+ * Header with authenticated user avatar menu.
+ */
+export const LoggedIn: Story = {
+  args: {
+    username: 'Ali Medhat',
+    avatarUrl: 'https://avatar.iran.liara.run/public/boy',
+  },
+};
+
+/**
+ * Authenticated header with fallback avatar (no image URL).
+ */
+export const LoggedInWithoutImage: Story = {
+  args: {
+    username: 'Ali Medhat',
+    avatarUrl: 'https://invalid.image.com',
+  },
+};

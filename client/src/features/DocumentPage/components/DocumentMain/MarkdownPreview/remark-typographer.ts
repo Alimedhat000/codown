@@ -43,6 +43,9 @@ const typographerPatterns = [
   },
 ];
 
+/**
+ * Remark plugin performing typographic adjustments on the markdown AST.
+ */
 export const remarkTypographer: Plugin = () => {
   return (tree: Node) => {
     visit(tree, 'text', (node: any) => {

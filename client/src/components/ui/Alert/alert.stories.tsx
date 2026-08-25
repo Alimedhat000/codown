@@ -19,6 +19,9 @@ export default meta;
 
 type Story = StoryObj<typeof Alert>;
 
+/**
+ * Info variant.
+ */
 export const Info: Story = {
   args: {
     variant: 'info',
@@ -27,6 +30,9 @@ export const Info: Story = {
   },
 };
 
+/**
+ * Success variant.
+ */
 export const Success: Story = {
   args: {
     variant: 'success',
@@ -35,6 +41,9 @@ export const Success: Story = {
   },
 };
 
+/**
+ * Warning variant.
+ */
 export const Warning: Story = {
   args: {
     variant: 'warning',
@@ -43,6 +52,9 @@ export const Warning: Story = {
   },
 };
 
+/**
+ * Error variant.
+ */
 export const Error: Story = {
   args: {
     variant: 'error',
@@ -51,6 +63,9 @@ export const Error: Story = {
   },
 };
 
+/**
+ * Dismissable via the onDismiss close button.
+ */
 export const Dismissible: Story = {
   args: {
     variant: 'info',

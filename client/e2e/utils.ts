@@ -1,9 +1,15 @@
 import { expect, type Page } from '@playwright/test';
 
+/**
+ * Locate a document card link by its title.
+ */
 export function getDocumentCard(page: Page, title: string) {
   return page.getByRole('link').filter({ hasText: title });
 }
 
+/**
+ * Open a document card's action dropdown.
+ */
 export async function openDocumentMenu(page: Page, title: string) {
   const card = getDocumentCard(page, title);
   await expect(card).toBeVisible();
@@ -11,6 +17,9 @@ export async function openDocumentMenu(page: Page, title: string) {
   await expect(page.getByRole('menu')).toBeVisible();
 }
 
+/**
+ * Create a document end-to-end from the dashboard.
+ */
 export async function createTestDocument(page: Page, title: string) {
   await page.goto('/app');
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
@@ -27,6 +36,9 @@ export async function createTestDocument(page: Page, title: string) {
   await expect(getDocumentCard(page, title)).toBeVisible();
 }
 
+/**
+ * Create a document and open it in the editor.
+ */
 export async function openDocumentEditor(page: Page, title: string) {
   await createTestDocument(page, title);
   await getDocumentCard(page, title).first().click();
@@ -35,6 +47,9 @@ export async function openDocumentEditor(page: Page, title: string) {
 
 // Server-generated links currently omit the port (e.g. http://localhost/...),
 // so navigate by pathname against the test baseURL instead of the raw URL.
+/**
+ * Extract the share-link path from the share dialog, rebased onto the test baseURL.
+ */
 export async function getSharePath(
   page: Page,
   permission?: 'view' | 'edit',

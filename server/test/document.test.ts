@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -95,6 +96,24 @@ describe('Document Routes', () => {
     expect(res.body.title).toBe('Updated Title');
   });
 
+  it('should not overwrite document content via REST update (Yjs is the source of truth)', async () => {
+    const created = await prisma.document.create({
+      data: { title: 'Synced Doc', content: 'yjs-derived-content', authorId: userId },
+    });
+
+    const res = await request(app)
+      .put(`/api/document/${created.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'Renamed', content: 'rest-overwrite-attempt' });
+
+    expect(res.status).toBe(StatusCodes.OK);
+    expect(res.body.title).toBe('Renamed');
+    expect(res.body.content).toBe('yjs-derived-content');
+
+    const doc = await prisma.document.findUniqueOrThrow({ where: { id: created.id } });
+    expect(doc.content).toBe('yjs-derived-content');
+  });
+
   it('should delete a document', async () => {
     const created = await prisma.document.create({
       data: {
@@ -106,6 +125,39 @@ describe('Document Routes', () => {
 
     const res = await request(app).delete(`/api/document/${created.id}`).set('Authorization', `Bearer ${token}`);
     expect(res.status).toBe(StatusCodes.NO_CONTENT);
+  });
+
+  it('should delete a document that has collaborators and join requests', async () => {
+    const created = await prisma.document.create({
+      data: {
+        title: 'Shared ToDelete',
+        authorId: userId,
+        content: '',
+      },
+    });
+
+    const otherUser = await prisma.user.create({
+      data: {
+        email: 'shared-collab@test.dev',
+        username: 'sharedcollab',
+        password: 'hashedpass',
+      },
+    });
+
+    await prisma.collaborator.create({
+      data: { documentId: created.id, userId: otherUser.id },
+    });
+
+    await prisma.collaborationRequest.create({
+      data: { documentId: created.id, userId: otherUser.id },
+    });
+
+    const res = await request(app).delete(`/api/document/${created.id}`).set('Authorization', `Bearer ${token}`);
+    expect(res.status).toBe(StatusCodes.NO_CONTENT);
+
+    expect(await prisma.document.findUnique({ where: { id: created.id } })).toBeNull();
+    expect(await prisma.collaborator.count({ where: { documentId: created.id } })).toBe(0);
+    expect(await prisma.collaborationRequest.count({ where: { documentId: created.id } })).toBe(0);
   });
 
   it('should update document settings (allowSelfJoin)', async () => {
@@ -233,9 +285,11 @@ describe('Document Routes', () => {
     const addRes = await request(app)
       .post(`/api/document/${doc.id}/collaborators`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ userId: newUser.id, permission: 'edit' });
+      .send({ email: newUser.email, permission: 'edit' });
 
     expect(addRes.status).toBe(StatusCodes.OK);
+    expect(addRes.body.userId).toBe(newUser.id);
+    expect(addRes.body.permission).toBe('edit');
 
     const collaboratorId = addRes.body.id;
 
@@ -244,6 +298,146 @@ describe('Document Routes', () => {
       .set('Authorization', `Bearer ${token}`);
 
     expect(removeRes.status).toBe(StatusCodes.OK);
+  });
+
+  it('should add a collaborator by email with default edit permission', async () => {
+    const doc = await prisma.document.create({
+      data: { title: 'Default Permission', authorId: userId, content: '' },
+    });
+
+    const newUser = await prisma.user.create({
+      data: {
+        email: 'defaultperm@test.dev',
+        username: 'defaultperm',
+        password: 'hashedpass',
+      },
+    });
+
+    const res = await request(app)
+      .post(`/api/document/${doc.id}/collaborators`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ email: newUser.email });
+
+    expect(res.status).toBe(StatusCodes.OK);
+    expect(res.body.userId).toBe(newUser.id);
+    expect(res.body.permission).toBe('edit');
+  });
+
+  it('should add a collaborator by email regardless of case', async () => {
+    const doc = await prisma.document.create({
+      data: { title: 'Case Insensitive', authorId: userId, content: '' },
+    });
+
+    const newUser = await prisma.user.create({
+      data: {
+        email: 'caseinsensitive@test.dev',
+        username: 'caseinsensitive',
+        password: 'hashedpass',
+      },
+    });
+
+    const res = await request(app)
+      .post(`/api/document/${doc.id}/collaborators`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ email: 'CaseInsensitive@Test.DEV' });
+
+    expect(res.status).toBe(StatusCodes.OK);
+    expect(res.body.userId).toBe(newUser.id);
+  });
+
+  it('should return 404 when adding a collaborator with an unknown email', async () => {
+    const doc = await prisma.document.create({
+      data: { title: 'Unknown Email', authorId: userId, content: '' },
+    });
+
+    const res = await request(app)
+      .post(`/api/document/${doc.id}/collaborators`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ email: 'nobody@test.dev' });
+
+    expect(res.status).toBe(StatusCodes.NOT_FOUND);
+  });
+
+  it('should return 409 when adding an existing collaborator', async () => {
+    const doc = await prisma.document.create({
+      data: { title: 'Duplicate Collab', authorId: userId, content: '' },
+    });
+
+    const newUser = await prisma.user.create({
+      data: {
+        email: 'dupcollab@test.dev',
+        username: 'dupcollab',
+        password: 'hashedpass',
+      },
+    });
+
+    const first = await request(app)
+      .post(`/api/document/${doc.id}/collaborators`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ email: newUser.email });
+
+    expect(first.status).toBe(StatusCodes.OK);
+
+    const second = await request(app)
+      .post(`/api/document/${doc.id}/collaborators`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ email: newUser.email });
+
+    expect(second.status).toBe(StatusCodes.CONFLICT);
+  });
+
+  it('should return 400 when adding a collaborator with an invalid body', async () => {
+    const doc = await prisma.document.create({
+      data: { title: 'Invalid Body', authorId: userId, content: '' },
+    });
+
+    const res = await request(app)
+      .post(`/api/document/${doc.id}/collaborators`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ email: 'not-an-email' });
+
+    expect(res.status).toBe(StatusCodes.BAD_REQUEST);
+  });
+
+  it('should return 409 when a concurrent duplicate insert loses the race (P2002)', async () => {
+    const doc = await prisma.document.create({
+      data: { title: 'Race Collab', authorId: userId, content: '' },
+    });
+
+    const newUser = await prisma.user.create({
+      data: {
+        email: 'racecollab@test.dev',
+        username: 'racecollab',
+        password: 'hashedpass',
+      },
+    });
+
+    // Simulate the losing insert of two concurrent adds that both passed the
+    // pre-check: the unique constraint on (documentId, userId) rejects it.
+    const p2002 = new Prisma.PrismaClientKnownRequestError(
+      'Unique constraint failed on the fields: (`documentId`,`userId`)',
+      { code: 'P2002', clientVersion: '6.12.0' }
+    );
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const originalFindUnique = prisma.collaborator.findUnique;
+    const originalCreate = prisma.collaborator.create;
+    (prisma.collaborator as any).findUnique = async () => null;
+    (prisma.collaborator as any).create = async () => {
+      throw p2002;
+    };
+
+    try {
+      const res = await request(app)
+        .post(`/api/document/${doc.id}/collaborators`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ email: newUser.email });
+
+      expect(res.status).toBe(StatusCodes.CONFLICT);
+    } finally {
+      (prisma.collaborator as any).findUnique = originalFindUnique;
+      (prisma.collaborator as any).create = originalCreate;
+      /* eslint-enable @typescript-eslint/no-explicit-any */
+    }
   });
 
   it('should forbid non-owners from listing collaborators', async () => {
@@ -353,5 +547,109 @@ describe('Document Routes', () => {
       .set('Authorization', `Bearer ${viewerLogin.body.accessToken}`);
 
     expect(res.status).toBe(StatusCodes.FORBIDDEN);
+  });
+});
+
+describe('Collaboration request decision scoping (#46)', () => {
+  async function createOwnedDocument(title: string) {
+    return prisma.document.create({
+      data: { title, authorId: userId, content: '' },
+    });
+  }
+
+  async function createPendingRequest(documentId: string, suffix: string) {
+    const requester = await prisma.user.create({
+      data: {
+        email: `requester-${suffix}@test.dev`,
+        username: `requester-${suffix}`,
+        password: 'hashedpw',
+      },
+    });
+
+    return prisma.collaborationRequest.create({
+      data: { userId: requester.id, documentId },
+    });
+  }
+
+  it('should not approve a request belonging to a different document', async () => {
+    const otherDoc = await createOwnedDocument('Other Doc');
+    const collabRequest = await createPendingRequest(otherDoc.id, 'a');
+    const targetDoc = await createOwnedDocument('Target Doc');
+
+    const res = await request(app)
+      .post(`/api/document/${targetDoc.id}/requests/${collabRequest.id}/approve`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.NOT_FOUND);
+
+    const untouched = await prisma.collaborationRequest.findUnique({ where: { id: collabRequest.id } });
+    expect(untouched?.status).toBe('pending');
+  });
+
+  it('should not reject a request belonging to a different document', async () => {
+    const otherDoc = await createOwnedDocument('Other Doc');
+    const collabRequest = await createPendingRequest(otherDoc.id, 'b');
+    const targetDoc = await createOwnedDocument('Target Doc');
+
+    const res = await request(app)
+      .delete(`/api/document/${targetDoc.id}/requests/${collabRequest.id}/reject`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.NOT_FOUND);
+
+    const untouched = await prisma.collaborationRequest.findUnique({ where: { id: collabRequest.id } });
+    expect(untouched?.status).toBe('pending');
+  });
+
+  it('should return 404 when approving a nonexistent request', async () => {
+    const doc = await createOwnedDocument('Target Doc');
+
+    const res = await request(app)
+      .post(`/api/document/${doc.id}/requests/00000000-0000-4000-8000-000000000000/approve`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.NOT_FOUND);
+  });
+
+  it('should return 404 when rejecting a nonexistent request', async () => {
+    const doc = await createOwnedDocument('Target Doc');
+
+    const res = await request(app)
+      .delete(`/api/document/${doc.id}/requests/00000000-0000-4000-8000-000000000000/reject`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(StatusCodes.NOT_FOUND);
+  });
+
+  it('should return 409 when approving an already-approved request', async () => {
+    const doc = await createOwnedDocument('Target Doc');
+    const collabRequest = await createPendingRequest(doc.id, 'c');
+
+    const first = await request(app)
+      .post(`/api/document/${doc.id}/requests/${collabRequest.id}/approve`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(first.status).toBe(StatusCodes.OK);
+
+    const second = await request(app)
+      .post(`/api/document/${doc.id}/requests/${collabRequest.id}/approve`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(second.status).toBe(StatusCodes.CONFLICT);
+  });
+
+  it('should return 409 when rejecting an already-rejected request', async () => {
+    const doc = await createOwnedDocument('Target Doc');
+    const collabRequest = await createPendingRequest(doc.id, 'd');
+
+    const first = await request(app)
+      .delete(`/api/document/${doc.id}/requests/${collabRequest.id}/reject`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(first.status).toBe(StatusCodes.OK);
+
+    const second = await request(app)
+      .delete(`/api/document/${doc.id}/requests/${collabRequest.id}/reject`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(second.status).toBe(StatusCodes.CONFLICT);
   });
 });

@@ -19,6 +19,7 @@ import {
 const meta: Meta<typeof Modal> = {
   title: 'Components/Modal',
   component: Modal,
+  tags: ['autodocs'],
 };
 
 export default meta;
@@ -26,6 +27,9 @@ export default meta;
 type Story = StoryObj<typeof Modal>;
 
 // Simple usage with the convenience component
+/**
+ * Minimal controlled modal.
+ */
 export const Simple: Story = {
   render: () => {
     const [open, setOpen] = useState(false);
@@ -55,6 +59,9 @@ export const Simple: Story = {
 };
 
 // Fully composable usage
+/**
+ * Composition of every modal part (title, description, body, footer, close).
+ */
 export const Composable: Story = {
   render: () => {
     const [open, setOpen] = useState(false);
@@ -117,6 +124,9 @@ export const Composable: Story = {
 };
 
 // Using trigger component
+/**
+ * Opening via a ModalTrigger element instead of controlled state.
+ */
 export const WithTrigger: Story = {
   render: () => {
     const [open, setOpen] = useState(false);
@@ -149,6 +159,9 @@ export const WithTrigger: Story = {
 };
 
 // Different sizes
+/**
+ * Available width presets.
+ */
 export const Sizes: Story = {
   render: () => {
     const [openSm, setOpenSm] = useState(false);
@@ -226,6 +239,9 @@ export const Sizes: Story = {
 };
 
 // Custom styling example
+/**
+ * Custom className overrides on overlay and content.
+ */
 export const CustomStyling: Story = {
   render: () => {
     const [open, setOpen] = useState(false);
@@ -294,6 +310,9 @@ export const CustomStyling: Story = {
   },
 };
 
+/**
+ * Animation prop options (slide vs fade).
+ */
 export const AnimationTypes: Story = {
   render: () => {
     const [openSlide, setOpenSlide] = useState(false);
@@ -369,6 +388,9 @@ export const AnimationTypes: Story = {
   },
 };
 
+/**
+ * Directional slide-in entrance variants.
+ */
 export const EntranceDirections: Story = {
   render: () => {
     const [openCenter, setOpenCenter] = useState(false);

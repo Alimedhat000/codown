@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   LuUsers as GroupIcon,
   LuChevronDown as ChevronIcon,
+  LuPlus as PlusIcon,
   LuTrash2 as TrashIcon,
 } from 'react-icons/lu';
 
@@ -10,21 +11,27 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  // DropdownMenuSeparator,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/Dropdown';
-import { useCollaborators } from '@/hooks/useCollaborators';
+import { useCollaborators } from '@/hooks/use-collaborators';
 import { Collaborator } from '@/types/api';
 import { cn } from '@/utils/cn';
 
 interface CollaboratorsDropdownProps {
+  /** ID of the document whose collaborators are listed. */
   docId?: string;
+  /** Extra classes merged onto the trigger button. */
   className?: string;
+  /** Renders per-collaborator remove buttons; owners only. */
   isOwner?: boolean;
-  /** Overrides fetched collaborators (Storybook/tests) */
+  /** Overrides fetched collaborators (Storybook/tests). */
   collaborators?: Collaborator[];
 }
 
+/**
+ * Avatar stack opening a dropdown listing collaborators with add/remove actions.
+ */
 export const CollaboratorsDropdown = ({
   docId,
   className,
@@ -32,23 +39,30 @@ export const CollaboratorsDropdown = ({
   collaborators,
 }: CollaboratorsDropdownProps) => {
   const [email, setEmail] = useState('');
+  const [open, setOpen] = useState(false);
   const {
     collaborators: fetchedCollaborators,
     loading,
+    error,
     addCollaborator,
     removeCollaborator,
   } = useCollaborators(docId);
   const list = collaborators ?? fetchedCollaborators;
 
-  const _handleAdd = async () => {
-    await addCollaborator(email);
-    setEmail('');
+  /** Adds the typed email as a collaborator and clears the input on success. */
+  const handleAdd = async () => {
+    const added = await addCollaborator(email);
+    if (added) setEmail('');
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild className={className}>
-        <Button variant="ghost" className="gap-1 flex px-2 ">
+        <Button
+          variant="ghost"
+          aria-label="Collaborators"
+          className="gap-1 flex px-2 "
+        >
           <GroupIcon className="h-4 w-4" />
           {list.length > 0 && <span className="text-xs">{list.length}</span>}
           <ChevronIcon
@@ -63,7 +77,7 @@ export const CollaboratorsDropdown = ({
           {loading ? (
             <DropdownMenuItem disabled>Loading…</DropdownMenuItem>
           ) : list.length > 0 ? (
-            list.map((collaborator, _index) => (
+            list.map((collaborator) => (
               <div
                 key={collaborator.id}
                 className="flex items-center justify-between px-2 py-1 rounded hover:bg-muted gap-3"
@@ -87,22 +101,41 @@ export const CollaboratorsDropdown = ({
           )}
         </div>
 
-        {/* <div className="flex items-center gap-1">
-          <Input
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="h-8 text-xs"
-          />
-          <Button
-            size="icon"
-            onClick={handleAdd}
-            disabled={!email.trim()}
-            className="h-8 w-8"
-          >
-            <PlusIcon className="w-4 h-4" />
-          </Button>
-        </div> */}
+        {isOwner && (
+          <>
+            <DropdownMenuSeparator />
+            <form
+              className="flex items-center gap-1 px-1 py-1"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAdd();
+              }}
+            >
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                aria-label="Collaborator email"
+                className="h-8 min-w-0 flex-1 rounded border border-surface-border bg-transparent px-2 text-xs outline-none focus-visible:border-ring"
+              />
+              <Button
+                size="icon"
+                type="submit"
+                aria-label="Add collaborator"
+                disabled={!email.trim()}
+                className="h-8 w-8 shrink-0"
+              >
+                <PlusIcon className="w-4 h-4" />
+              </Button>
+            </form>
+            {error && (
+              <p role="alert" className="px-2 pb-1 text-xs text-error">
+                {error}
+              </p>
+            )}
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

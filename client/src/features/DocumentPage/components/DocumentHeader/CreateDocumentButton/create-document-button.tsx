@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
 import { LuPlus as AddIcon } from 'react-icons/lu';
 
-import NewDocumentFormBody from '@/components/common/forms/NewDocumentFormBody';
+import NewDocumentFormBody from '@/components/common/NewDocumentFormBody';
 import { Button } from '@/components/ui/Button';
 import { Modal, ModalOverlay, ModalTrigger } from '@/components/ui/Modal';
 import type { CreateDocumentForm } from '@/types/api';
 
 interface CreateDocumentButtonProps {
+  /** Creates a document with the submitted title; closes the modal on success. */
   onCreateDocument?: (title: string) => Promise<void>;
+  /** Extra classes merged onto the trigger button. */
   className?: string;
 }
 
+/**
+ * Header button driving the shared create-document flow with pending/error handling.
+ */
 export const CreateDocumentButton = ({
   onCreateDocument,
   className,

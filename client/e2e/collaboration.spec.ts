@@ -7,10 +7,13 @@ import {
 
 import { getSharePath, openDocumentEditor } from './utils';
 
-const API_URL = process.env.E2E_API_URL ?? 'http://localhost:5000';
+const API_URL = process.env.E2E_API_URL ?? 'http://localhost:5001';
 
 // The second user is created via the API: the registration form is already
 // covered by auth.spec.ts and proved flaky to drive from a second context.
+/**
+ * Register a throwaway second user via the API for collaboration specs.
+ */
 async function createUserViaApi(requestCtx: APIRequestContext, suffix: number) {
   const res = await requestCtx.post(`${API_URL}/api/auth/register`, {
     data: {
@@ -24,6 +27,9 @@ async function createUserViaApi(requestCtx: APIRequestContext, suffix: number) {
   expect(res.status()).toBe(201);
 }
 
+/**
+ * Log the second user in through the login UI.
+ */
 async function loginUser2(page: Page, suffix: number) {
   await page.goto('/login');
   await page.getByLabel(/email/i).fill(`e2e-${suffix}@test.local`);
@@ -34,6 +40,9 @@ async function loginUser2(page: Page, suffix: number) {
 
 // Owner resolves the pending request from the Share menu. The hook fetching
 // join requests runs once on mount (no polling), so the page is reloaded first.
+/**
+ * Owner approves or rejects a pending collaboration request via the UI.
+ */
 async function resolvePendingRequest(
   page: Page,
   username: string,
@@ -61,6 +70,9 @@ async function resolvePendingRequest(
 // other client's editor. Retried because a CodeMirror remount (awareness
 // updates, provider reconnect) can swallow a click's focus, dropping the
 // whole keystroke burst.
+/**
+ * Type into one client and wait for the text to appear in the other.
+ */
 async function typeAndSync(from: Page, to: Page, text: string) {
   const content = from.locator('.cm-content').first();
   for (let attempt = 0; attempt < 3; attempt++) {

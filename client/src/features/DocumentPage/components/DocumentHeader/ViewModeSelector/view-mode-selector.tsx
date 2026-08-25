@@ -9,11 +9,17 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/ToggleGroup';
 import { cn } from '@/utils/cn';
 
 interface ViewModeSelectorProps {
+  /** Active editor layout shown as the selected toggle. */
   mode: 'edit' | 'both' | 'view';
+  /** Called with the selected layout when the toggle changes. */
   setMode: (mode: 'edit' | 'both' | 'view') => void;
+  /** Extra classes merged onto the toggle group. */
   className?: string;
 }
 
+/**
+ * Toggle between editing and preview modes.
+ */
 export const ViewModeSelector: React.FC<ViewModeSelectorProps> = ({
   mode,
   setMode,

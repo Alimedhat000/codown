@@ -68,6 +68,9 @@ const createAppRouter = () =>
     },
   ]);
 
+/**
+ * Creates and renders the route tree, separating protected and public routes.
+ */
 export function AppRouter() {
   const router = createAppRouter();
   return <RouterProvider router={router} />;

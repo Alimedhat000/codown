@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { Input } from './Input';
+import { Input } from './input';
 
 const meta: Meta<typeof Input> = {
   title: 'Components/Input',
@@ -36,26 +36,41 @@ const meta: Meta<typeof Input> = {
 export default meta;
 type Story = StoryObj<typeof Input>;
 
+/**
+ * Default variant with label and placeholder.
+ */
 export const Default: Story = {};
 
+/**
+ * Bordered variant.
+ */
 export const Bordered: Story = {
   args: {
     variant: 'bordered',
   },
 };
 
+/**
+ * Ghost variant.
+ */
 export const Ghost: Story = {
   args: {
     variant: 'ghost',
   },
 };
 
+/**
+ * Unstyled variant.
+ */
 export const Unstyled: Story = {
   args: {
     variant: 'unstyled',
   },
 };
 
+/**
+ * Validation error display via the error prop.
+ */
 export const WithError: Story = {
   args: {
     error: {

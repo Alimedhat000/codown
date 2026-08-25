@@ -37,6 +37,9 @@ const meta: Meta = {
 
 export default meta;
 
+/**
+ * Basic trigger-and-items menu.
+ */
 export const Default = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -51,6 +54,9 @@ export const Default = () => (
   </DropdownMenu>
 );
 
+/**
+ * Checkbox items bound to local state.
+ */
 export const WithCheckboxItems = () => {
   const [checked, setChecked] = React.useState(true);
   const [checked2, setChecked2] = React.useState(false);
@@ -78,6 +84,9 @@ export const WithCheckboxItems = () => {
   );
 };
 
+/**
+ * Radio group selection.
+ */
 export const WithRadioItems = () => {
   const [value, setValue] = React.useState('one');
 
@@ -101,6 +110,9 @@ export const WithRadioItems = () => {
   );
 };
 
+/**
+ * Nested submenu.
+ */
 export const WithSubmenus = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -120,6 +132,9 @@ export const WithSubmenus = () => (
   </DropdownMenu>
 );
 
+/**
+ * Keyboard shortcut hints on items.
+ */
 export const WithShortcuts = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -147,6 +162,9 @@ export const WithShortcuts = () => (
   </DropdownMenu>
 );
 
+/**
+ * Labeled groups separated visually.
+ */
 export const WithGroups = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -170,6 +188,9 @@ export const WithGroups = () => (
   </DropdownMenu>
 );
 
+/**
+ * Portal-mounted content.
+ */
 export const WithPortal = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -188,6 +209,9 @@ export const WithPortal = () => (
   </DropdownMenu>
 );
 
+/**
+ * Composite menu combining checkboxes, shortcuts and submenu.
+ */
 export const ComplexMenu = () => {
   const [notifications, setNotifications] = React.useState(true);
   const [marketing, setMarketing] = React.useState(false);
@@ -268,6 +292,9 @@ export const ComplexMenu = () => {
   );
 };
 
+/**
+ * Multiple nesting levels.
+ */
 export const NestedSubmenus = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -303,6 +330,9 @@ export const NestedSubmenus = () => (
   </DropdownMenu>
 );
 
+/**
+ * Disabled item appearance and behavior.
+ */
 export const DisabledItems = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -321,6 +351,9 @@ export const DisabledItems = () => (
   </DropdownMenu>
 );
 
+/**
+ * Every dropdown primitive composed in one menu.
+ */
 export const AllComponents = () => {
   const [checkboxState, setCheckboxState] = React.useState({
     option1: true,

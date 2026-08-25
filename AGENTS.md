@@ -36,6 +36,22 @@ Real-time collaborative Markdown editor. pnpm workspace monorepo: `client/` (Rea
 - Hocuspocus WS is mounted at `/collaboration` on the same Express app and port (`server.ts` calls `app.ws('/collaboration', ...)`) — no separate WS port. Yjs state persistence is `server/src/lib/dbPersistence.ts` (`@hocuspocus/extension-database`).
 - Schema lives in `server/prisma/schema.prisma` (Prisma 6). Use `db:migrate` (dev, creates migrations) / `db:migrate:prod` (deploy); CI runs `db:migrate:prod`.
 
+## Client conventions (enforced by lint — see `client/eslint.config.js`)
+
+- Folder-per-component: `ComponentName/{component-name.tsx, index.ts, component-name.stories.tsx}`. **Directories PascalCase, all `.ts`/`.tsx` files kebab-case** (`check-file/filename-naming-convention`, `ignoreMiddleExtensions: true`).
+- Composite "kit" folders (e.g. `ui/Form`) may hold small internal parts flat when they have no external consumers; the external API goes through the folder barrel.
+- Every export carries JSDoc (`jsdoc/require-jsdoc` at `error`). One concise block per component/hook/util.
+- Component props: document each **custom** prop with a one-line JSDoc on its member in the Props interface/type (e.g. `/** Visual style preset. */ variant?: 'default' | 'ghost';`). Note defaults established in implementation when not obvious from the type (`Defaults to 'default'.`); never re-document inherited React/Radix props, and don't restate what the type already says. Lint enforces non-empty descriptions (`jsdoc/require-description` in components/hooks/features); member-level completeness is a review responsibility.
+- Hook/helper params: `@param` for every param wherever a JSDoc block exists in `src/hooks/**` / `src/features/**/*.ts` (`jsdoc/require-param`, destructured-object members exempt); add `@returns` when the return value is non-obvious. Component functions stay exempt — their props live on the Props interface.
+- Every story meta has `tags: ['autodocs']`; plop (`pnpm --filter client generate`) scaffolds this automatically.
+- Component tests = Storybook interaction tests: state stories for every variant/boolean prop + `play()` assertions using `{ expect, fn, userEvent, within } from 'storybook/test'`. Run via `pnpm --filter client test` (browser mode, needs `playwright install chromium` once).
+- Story gotchas:
+  - Never pass complex objects (e.g. CodeMirror views) through story `args` — Storybook JSON-serializes args and circular refs hang the run forever. Build them inside `render()` instead.
+  - Radix portals render outside the story canvas — query `within(document.body)` for dropdown/modal content.
+  - Animated Radix open/close: prefer existence-based assertions (`findByText`) over `toBeVisible()`, and `waitFor(..., { timeout })` before asserting unmount.
+  - First run after adding a heavy dep to stories can fail imports mid-run while Vite optimizes deps — add it to `optimizeDeps.include` in `client/vite.config.ts`.
+- Global decorators live in `client/.storybook/preview.tsx`: every story is wrapped in `MemoryRouter` + an authenticated mock auth context. Override with `parameters.auth` (partial context) or `parameters.auth: null` for signed-out; `parameters.modal: true` adds a Modal ancestor for components emitting ModalContent parts.
+
 ## Docker
 
 - `docker-compose.dev.yml`: full dev stack driven by **compose watch** (`develop.watch`). Images use dedicated `dev` stages with source baked in and nothing compiled at build time. Run `docker compose -f docker-compose.dev.yml up --build --watch` (or `pnpm docker:dev`); later runs can skip `--build`. Source edits sync into containers live (server: esbuild rebuild + nodemon restart; client: Vite HMR). Changes to package.json / lockfile / vite.config.ts trigger automatic rebuild+restart of that service. Schema changes: edit `schema.prisma`, then `docker compose -f docker-compose.dev.yml exec server pnpm exec prisma migrate dev`. Prisma Studio is opt-in via `docker compose -f docker-compose.dev.yml --profile tools up studio` (port 5555, runs from the `generated` stage).

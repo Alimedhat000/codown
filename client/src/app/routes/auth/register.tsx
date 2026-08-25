@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { AuthLayout } from '@/components/layouts/AuthLayout';
-import RegisterForm from '@/components/ui/auth/register-form';
+import RegisterForm from '@/components/ui/Auth/register-form';
 import { paths } from '@/config/paths';
 import { RegisterUser } from '@/lib/auth';
 import { type RegisterSchemaType } from '@/lib/auth';
 
+/**
+ * Registration page wiring RegisterForm to the auth flow and redirect after signup.
+ */
 export default function Register() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);

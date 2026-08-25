@@ -10,8 +10,11 @@ import { buttonVariants } from './variants';
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
   VariantProps<typeof buttonVariants> & {
+    /** Render the child via Slot instead of a <button>. Defaults to false. */
     asChild?: boolean;
+    /** Swaps the icon for a spinner while pending; does not disable. */
     isLoading?: boolean;
+    /** Optional leading element rendered before the label. */
     icon?: React.ReactNode;
   };
 

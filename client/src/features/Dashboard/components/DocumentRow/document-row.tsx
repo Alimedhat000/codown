@@ -6,12 +6,19 @@ import { dateFormat } from '@/utils/dateformat';
 import { DocumentCardDropdown } from '../DocumentCardDropdown';
 
 type DocumentRowProps = {
+  /** Document rendered by the row. */
   document: Document;
+  /** Called with the updated document after a successful rename. */
   onDocumentUpdated: (updatedDocument: Document) => void;
+  /** Called after a successful delete so parents can drop the document. */
   onDocumentDeleted: (documentId: string) => void;
+  /** Shows the action menu (rename/delete) for owned documents. */
   isOwned?: boolean;
 };
 
+/**
+ * List-view document row linking to the editor with its action menu.
+ */
 export function DocumentRow({
   document,
   onDocumentUpdated,

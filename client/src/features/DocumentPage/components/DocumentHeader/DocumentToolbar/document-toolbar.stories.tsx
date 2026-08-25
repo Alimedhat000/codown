@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { MemoryRouter } from 'react-router';
 import { fn } from 'storybook/test';
 
 import { DocumentToolbar } from './document-toolbar';
@@ -7,16 +6,15 @@ import { DocumentToolbar } from './document-toolbar';
 const meta: Meta = {
   title: 'DocumentPage/DocumentToolbar',
   component: DocumentToolbar,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
   },
   decorators: [
     (Story) => (
-      <MemoryRouter>
-        <div className="w-full max-w-4xl">
-          <Story />
-        </div>
-      </MemoryRouter>
+      <div className="w-full max-w-4xl">
+        <Story />
+      </div>
     ),
   ],
   args: {
@@ -30,12 +28,18 @@ export default meta;
 
 type Story = StoryObj;
 
+/**
+ * Toolbar with minimal props.
+ */
 export const ToolbarMinimal: Story = {
   args: {
     mode: 'both',
   },
 };
 
+/**
+ * Toolbar including user-specific controls.
+ */
 export const ToolbarWithUser: Story = {
   args: {
     mode: 'edit',
@@ -45,6 +49,9 @@ export const ToolbarWithUser: Story = {
   },
 };
 
+/**
+ * Fully populated toolbar.
+ */
 export const ToolbarComplete: Story = {
   args: {
     mode: 'both',
