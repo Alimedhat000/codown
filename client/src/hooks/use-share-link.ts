@@ -5,7 +5,8 @@ import { api } from '@/lib/api';
 /**
  * Fetches (and can refresh) a share link for a permission level;
  * surfaces shareLink, loading and error. Concurrent fetches resolve
- * last-request-wins, so a stale response never overwrites a newer one.
+ * last-request-wins, so a stale response never overwrites a newer one,
+ * and any previous link is invalidated whenever a new fetch starts.
  *
  * @param docId - Document id whose share link is fetched; fetching is
  *   skipped while undefined.
@@ -30,6 +31,9 @@ export const useShareLink = (
     async (permission: 'view' | 'edit') => {
       if (!docId) return;
       const requestId = ++requestRef.current;
+      // Invalidate any previous link up front so a stale URL can never be
+      // displayed or copied while loading or after a failure
+      setShareLink('');
       setLoading(true);
       setError(null);
       try {
