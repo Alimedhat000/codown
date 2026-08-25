@@ -272,6 +272,28 @@ describe('Document Routes', () => {
     expect(res.body.permission).toBe('edit');
   });
 
+  it('should add a collaborator by email regardless of case', async () => {
+    const doc = await prisma.document.create({
+      data: { title: 'Case Insensitive', authorId: userId, content: '' },
+    });
+
+    const newUser = await prisma.user.create({
+      data: {
+        email: 'caseinsensitive@test.dev',
+        username: 'caseinsensitive',
+        password: 'hashedpass',
+      },
+    });
+
+    const res = await request(app)
+      .post(`/api/document/${doc.id}/collaborators`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ email: 'CaseInsensitive@Test.DEV' });
+
+    expect(res.status).toBe(StatusCodes.OK);
+    expect(res.body.userId).toBe(newUser.id);
+  });
+
   it('should return 404 when adding a collaborator with an unknown email', async () => {
     const doc = await prisma.document.create({
       data: { title: 'Unknown Email', authorId: userId, content: '' },
