@@ -38,6 +38,24 @@ describe('Auth Routes', () => {
     expect(res.status).toBe(StatusCodes.CONFLICT);
   });
 
+  it('should normalize email case on register and allow lowercase login', async () => {
+    const register = await request(app).post('/api/auth/register').send({
+      email: 'MixedCase@Test.DEV',
+      username: 'mixedcase',
+      password: 'secure123',
+    });
+
+    expect(register.status).toBe(StatusCodes.CREATED);
+
+    const res = await request(app).post('/api/auth/login').send({
+      email: 'mixedcase@test.dev',
+      password: 'secure123',
+    });
+
+    expect(res.status).toBe(StatusCodes.OK);
+    expect(res.body.user.email).toBe('mixedcase@test.dev');
+  });
+
   it('should login with valid credentials and receive cookies', async () => {
     await request(app).post('/api/auth/register').send({
       email: 'test@test.dev',

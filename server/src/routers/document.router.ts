@@ -17,6 +17,8 @@ import {
   updateDocSettings,
 } from '@/controllers/document.controller';
 import { authenticate } from '@/middlewares/auth.middleware';
+import { validate } from '@/middlewares/validation.middleware';
+import { AddCollaboratorSchema } from '@/validations/addCollaborator.schema';
 
 export const docRouter = express.Router();
 
@@ -34,7 +36,7 @@ docRouter.patch('/:id/settings', updateDocSettings); // Used to toggle allowSelf
 docRouter.get('/:id/share-link', getShareLink); // get the document share link with the share token
 
 docRouter.get('/:id/collaborators', getCollaborators); // returns list
-docRouter.post('/:id/collaborators', addCollaborator); // adds a new one //!Owner only access
+docRouter.post('/:id/collaborators', validate({ body: AddCollaboratorSchema }), addCollaborator); // adds a new one by email //!Owner only access
 docRouter.delete('/:id/collaborators/:userId', removeCollaborator); // optional
 
 docRouter.get('/:id/requests', getRequests); // !Owner only access
