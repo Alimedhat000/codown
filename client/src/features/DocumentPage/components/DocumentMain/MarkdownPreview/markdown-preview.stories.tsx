@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, waitFor } from 'storybook/test';
 
-import { MarkdownPreview } from './MarkdownPreview';
+import { MarkdownPreview } from './markdown-preview';
 
 const meta: Meta<typeof MarkdownPreview> = {
   component: MarkdownPreview,
+  tags: ['autodocs'],
   title: 'Features/DocumentPage/MarkdownPreview',
 };
 
@@ -25,6 +26,9 @@ const XSS_PAYLOAD = [
   '',
 ].join('\n');
 
+/**
+ * Raw HTML attacks are stripped by sanitization.
+ */
 export const SanitizesMaliciousHtml: StoryObj<typeof MarkdownPreview> = {
   args: {
     content: XSS_PAYLOAD,
@@ -70,6 +74,9 @@ const MERMAID_DOC = [
   '```',
 ].join('\n');
 
+/**
+ * Fenced mermaid blocks render as diagrams.
+ */
 export const RendersMermaidDiagrams: StoryObj<typeof MarkdownPreview> = {
   args: {
     content: MERMAID_DOC,
@@ -116,6 +123,9 @@ const RICH_DOC = [
   'Math: $E = mc^2$',
 ].join('\n');
 
+/**
+ * Safe markdown features survive sanitization intact.
+ */
 export const PreservesSafeMarkdownFeatures: StoryObj<typeof MarkdownPreview> = {
   args: {
     content: RICH_DOC,
@@ -154,6 +164,9 @@ export const PreservesSafeMarkdownFeatures: StoryObj<typeof MarkdownPreview> = {
   },
 };
 
+/**
+ * Grab the rendered prose container from the story canvas.
+ */
 function getProse(canvasElement: HTMLElement): HTMLElement {
   const preview = canvasElement.querySelector<HTMLElement>(
     '.markdown-previewer',

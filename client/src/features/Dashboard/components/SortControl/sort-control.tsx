@@ -15,15 +15,22 @@ import {
 } from '@/components/ui/Dropdown';
 
 export interface SortControlProps {
+  /** Currently selected sort option value. */
   value: string;
+  /** Called with the chosen option value on selection. */
   onChange: (val: string) => void;
+  /** Sort choices rendered as radio items. */
   options: {
     label: string;
     value: string;
   }[];
+  /** Extra classes merged onto the trigger button. */
   className?: string;
 }
 
+/**
+ * Controlled select for document sort order (value + onChange).
+ */
 export function SortControl({
   value,
   onChange,

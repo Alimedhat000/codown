@@ -21,6 +21,22 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'), // ⬅️ this is required
     },
   },
+  optimizeDeps: {
+    // Pre-bundled on first storybook-test run otherwise, which reloads the
+    // browser mid-run and fails imports ("Failed to fetch dynamically
+    // imported module"). Keep in sync with heavy deps used by stories.
+    include: [
+      'react-dom/client',
+      '@hocuspocus/provider',
+      'yjs',
+      'y-codemirror.next',
+      'codemirror',
+      '@codemirror/view',
+      '@codemirror/state',
+      '@codemirror/language',
+      'react-resizable-panels',
+    ],
+  },
   test: {
     projects: [
       {
@@ -34,6 +50,9 @@ export default defineConfig({
         ],
         test: {
           name: 'storybook',
+          // One browser instance already stretches CI runners; parallel
+          // files alongside the server suite starves vitest's runner.
+          fileParallelism: false,
           browser: {
             enabled: true,
             headless: true,

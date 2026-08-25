@@ -4,13 +4,18 @@ import { cn } from '@/utils/cn';
 
 import { ToolbarButton } from './toolbar-button';
 import { toolbarButtons } from './toolbar-buttons';
-import { useMarkdownCommands } from './useMarkdownCommands';
+import { useMarkdownCommands } from './use-markdown-commands';
 
+/**
+ * Formatting button row dispatching commands into the CodeMirror view.
+ */
 export function MarkdownToolbar({
   view,
   className,
 }: {
+  /** Editor view the formatting commands dispatch into. */
   view: EditorView | null;
+  /** Extra classes merged onto the toolbar container. */
   className?: string;
 }) {
   const { handleUndo, handleRedo, runCommand, runOrderedListCommand } =

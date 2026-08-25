@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 
 import { Collaborator } from '@/types/api';
 
@@ -73,6 +74,7 @@ const longNameCollaborators: Collaborator[] = [
 const meta: Meta = {
   title: 'DocumentPage/CollaboratorsDropdown',
   component: CollaboratorsDropdown,
+  tags: ['autodocs'],
   parameters: {
     layout: 'centered',
   },
@@ -94,6 +96,7 @@ export const OwnerWithCollaborators: Story = {
   },
 };
 
+/** Non-owner sees the roster without remove buttons. */
 export const ViewOnlyCollaborators: Story = {
   args: {
     isOwner: false,
@@ -101,9 +104,83 @@ export const ViewOnlyCollaborators: Story = {
   },
 };
 
+/**
+ * Long display names truncation.
+ */
 export const LongNames: Story = {
   args: {
     isOwner: true,
     collaborators: longNameCollaborators,
+  },
+};
+
+/** Owner sees the add-by-email form; the submit button is disabled until an email is typed. */
+export const OwnerAddByEmailForm: Story = {
+  args: {
+    docId: 'doc1',
+    isOwner: true,
+    collaborators: mockCollaborators,
+  },
+  play: async ({ canvas }) => {
+    await userEvent.click(
+      canvas.getByRole('button', { name: /collaborators/i }),
+    );
+    // Radix portals menu content to document.body, outside the story canvas
+    const body = within(document.body);
+    const emailInput = await body.findByLabelText('Collaborator email');
+    const addButton = body.getByRole('button', { name: /add collaborator/i });
+
+    await expect(addButton).toBeDisabled();
+    await userEvent.type(emailInput, 'newcollab@example.com');
+    await expect(addButton).toBeEnabled();
+  },
+};
+
+/** Non-owners never see the add-by-email form. */
+export const NonOwnerHidesAddForm: Story = {
+  args: {
+    isOwner: false,
+    collaborators: mockCollaborators,
+  },
+  play: async ({ canvas }) => {
+    await userEvent.click(
+      canvas.getByRole('button', { name: /collaborators/i }),
+    );
+    const body = within(document.body);
+    await body.findByText('alice');
+
+    await expect(body.queryByLabelText('Collaborator email')).toBeNull();
+  },
+};
+
+/**
+ * Failed adds surface an error and keep the typed email so it can be
+ * corrected and resubmitted.
+ *
+ * The story canvas has no API to talk to, so this exercises the error
+ * path of the add flow.
+ */
+export const AddFailureShowsError: Story = {
+  args: {
+    docId: 'doc1',
+    isOwner: true,
+    collaborators: mockCollaborators,
+  },
+  play: async ({ canvas }) => {
+    await userEvent.click(
+      canvas.getByRole('button', { name: /collaborators/i }),
+    );
+    const body = within(document.body);
+    const emailInput = await body.findByLabelText('Collaborator email');
+
+    await userEvent.type(emailInput, 'nobody@example.com');
+    await userEvent.click(
+      body.getByRole('button', { name: /add collaborator/i }),
+    );
+
+    await expect(body.findByRole('alert')).resolves.toHaveTextContent(
+      /failed to add collaborator/i,
+    );
+    await expect(emailInput).toHaveValue('nobody@example.com');
   },
 };

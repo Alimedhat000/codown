@@ -4,6 +4,9 @@ import { createTestDocument, getDocumentCard } from './utils';
 
 const MARKDOWN = '# Hello E2E\n\nSome *emphasis* text.';
 
+/**
+ * Open an existing dashboard document in the editor.
+ */
 async function openInEditor(page: Page, title: string) {
   await getDocumentCard(page, title).first().click();
   await expect(page).toHaveURL(/.*\/app\/doc\/.+/);

@@ -6,12 +6,19 @@ import { api } from '@/lib/api';
 import { Document } from '@/types/api';
 
 interface RenameDocumentModalProps {
+  /** Document whose title the form edits. */
   document: Document;
+  /** Controls modal visibility. */
   open: boolean;
+  /** Called with the next visibility whenever the modal opens or closes. */
   onOpenChange: (open: boolean) => void;
+  /** Called with the updated document after a successful rename. */
   onDocumentUpdated?: (updatedDocument: Document) => void;
 }
 
+/**
+ * Modal form for renaming a document.
+ */
 export function RenameDocumentModal({
   document,
   open,

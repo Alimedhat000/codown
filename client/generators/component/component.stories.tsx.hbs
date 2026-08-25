@@ -2,14 +2,29 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { {{pascalCase name}} } from './{{kebabCase name}}';
 
-const meta: Meta = {
+const meta: Meta<typeof {{pascalCase name}}> = {
   title: '{{titlePath}}/{{pascalCase name}}',
   component: {{pascalCase name}},
+  tags: ['autodocs'],
 };
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<typeof {{pascalCase name}}>;
 
 export const Default: Story = {
   args: {},
 };
+
+// Interaction-test example — uncomment and adapt:
+// import { expect, fn, userEvent, within } from 'storybook/test';
+//
+// const onClickFn = fn();
+//
+// export const Clicked: Story = {
+//   args: {},
+//   play: async ({ canvasElement }) => {
+//     const canvas = within(canvasElement);
+//     await userEvent.click(canvas.getByText('{{pascalCase name}} works!'));
+//     await expect(onClickFn).toHaveBeenCalledTimes(1);
+//   },
+// };

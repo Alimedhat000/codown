@@ -37,6 +37,9 @@ type ToolbarCommand =
     }
   | { type: 'divider' };
 
+/**
+ * Ordered registry of toolbar commands (undo/redo, inline formatting, headings).
+ */
 export const toolbarButtons: ToolbarCommand[] = [
   { type: 'button', icon: LuUndo, title: 'Undo', action: 'undo' },
   { type: 'button', icon: LuRedo, title: 'Redo', action: 'redo' },

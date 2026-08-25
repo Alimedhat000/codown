@@ -10,11 +10,12 @@ import prettier from 'eslint-config-prettier';
 import eslintPluginPrettier from 'eslint-plugin-prettier';
 import checkFile from 'eslint-plugin-check-file';
 import importPlugin from 'eslint-plugin-import';
+import jsdoc from 'eslint-plugin-jsdoc';
 
 export default tseslint.config([
   // Global ignores
   {
-    ignores: ['dist/**', 'build/**', 'node_modules/**', 'src/shared/**'],
+    ignores: ['dist/**', 'build/**', 'node_modules/**'],
   },
 
   // Base config for all files
@@ -51,6 +52,7 @@ export default tseslint.config([
       'react-refresh': reactRefresh,
       'check-file': checkFile,
       import: importPlugin,
+      jsdoc: jsdoc,
       prettier: eslintPluginPrettier,
     },
     rules: {
@@ -133,12 +135,30 @@ export default tseslint.config([
       '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
 
+      // JSDoc policy: every export documented; params optional (types self-document)
+      'jsdoc/require-jsdoc': [
+        'error',
+        {
+          require: {
+            FunctionDeclaration: true,
+            ClassDeclaration: true,
+            ArrowFunctionExpression: false,
+            FunctionExpression: false,
+          },
+          contexts: [
+            'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > ArrowFunctionExpression',
+            'ExportNamedDeclaration > FunctionDeclaration',
+          ],
+          exemptEmptyFunctions: true,
+        },
+      ],
+      'jsdoc/require-param': 'off',
+
       // File naming conventions
       'check-file/filename-naming-convention': [
         'error',
         {
-          '**/*.{tsx}': 'PASCAL_CASE',
-          '**/*.{ts}': 'KEBAB_CASE',
+          '**/*.{ts,tsx}': 'KEBAB_CASE',
         },
         {
           ignoreMiddleExtensions: true,
@@ -154,6 +174,32 @@ export default tseslint.config([
           jsx: true,
         },
       },
+    },
+  },
+
+  // Doc quality (components/hooks/features only): JSDoc blocks must carry a
+  // real description — no empty stubs. Member-level prop docs and param docs
+  // are conventions (see AGENTS.md), not mechanically enforceable.
+  {
+    files: [
+      'src/components/**/*.{ts,tsx}',
+      'src/features/**/*.{ts,tsx}',
+      'src/hooks/**/*.{ts,tsx}',
+    ],
+    ignores: ['**/*.stories.*'],
+    settings: { jsdoc: { mode: 'typescript' } },
+    rules: {
+      'jsdoc/require-description': 'error',
+    },
+  },
+
+  // Hook/helper params are documented via @param wherever a JSDoc block
+  // exists (component files stay exempt — props live on the Props interface).
+  {
+    files: ['src/features/**/*.ts', 'src/hooks/**/*.ts'],
+    settings: { jsdoc: { mode: 'typescript' } },
+    rules: {
+      'jsdoc/require-param': ['error', { checkDestructured: false }],
     },
   },
 ], storybook.configs["flat/recommended"]);

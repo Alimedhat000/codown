@@ -13,6 +13,9 @@ test.describe('Document Sharing', () => {
     await expect(page).toHaveURL(/.*\/app\/doc\/.+/);
   });
 
+  /**
+   * Open the share dialog for the current document.
+   */
   async function openShareMenu(page: Page) {
     await page.getByRole('button', { name: 'Share' }).click();
 
@@ -48,6 +51,86 @@ test.describe('Document Sharing', () => {
 
     const clipboard = await page.evaluate(() => navigator.clipboard.readText());
     expect(new URL(clipboard).pathname).toBe(sharePath);
+  });
+
+  /**
+   * Decode the permission claim from a share-link JWT.
+   */
+  function tokenPermission(shareUrl: string): string {
+    const token = new URL(shareUrl).pathname.split('/').pop() ?? '';
+    const payload = JSON.parse(
+      Buffer.from(token.split('.')[1], 'base64url').toString(),
+    );
+    return payload.permission;
+  }
+
+  test('should copy an edit-mode link right after switching permission', async ({
+    page,
+  }) => {
+    // Slow down share-link responses so the copy lands while the
+    // post-switch refetch is still in flight (exposes stale-link races)
+    await page.route('**/share-link*', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await route.continue();
+    });
+
+    await openShareMenu(page); // initial view-mode link loaded
+
+    const menu = page.getByRole('menu');
+    await menu.getByRole('combobox').click();
+    await page.getByRole('option', { name: 'Edit mode' }).click();
+
+    const copyButton = menu.getByRole('button').first();
+    await expect(copyButton).toBeEnabled();
+    await copyButton.click({ force: true }); // skip radix open-animation checks
+
+    await expect(page.getByRole('status')).toContainText(/cop{2}ied|copied/i);
+
+    const clipboard = await page.evaluate(() => navigator.clipboard.readText());
+    expect(new URL(clipboard).pathname).toContain('/app/doc/share/');
+    // The copied token must match the newly selected mode, not the previous one
+    expect(tokenPermission(clipboard)).toBe('edit');
+  });
+
+  test('should not keep a copyable link after a failed refetch', async ({
+    page,
+  }) => {
+    // Only the post-switch edit fetch fails; earlier view fetches
+    // (including StrictMode's dev double-invoke) succeed
+    await page.route('**/share-link*', async (route) => {
+      if (route.request().url().includes('permission=edit')) {
+        return route.abort('connectionrefused');
+      }
+      return route.continue();
+    });
+
+    await openShareMenu(page); // view link loaded, copy enabled
+
+    const menu = page.getByRole('menu');
+    await menu.getByRole('combobox').click();
+    await page.getByRole('option', { name: 'Edit mode' }).click();
+
+    // The failed edit fetch must invalidate the old view link entirely:
+    // nothing copyable, and no view URL displayed under an "Edit mode" select
+    await expect(menu.getByText('Failed to fetch share link')).toBeVisible();
+    await expect(menu.locator('p').first()).toHaveText(/No link available/);
+    await expect(menu.getByRole('button').first()).toBeDisabled();
+
+    // Recovery: switching back to View (not intercepted) must clear the
+    // error and restore a working, copyable link without a page reload
+    await menu.getByRole('combobox').click();
+    await page.getByRole('option', { name: 'View mode' }).click();
+
+    const recoveredLink = menu.locator('p').first();
+    await expect(recoveredLink).toHaveText(/\/app\/doc\/share\/\S+/);
+    await expect(menu.getByText('Failed to fetch share link')).toBeHidden();
+    const recoveredCopy = menu.getByRole('button').first();
+    await expect(recoveredCopy).toBeEnabled();
+    await recoveredCopy.click({ force: true }); // skip radix open-animation checks
+    const clipboardAfterRecovery = await page.evaluate(() =>
+      navigator.clipboard.readText(),
+    );
+    expect(tokenPermission(clipboardAfterRecovery)).toBe('view');
   });
 
   test('should grant access through the share link', async ({ page }) => {
