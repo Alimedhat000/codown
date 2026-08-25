@@ -51,11 +51,15 @@ export function useDocument(id?: string) {
   }, [id]);
 
   const handleSave = useCallback(async () => {
-    if (!id) return;
+    if (!id || !editedDoc) return;
     try {
       setSaving(true);
       setError(null);
-      await api.put(`/document/${id}`, editedDoc);
+      // Content is owned by Yjs sync; REST persists metadata only (issue #47).
+      await api.put(`/document/${id}`, {
+        title: editedDoc.title,
+        isPublic: editedDoc.isPublic,
+      });
       setDoc(editedDoc);
     } catch (err) {
       console.error('Failed to save document:', err);
