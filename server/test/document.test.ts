@@ -95,6 +95,24 @@ describe('Document Routes', () => {
     expect(res.body.title).toBe('Updated Title');
   });
 
+  it('should not overwrite document content via REST update (Yjs is the source of truth)', async () => {
+    const created = await prisma.document.create({
+      data: { title: 'Synced Doc', content: 'yjs-derived-content', authorId: userId },
+    });
+
+    const res = await request(app)
+      .put(`/api/document/${created.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'Renamed', content: 'rest-overwrite-attempt' });
+
+    expect(res.status).toBe(StatusCodes.OK);
+    expect(res.body.title).toBe('Renamed');
+    expect(res.body.content).toBe('yjs-derived-content');
+
+    const doc = await prisma.document.findUniqueOrThrow({ where: { id: created.id } });
+    expect(doc.content).toBe('yjs-derived-content');
+  });
+
   it('should delete a document', async () => {
     const created = await prisma.document.create({
       data: {

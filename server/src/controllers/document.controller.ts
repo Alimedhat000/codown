@@ -10,7 +10,7 @@ import { getClientInfo } from '@/utils/getClientInfo';
 export const createDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
   const clientInfo = getClientInfo(req);
   const userId = req.user?.userId;
-  const { title, content = '', isPublic = false } = req.body;
+  const { title, isPublic = false } = req.body;
 
   logger.debug('Document creation attempt', {
     action: 'CREATE_DOCUMENT_ATTEMPT',
@@ -18,14 +18,15 @@ export const createDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
     userId,
     title,
     isPublic,
-    contentLength: content.length,
   });
 
   try {
+    // `content` starts empty and is owned by Yjs sync afterwards (issue #47);
+    // accepting it here would store text no reader ever sees.
     const newDoc = await prisma.document.create({
       data: {
         title,
-        content,
+        content: '',
         isPublic,
         authorId: req.user?.userId,
       },
@@ -190,18 +191,7 @@ export const updateDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
   const clientInfo = getClientInfo(req);
   const userId = req.user?.userId;
   const documentId = req.params.id;
-  const { title, content, isPublic } = req.body;
-
-  // logger.info('Document update attempt', {
-  //   action: 'UPDATE_DOCUMENT_ATTEMPT',
-  //   ...clientInfo,
-  //   userId,
-  //   documentId,
-  //   title,
-  //   isPublic,
-  //   contentLength: content?.length,
-  // });
-
+  const { title, isPublic } = req.body;
   try {
     const doc = await prisma.document.findFirst({
       where: { id: documentId },
@@ -227,11 +217,12 @@ export const updateDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res
       return;
     }
 
+    // `content` is intentionally not writable here: it is a mirror of the
+    // Yjs document state maintained by dbPersistence.store (issue #47).
     const updatedDoc = await prisma.document.update({
       where: { id: doc.id },
-      data: { title, content, isPublic },
+      data: { title, isPublic },
     });
-
     // logger.info('Document updated successfully', {
     //   action: 'UPDATE_DOCUMENT_SUCCESS',
     //   ...clientInfo,

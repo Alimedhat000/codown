@@ -54,35 +54,38 @@ export const dbPersistence = new Database({
       });
 
       if (existing) {
-        await prisma.yjsDocumentState.update({
-          where: { documentId: id },
-          data: {
-            state: Buffer.from(state),
-            version: { increment: 1 },
-          },
-        });
-
-        await prisma.document.update({
-          where: { id: id },
-          data: { content: plainText },
-        });
+        // Snapshot and its plaintext mirror must stay consistent: write both atomically.
+        await prisma.$transaction([
+          prisma.yjsDocumentState.update({
+            where: { documentId: id },
+            data: {
+              state: Buffer.from(state),
+              version: { increment: 1 },
+            },
+          }),
+          prisma.document.update({
+            where: { id: id },
+            data: { content: plainText },
+          }),
+        ]);
       } else {
         const documentExists = await prisma.document.findFirst({
           where: { id: id },
         });
 
         if (documentExists) {
-          await prisma.yjsDocumentState.create({
-            data: {
-              documentId: documentExists.id,
-              state: Buffer.from(state),
-            },
-          });
-
-          await prisma.document.update({
-            where: { id: documentExists.id },
-            data: { content: plainText },
-          });
+          await prisma.$transaction([
+            prisma.yjsDocumentState.create({
+              data: {
+                documentId: documentExists.id,
+                state: Buffer.from(state),
+              },
+            }),
+            prisma.document.update({
+              where: { id: documentExists.id },
+              data: { content: plainText },
+            }),
+          ]);
         } else {
           logger.warn(`No Document found for ID prefix: ${documentName}`, {
             action: 'DB_STORE_DOC_NOT_FOUND',
