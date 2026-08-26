@@ -41,6 +41,7 @@ export const useCollaborators = (docId?: string) => {
 
   const removeCollaborator = async (userId: string) => {
     if (!docId) return;
+    setError(null);
     try {
       await api.delete(`/document/${docId}/collaborators/${userId}`);
       setCollaborators((prev) => prev.filter((c) => c.id !== userId));
@@ -52,6 +53,7 @@ export const useCollaborators = (docId?: string) => {
 
   const addCollaborator = async (email: string) => {
     if (!docId || !email) return false;
+    setError(null);
     try {
       await api.post(`/document/${docId}/collaborators`, { email });
       const res = await api.get(`/document/${docId}/collaborators`);

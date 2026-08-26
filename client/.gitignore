@@ -35,3 +35,6 @@ storybook-static
 /blob-report/
 /playwright/.auth/
 /playwright/.cache/
+
+# Vitest browser failure screenshots
+__screenshots__/
