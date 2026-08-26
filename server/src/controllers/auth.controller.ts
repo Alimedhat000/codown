@@ -325,13 +325,6 @@ export const refreshToken = asyncErrorWrapper(async (req: Request, res: Response
       username: user.username,
     });
 
-    res.cookie('accessToken', newAccessToken, {
-      httpOnly: true,
-      maxAge: 15 * 60 * 1000,
-      sameSite: 'none', // ✅
-      secure: true, // ✅
-    });
-
     res.status(StatusCodes.OK).json({
       accessToken: newAccessToken,
       user: {
