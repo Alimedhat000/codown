@@ -41,6 +41,18 @@ export default defineConfig({
     projects: [
       {
         extends: true,
+        test: {
+          name: 'unit',
+          include: ['src/**/*.test.{ts,tsx}'],
+          environment: 'node',
+          env: {
+            VITE_APP_API_URL: 'http://localhost:4599',
+            VITE_APP_SOCKET_URL: 'ws://localhost:5000/collaboration',
+          },
+        },
+      },
+      {
+        extends: true,
         plugins: [
           // The plugin will run tests for the stories defined in your Storybook config
           // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
