@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { env } from '@/config/env';
+import { type User } from '@/types/api';
 import {
   clearAccessToken,
   getAccessToken,
@@ -62,20 +63,30 @@ const AUTH_PATHS = [
   '/auth/logout',
 ];
 
-let refreshPromise: Promise<string> | null = null;
+let refreshPromise: Promise<RefreshPayload> | null = null;
+
+/**
+ * Payload returned by the refresh endpoint.
+ */
+interface RefreshPayload {
+  accessToken: string;
+  user: User;
+}
 
 /**
  * Requests a fresh access token via the httpOnly refresh cookie; concurrent
- * callers share the in-flight request so only one round-trip happens.
+ * callers share the in-flight request so only one round-trip happens. Stores
+ * the new token before resolving with the full payload.
  */
-const refreshAccessToken = (): Promise<string> => {
+export const refreshAccessToken = (): Promise<RefreshPayload> => {
   if (!refreshPromise) {
     refreshPromise = axios
-      .post(`${env.API_URL}/api/auth/refresh`, null, { withCredentials: true })
+      .post<RefreshPayload>(`${env.API_URL}/api/auth/refresh`, null, {
+        withCredentials: true,
+      })
       .then((res) => {
-        const token: string = res.data.accessToken;
-        setAccessToken(token);
-        return token;
+        setAccessToken(res.data.accessToken);
+        return res.data;
       })
       .finally(() => {
         refreshPromise = null;
@@ -105,7 +116,7 @@ api.interceptors.response.use(undefined, async (error: unknown) => {
     const token =
       getAccessToken() !== original._tokenUsed
         ? getAccessToken()!
-        : await refreshAccessToken();
+        : (await refreshAccessToken()).accessToken;
     original.headers.Authorization = `Bearer ${token}`;
     return api(original);
   } catch {
