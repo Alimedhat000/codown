@@ -206,4 +206,25 @@ describe('Auth Routes', () => {
 
     expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
   });
+
+  it('should not set an accessToken cookie on refresh', async () => {
+    await request(app).post('/api/auth/register').send({
+      email: 'refresh@test.dev',
+      username: 'refreshUser',
+      password: 'secure123',
+    });
+
+    const loginRes = await request(app).post('/api/auth/login').send({
+      email: 'refresh@test.dev',
+      password: 'secure123',
+    });
+    const cookieHeader = extractCookies(loginRes.headers['set-cookie']);
+
+    const res = await request(app).post('/api/auth/refresh').set('Cookie', cookieHeader);
+
+    expect(res.status).toBe(StatusCodes.OK);
+    const cookies = res.headers['set-cookie'] ?? [];
+    const names = (Array.isArray(cookies) ? cookies : [cookies]).map(c => c.split('=')[0]);
+    expect(names).not.toContain('accessToken');
+  });
 });
