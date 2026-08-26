@@ -214,7 +214,10 @@ describe('Auth Routes', () => {
     });
 
     expect(res.status).toBe(StatusCodes.OK);
-    const refreshCookie = res.headers['set-cookie'].find((c: string) => c.startsWith('refreshToken='));
+    const setCookies = Array.isArray(res.headers['set-cookie'])
+      ? res.headers['set-cookie']
+      : [res.headers['set-cookie'] ?? ''];
+    const refreshCookie = setCookies.find(c => c.startsWith('refreshToken='));
     expect(refreshCookie).toBeDefined();
     expect(refreshCookie).not.toContain('Secure');
     expect(refreshCookie).toContain('SameSite=Lax');
