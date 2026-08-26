@@ -54,6 +54,28 @@ function renderHook<T>(useHook: () => T) {
   };
 }
 
+/**
+ * Flushes pending React updates and microtasks. Polls until the
+ * predicate holds, so `await act(async () => {})` empty flushes don't
+ * flake when the initial fetch resolves on the next microtask.
+ *
+ * @param predicate - Condition to wait for.
+ * @param timeoutMs - Fail after this long.
+ */
+async function waitFor(predicate: () => boolean, timeoutMs = 1000) {
+  const start = Date.now();
+  while (!predicate()) {
+    if (Date.now() - start > timeoutMs) {
+      throw new Error('waitFor timeout');
+    }
+    await act(async () => {
+      await new Promise<void>((r) => {
+        setTimeout(r, 0);
+      });
+    });
+  }
+}
+
 describe('useCollaborators', () => {
   beforeEach(() => {
     (
@@ -68,7 +90,7 @@ describe('useCollaborators', () => {
 
   it('clears a stale add error when a retry succeeds', async () => {
     const hook = renderHook(() => useCollaborators('doc1'));
-    await act(async () => {}); // flush initial fetch
+    await waitFor(() => !hook.current.loading);
 
     mockApi.post.mockRejectedValueOnce(new Error('boom'));
     await act(async () => {
@@ -89,7 +111,7 @@ describe('useCollaborators', () => {
 
   it('clears a stale remove error when a retry succeeds', async () => {
     const hook = renderHook(() => useCollaborators('doc1'));
-    await act(async () => {});
+    await waitFor(() => !hook.current.loading);
 
     mockApi.delete.mockRejectedValueOnce(new Error('boom'));
     await act(async () => {
@@ -108,7 +130,7 @@ describe('useCollaborators', () => {
 
   it('surfaces an error when adding fails', async () => {
     const hook = renderHook(() => useCollaborators('doc1'));
-    await act(async () => {});
+    await waitFor(() => !hook.current.loading);
 
     mockApi.post.mockRejectedValueOnce(new Error('boom'));
     let added = true;
@@ -123,7 +145,7 @@ describe('useCollaborators', () => {
 
   it('surfaces an error when removing fails', async () => {
     const hook = renderHook(() => useCollaborators('doc1'));
-    await act(async () => {});
+    await waitFor(() => !hook.current.loading);
 
     mockApi.delete.mockRejectedValueOnce(new Error('boom'));
     await act(async () => {
