@@ -201,6 +201,25 @@ describe('Auth Routes', () => {
     expect(res.body.email).toBe('me@test.dev');
   });
 
+  it('should set the refresh cookie without Secure/SameSite=None outside production', async () => {
+    await request(app).post('/api/auth/register').send({
+      email: 'cookie-flags@test.dev',
+      username: 'cookieFlagsUser',
+      password: 'secure123',
+    });
+
+    const res = await request(app).post('/api/auth/login').send({
+      email: 'cookie-flags@test.dev',
+      password: 'secure123',
+    });
+
+    expect(res.status).toBe(StatusCodes.OK);
+    const refreshCookie = res.headers['set-cookie'].find((c: string) => c.startsWith('refreshToken='));
+    expect(refreshCookie).toBeDefined();
+    expect(refreshCookie).not.toContain('Secure');
+    expect(refreshCookie).toContain('SameSite=Lax');
+  });
+
   it('should reject refresh with invalid refresh token', async () => {
     const res = await request(app).post('/api/auth/refresh').set('Cookie', 'refreshToken=invalid.token.here');
 
