@@ -232,3 +232,47 @@ export const SplitSyncSurvivesLateEcho: Story = {
     ).toBeLessThan(pvMax * 0.05);
   },
 };
+
+export const SplitSyncMirrorsLatestUnderBurst: Story = {
+  render: renderSplitWithLongDoc,
+  play: async ({ canvasElement }) => {
+    await enableSyncScroll(canvasElement);
+    const editor = canvasElement
+      .querySelector('.cm-editor')
+      ?.closest('div.custom-scrollbar.overflow-y-scroll') as HTMLElement;
+    const preview = canvasElement.querySelector(
+      '.markdown-previewer',
+    ) as HTMLElement;
+
+    const edMax = editor.scrollHeight - editor.clientHeight;
+    const pvMax = preview.scrollHeight - preview.clientHeight;
+
+    // Two scroll updates land within one frame but are delivered separately
+    // (Firefox dispatches a scroll event per wheel-tick write instead of
+    // coalescing them). The second must not be swallowed by suppression
+    // state left behind by the first: the mirror has to end up at the
+    // LATEST position once the frame flushes.
+    editor.scrollTop = edMax * 0.2;
+    await nextScrollEvent(editor);
+    editor.scrollTop = edMax * 0.6;
+    await rafFrames(3);
+    expect(
+      Math.abs(
+        preview.scrollTop -
+          (editor.scrollTop / (editor.scrollHeight - editor.clientHeight)) *
+            (preview.scrollHeight - preview.clientHeight),
+      ),
+    ).toBeLessThan(pvMax * 0.05);
+
+    // ...and a third update after the burst still mirrors.
+    editor.scrollTop = edMax * 0.85;
+    await rafFrames(3);
+    expect(
+      Math.abs(
+        preview.scrollTop -
+          (editor.scrollTop / (editor.scrollHeight - editor.clientHeight)) *
+            (preview.scrollHeight - preview.clientHeight),
+      ),
+    ).toBeLessThan(pvMax * 0.05);
+  },
+};
