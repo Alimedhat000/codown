@@ -85,3 +85,150 @@ export const ReadOnly: Story = {
     await expect(canvas.queryByTitle('Bold')).toBeNull();
   },
 };
+
+/**
+ * Provider stub seeding enough content that both split panes overflow and
+ * can actually scroll (the short default seed cannot).
+ */
+const longProviderFactory: CollabProviderFactory = (options) => {
+  const ytext = options.document.getText('content');
+  if (!ytext.length) {
+    const paragraphs = Array.from(
+      { length: 120 },
+      (_, i) =>
+        `\n\nParagraph ${i + 1}: lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
+    ).join('');
+    ytext.insert(0, `# Long Document${paragraphs}`);
+  }
+  return { destroy: () => {} };
+};
+
+/**
+ * Resolves after n animation frames so effects and rAF callbacks have run.
+ */
+const rafFrames = (n: number) =>
+  new Promise<void>((resolve) => {
+    const step = () => (--n <= 0 ? resolve() : requestAnimationFrame(step));
+    requestAnimationFrame(step);
+  });
+
+/**
+ * Resolves on the element's next scroll event; rejects after timeoutMs so a
+ * swallowed mirror update fails fast instead of hanging the run.
+ */
+const nextScrollEvent = (el: HTMLElement, timeoutMs = 1000) =>
+  new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      el.removeEventListener('scroll', onScroll);
+      reject(new Error(`no scroll event within ${timeoutMs}ms`));
+    }, timeoutMs);
+    const onScroll = () => {
+      clearTimeout(timer);
+      el.removeEventListener('scroll', onScroll);
+      resolve();
+    };
+    el.addEventListener('scroll', onScroll);
+  });
+
+const renderSplitWithLongDoc: Story['render'] = function RenderedStory() {
+  return (
+    <div className="h-96">
+      <DocumentMain
+        docId="story-doc-long"
+        mode="both"
+        doc={mockDoc}
+        setDoc={fn()}
+        createProvider={longProviderFactory}
+      />
+    </div>
+  );
+};
+
+/** Enables synced scrolling via the handle overlay button. */
+async function enableSyncScroll(canvasElement: HTMLElement) {
+  const toggle = canvasElement.querySelector(
+    '[data-panel-resize-handle-id] div.absolute',
+  ) as HTMLElement | null;
+  if (!toggle) throw new Error('scroll-sync toggle not found');
+  toggle.click();
+  await rafFrames(3);
+}
+
+export const SplitSyncMirrorsScroll: Story = {
+  render: renderSplitWithLongDoc,
+  play: async ({ canvasElement }) => {
+    await enableSyncScroll(canvasElement);
+    const editor = canvasElement
+      .querySelector('.cm-editor')
+      ?.closest('div.custom-scrollbar.overflow-y-scroll') as HTMLElement;
+    const preview = canvasElement.querySelector(
+      '.markdown-previewer',
+    ) as HTMLElement;
+
+    // Editor -> preview. Expectations are computed against live geometry:
+    // CodeMirror's scrollHeight can still grow during deep scrolls.
+    const edMax = editor.scrollHeight - editor.clientHeight;
+    const pvMax = preview.scrollHeight - preview.clientHeight;
+
+    editor.scrollTop = edMax * 0.4;
+    await nextScrollEvent(preview);
+    await rafFrames(2);
+    expect(
+      Math.abs(
+        preview.scrollTop -
+          (editor.scrollTop / (editor.scrollHeight - editor.clientHeight)) *
+            (preview.scrollHeight - preview.clientHeight),
+      ),
+    ).toBeLessThan(pvMax * 0.05);
+
+    // Preview -> editor
+    const pvMax2 = preview.scrollHeight - preview.clientHeight;
+    preview.scrollTop = pvMax2 * 0.8;
+    await nextScrollEvent(editor);
+    await rafFrames(2);
+    expect(
+      Math.abs(
+        editor.scrollTop -
+          (preview.scrollTop / (preview.scrollHeight - preview.clientHeight)) *
+            (editor.scrollHeight - editor.clientHeight),
+      ),
+    ).toBeLessThan(edMax * 0.05);
+  },
+};
+
+export const SplitSyncSurvivesLateEcho: Story = {
+  render: renderSplitWithLongDoc,
+  play: async ({ canvasElement }) => {
+    await enableSyncScroll(canvasElement);
+    const editor = canvasElement
+      .querySelector('.cm-editor')
+      ?.closest('div.custom-scrollbar.overflow-y-scroll') as HTMLElement;
+    const preview = canvasElement.querySelector(
+      '.markdown-previewer',
+    ) as HTMLElement;
+
+    const edMax = editor.scrollHeight - editor.clientHeight;
+    const pvMax = preview.scrollHeight - preview.clientHeight;
+
+    // A normal mirrored scroll leaves both panes aligned...
+    editor.scrollTop = edMax * 0.5;
+    await nextScrollEvent(preview);
+    await rafFrames(2);
+
+    // ...then the mirrored pane's own scroll event arrives one frame LATE
+    // (Firefox delivers it after the syncing flag was already reset). It must
+    // be recognized as an echo, not consume the suppression state.
+    preview.dispatchEvent(new Event('scroll'));
+
+    // And a genuine editor scroll in the SAME task must still be mirrored.
+    editor.scrollTop = edMax * 0.75;
+    await rafFrames(5);
+    expect(
+      Math.abs(
+        preview.scrollTop -
+          (editor.scrollTop / (editor.scrollHeight - editor.clientHeight)) *
+            (preview.scrollHeight - preview.clientHeight),
+      ),
+    ).toBeLessThan(pvMax * 0.05);
+  },
+};
