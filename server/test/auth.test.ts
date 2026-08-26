@@ -155,6 +155,27 @@ describe('Auth Routes', () => {
     expect(logoutRes.status).toBe(StatusCodes.OK);
   });
 
+  it('should logout with only the refresh cookie when no access token is sent', async () => {
+    await request(app).post('/api/auth/register').send({
+      email: 'cookie-logout@test.dev',
+      username: 'cookieLogoutUser',
+      password: 'secure123',
+    });
+
+    const loginRes = await request(app).post('/api/auth/login').send({
+      email: 'cookie-logout@test.dev',
+      password: 'secure123',
+    });
+    const cookieHeader = extractCookies(loginRes.headers['set-cookie']);
+
+    const logoutRes = await request(app).post('/api/auth/logout').set('Cookie', cookieHeader);
+
+    expect(logoutRes.status).toBe(StatusCodes.OK);
+
+    const refreshRes = await request(app).post('/api/auth/refresh').set('Cookie', cookieHeader);
+    expect(refreshRes.status).toBe(StatusCodes.UNAUTHORIZED);
+  });
+
   it('should return 401 when accessing protected route without token', async () => {
     const res = await request(app).get('/api/user');
     expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
