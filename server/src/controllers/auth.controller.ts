@@ -184,11 +184,16 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
       tokenExpiry: '15m',
     });
 
+    // Cross-site deployments (prod) need SameSite=None + Secure; in dev the
+    // client and API are same-site over http, where Secure cookies are dropped
+    // by browsers that don't trust localhost and None is rejected without TLS.
+    const isProduction = process.env.NODE_ENV === 'production';
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: 'none', // ✅ allow cross-site cookies
-      secure: true, // ✅ must be secure for SameSite=None
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
     });
 
     res.status(StatusCodes.OK).json({
