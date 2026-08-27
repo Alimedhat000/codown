@@ -176,6 +176,88 @@ describe('Auth Routes', () => {
     expect(refreshRes.status).toBe(StatusCodes.UNAUTHORIZED);
   });
 
+  it('should clear refreshToken cookie with matching attributes on logout', async () => {
+    await request(app).post('/api/auth/register').send({
+      email: 'clear-attrs@test.dev',
+      username: 'clearAttrsUser',
+      password: 'secure123',
+    });
+
+    const loginRes = await request(app).post('/api/auth/login').send({
+      email: 'clear-attrs@test.dev',
+      password: 'secure123',
+    });
+    const cookieHeader = extractCookies(loginRes.headers['set-cookie']);
+
+    const logoutRes = await request(app).post('/api/auth/logout').set('Cookie', cookieHeader);
+
+    expect(logoutRes.status).toBe(StatusCodes.OK);
+    const setCookies = (logoutRes.headers['set-cookie'] ?? []) as string[];
+    const cookiesArray = Array.isArray(setCookies) ? setCookies : [setCookies];
+    // Express clearCookie sets `name=; Path=/; Expires=Thu, 01 Jan 1970 ...`
+    const refreshClear = cookiesArray.find(c => c.startsWith('refreshToken=;'));
+    expect(refreshClear).toBeDefined();
+    // Must mirror login attributes or browsers (prod SameSite=None; Secure) won't clear
+    expect(refreshClear).toContain('Path=/');
+    expect(refreshClear).toContain('HttpOnly');
+    expect(refreshClear).toContain('SameSite=Lax');
+    expect(refreshClear).not.toContain('Secure');
+    expect(refreshClear).toMatch(/Expires=Thu, 01 Jan 1970|Max-Age=0/);
+  });
+
+  it('should clear both refreshToken and legacy accessToken cookies on logout', async () => {
+    await request(app).post('/api/auth/register').send({
+      email: 'clear-both@test.dev',
+      username: 'clearBothUser',
+      password: 'secure123',
+    });
+
+    const loginRes = await request(app).post('/api/auth/login').send({
+      email: 'clear-both@test.dev',
+      password: 'secure123',
+    });
+    const cookieHeader = extractCookies(loginRes.headers['set-cookie']);
+
+    const logoutRes = await request(app).post('/api/auth/logout').set('Cookie', cookieHeader);
+
+    expect(logoutRes.status).toBe(StatusCodes.OK);
+    const setCookies = (logoutRes.headers['set-cookie'] ?? []) as string[];
+    const cookiesArray = Array.isArray(setCookies) ? setCookies : [setCookies];
+    const names = cookiesArray.map(c => c.split('=')[0]);
+    expect(names).toContain('refreshToken');
+    expect(names).toContain('accessToken');
+    // Both clearing cookies must carry the same path/sameSite so they actually overwrite
+    for (const c of cookiesArray) {
+      if (c.startsWith('refreshToken=;') || c.startsWith('accessToken=;')) {
+        expect(c).toContain('Path=/');
+        expect(c).toContain('SameSite=Lax');
+      }
+    }
+  });
+
+  it('should not allow refresh with the old cookie after logout', async () => {
+    await request(app).post('/api/auth/register').send({
+      email: 'refresh-after-logout@test.dev',
+      username: 'refreshAfterLogoutUser',
+      password: 'secure123',
+    });
+
+    const loginRes = await request(app).post('/api/auth/login').send({
+      email: 'refresh-after-logout@test.dev',
+      password: 'secure123',
+    });
+    const cookieHeader = extractCookies(loginRes.headers['set-cookie']);
+
+    const logoutRes = await request(app).post('/api/auth/logout').set('Cookie', cookieHeader);
+    expect(logoutRes.status).toBe(StatusCodes.OK);
+
+    // Even though the client still holds the old cookie string, the server has
+    // nulled the stored refreshToken and the browser should have received a
+    // clearing Set-Cookie (verified above). Replaying the old cookie must fail.
+    const refreshRes = await request(app).post('/api/auth/refresh').set('Cookie', cookieHeader);
+    expect(refreshRes.status).toBe(StatusCodes.UNAUTHORIZED);
+  });
+
   it('should return 401 when accessing protected route without token', async () => {
     const res = await request(app).get('/api/user');
     expect(res.status).toBe(StatusCodes.UNAUTHORIZED);
