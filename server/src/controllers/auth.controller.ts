@@ -176,9 +176,7 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
       tokenExpiry: '15m',
     });
 
-    // Cross-site deployments (prod) need SameSite=None + Secure; in dev the
-    // client and API are same-site over http, where Secure cookies are dropped
-    // by browsers that don't trust localhost and None is rejected without TLS.
+    // Production uses cross-site cookies, which require SameSite=None + Secure.
     const isProduction = process.env.NODE_ENV === 'production';
 
     res.cookie('refreshToken', refreshToken, {
@@ -241,8 +239,18 @@ export const logoutUser = asyncErrorWrapper(async (req: AuthenticatedRequest, re
       userId,
     });
 
-    res.clearCookie('refreshToken');
-    res.clearCookie('accessToken');
+    // Must match the attributes used when setting the cookie, otherwise
+    // browsers keep the SameSite=None; Secure cookie (prod) alive and a
+    // subsequent refresh still succeeds after logout.
+    const isProduction = process.env.NODE_ENV === 'production';
+    const clearOpts = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+      path: '/',
+    };
+    res.clearCookie('refreshToken', clearOpts);
+    res.clearCookie('accessToken', clearOpts);
     res.status(StatusCodes.OK).json({ message: 'Logged out successfully' });
   } catch (error) {
     logger.error('Logout failed - database error', {
