@@ -76,7 +76,9 @@ interface RefreshPayload {
 /**
  * Requests a fresh access token via the httpOnly refresh cookie; concurrent
  * callers share the in-flight request so only one round-trip happens. Stores
- * the new token before resolving with the full payload.
+ * the new token before resolving with the full payload. On failure the
+ * session is cleared and listeners notified once — concurrent waiters share
+ * the same rejection.
  */
 export const refreshAccessToken = (): Promise<RefreshPayload> => {
   if (!refreshPromise) {
@@ -87,6 +89,11 @@ export const refreshAccessToken = (): Promise<RefreshPayload> => {
       .then((res) => {
         setAccessToken(res.data.accessToken);
         return res.data;
+      })
+      .catch((err: unknown) => {
+        clearAccessToken();
+        sessionExpiredListeners.forEach((listener) => listener());
+        throw err;
       })
       .finally(() => {
         refreshPromise = null;
@@ -111,17 +118,21 @@ api.interceptors.response.use(undefined, async (error: unknown) => {
 
   original._retry = true;
   try {
-    // A concurrent request may have refreshed the token while this one was in
-    // flight; reuse it instead of refreshing again.
-    const token =
-      getAccessToken() !== original._tokenUsed
-        ? getAccessToken()!
-        : (await refreshAccessToken()).accessToken;
+    // A concurrent request may have refreshed (or cleared) the token while
+    // this one was in flight; reuse it instead of refreshing again. If the
+    // token was cleared (null) the session is already expired — don't replay
+    // with `Bearer null` or trigger a second refresh, just fail.
+    const current = getAccessToken();
+    let token: string;
+    if (current !== original._tokenUsed) {
+      if (!current) throw error;
+      token = current;
+    } else {
+      token = (await refreshAccessToken()).accessToken;
+    }
     original.headers.Authorization = `Bearer ${token}`;
     return api(original);
   } catch {
-    clearAccessToken();
-    sessionExpiredListeners.forEach((listener) => listener());
     throw error;
   }
 });
