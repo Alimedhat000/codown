@@ -121,6 +121,25 @@ describe('api response interceptor', () => {
     refreshShouldFail = false;
   });
 
+  it('notifies sessionExpired listeners only once for concurrent refresh failures', async () => {
+    refreshShouldFail = true;
+    refreshCallCount = 0;
+    setAccessToken('expired-token');
+    const expired = vi.fn();
+    const unsubscribe = onSessionExpired(expired);
+
+    await Promise.allSettled([
+      api.get(`${BASE}/always-401`),
+      api.get(`${BASE}/always-401`),
+      api.get(`${BASE}/always-401`),
+    ]);
+
+    expect(expired).toHaveBeenCalledTimes(1);
+    expect(refreshCallCount).toBe(1);
+    unsubscribe();
+    refreshShouldFail = false;
+  });
+
   it('does not attempt a refresh when no access token is stored', async () => {
     refreshCallCount = 0;
     clearAccessToken();
