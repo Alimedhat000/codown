@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { DocumentLayout } from '@/components/layouts/DocumentLayout';
@@ -8,15 +8,26 @@ import { DocumentHeader } from '@/features/DocumentPage/components/DocumentHeade
 import { DocumentMain } from '@/features/DocumentPage/components/DocumentMain';
 import { useDocument } from '@/hooks/use-document';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import { resolveDocumentId } from '@/utils/short-id';
 
 /**
  * Editor page: resolves the :id param and wires the document header, collaboration and editor/preview panes.
  */
 export default function DocumentPage() {
-  const { id } = useParams();
+  const { id: rawId } = useParams();
+  const navigate = useNavigate();
+
+  const id = useMemo(() => {
+    if (!rawId) return undefined;
+    try {
+      return resolveDocumentId(rawId);
+    } catch {
+      return undefined;
+    }
+  }, [rawId]);
+
   const { doc, editedDoc, setEditedDoc, loading, /*handleSave,*/ access } =
     useDocument(id);
-  const navigate = useNavigate();
 
   const isReadOnly = access?.permission === 'view';
   const isCollaborator = access?.isCollaborator;
@@ -24,6 +35,12 @@ export default function DocumentPage() {
   const [mode, setMode] = useState<EditorMode>('edit');
 
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
+
+  useEffect(() => {
+    if (rawId && !id) {
+      navigate('/not-found', { replace: true });
+    }
+  }, [rawId, id, navigate]);
 
   useEffect(() => {
     if (loading) return;

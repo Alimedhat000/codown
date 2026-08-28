@@ -55,6 +55,7 @@ model Document {
   Collaborator         Collaborator[]
   CollaborationRequest CollaborationRequest[]
 
+  @@index([authorId])
   @@map("documents")
 }
 
@@ -67,6 +68,7 @@ model Collaborator {
   permission String   @default("edit") // "edit" or "view"
 
   @@unique([documentId, userId])
+  @@index([userId])
   @@map("collaborators")
 }
 
@@ -81,6 +83,8 @@ model CollaborationRequest {
   createdAt  DateTime @default(now())
 
   @@unique([documentId, userId])
+  @@index([userId])
+  @@index([documentId])
   @@map("collaboration_requests")
 }
 
