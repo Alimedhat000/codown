@@ -46,13 +46,15 @@ export default defineConfig({
 
   /* Configure projects for major browsers.
    *
-   * Order matters: logging in overwrites the user's single stored refresh
-   * token (server-side), which invalidates every previously-issued session,
-   * and logging out nulls it entirely. The unauthenticated auth specs
-   * (which perform a real login) therefore run BEFORE the setup project saves
-   * the storageState, the authenticated specs run against that shared session,
-   * and the logout spec runs LAST. Token refresh itself does not rotate the
-   * stored token, so those tests can safely run in parallel. */
+   * Order matters: with multi-device sessions (fix #51) each login creates
+   * its own Session row, but refresh now rotates the presented token and
+   * invalidates the previous jti. The unauthenticated auth specs (which
+   * perform real logins) still run BEFORE the setup project saves the
+   * storageState, the authenticated specs run against that shared session,
+   * and the logout spec runs LAST. Because refresh rotates, sharing the
+   * same storageState across sequential tests would make the second test's
+   * refresh present a stale jti — `createTestDocument` now re-logs in
+   * transparently when that happens. */
   projects: [
     {
       name: 'auth-specs',

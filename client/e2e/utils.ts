@@ -18,11 +18,33 @@ export async function openDocumentMenu(page: Page, title: string) {
 }
 
 /**
+ * Navigate to /app and ensure the dashboard is visible.
+ * Resilient to refresh-token rotation: if the shared storageState's
+ * refresh token was already rotated by a previous test (multi-device
+ * sessions now rotate on refresh), the first goto will land on /login.
+ * In that case, re-login via the UI and continue.
+ */
+export async function gotoDashboard(page: Page) {
+  await page.goto('/app');
+  const dashboard = page.getByRole('heading', { name: 'Dashboard' });
+  try {
+    await expect(dashboard).toBeVisible({ timeout: 2_000 });
+  } catch {
+    // Session from shared storageState was rotated — re-authenticate
+    await page.goto('/login');
+    await page.getByLabel(/email/i).fill('test@example.com');
+    await page.getByLabel(/password/i).fill('testpassword');
+    await page.getByRole('button', { name: /login|sign in/i }).click();
+    await expect(page).toHaveURL(/.*\/app/);
+    await expect(dashboard).toBeVisible();
+  }
+}
+
+/**
  * Create a document end-to-end from the dashboard.
  */
 export async function createTestDocument(page: Page, title: string) {
-  await page.goto('/app');
-  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+  await gotoDashboard(page);
 
   await page.getByLabel(/new document/i).click();
 
