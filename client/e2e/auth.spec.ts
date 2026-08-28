@@ -2,6 +2,10 @@ import { expect, test } from '@playwright/test';
 
 // These tests cover the unauthenticated flows; they run without a saved
 // session (see the 'auth-specs' project in playwright.config.ts).
+// Several of them perform real logins, which overwrite the user's single
+// stored refresh token server-side — so they must not overlap.
+test.describe.configure({ mode: 'serial' });
+
 test.describe('Authentication Flow', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -66,6 +70,48 @@ test.describe('Authentication Flow', () => {
 
     await page.getByRole('button', { name: /user menu/i }).click();
     await expect(page.getByRole('menuitem', { name: /logout/i })).toBeVisible();
+  });
+
+  test('should keep the session when logging back in and reloading', async ({
+    page,
+  }) => {
+    const login = async () => {
+      await page.goto('/login');
+      await page.getByLabel(/email/i).fill('test@example.com');
+      await page.getByLabel(/password/i).fill('testpassword');
+      await page.getByRole('button', { name: /login|sign in/i }).click();
+      await expect(page).toHaveURL(/.*\/app/);
+    };
+
+    await login();
+
+    // Log out via the UI, then log back in — all within the same SPA session.
+    await page.getByRole('button', { name: /user menu/i }).click();
+    await page.getByRole('menuitem', { name: /logout/i }).click();
+    await login();
+
+    // A reload must restore the session from the refresh cookie.
+    await page.reload();
+    await expect(page).toHaveURL(/.*\/app/, { timeout: 10_000 });
+    await expect(page.getByRole('button', { name: /user menu/i })).toBeVisible({
+      timeout: 10_000,
+    });
+  });
+
+  test('should not call authenticated logout when bootstrap has no session', async ({
+    page,
+  }) => {
+    const logoutCalls: string[] = [];
+    page.on('request', (req) => {
+      if (req.url().includes('/api/auth/logout')) {
+        logoutCalls.push(req.url());
+      }
+    });
+
+    await page.goto('/login');
+    await expect(page.getByLabel(/email/i)).toBeVisible();
+
+    expect(logoutCalls).toEqual([]);
   });
 
   test('should register a new account and redirect to login', async ({

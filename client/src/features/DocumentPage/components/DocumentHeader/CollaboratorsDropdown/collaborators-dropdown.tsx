@@ -116,6 +116,7 @@ export const CollaboratorsDropdown = ({
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                maxLength={254}
                 aria-label="Collaborator email"
                 className="h-8 min-w-0 flex-1 rounded border border-surface-border bg-transparent px-2 text-xs outline-none focus-visible:border-ring"
               />

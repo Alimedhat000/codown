@@ -10,6 +10,7 @@ import { cn } from '@/utils/cn';
 
 import { MarkdownEditor } from './MarkdownEditor';
 import { MarkdownPreview } from './MarkdownPreview';
+import { useScrollSync } from './use-scroll-sync';
 
 /**
  * Wires collaboration state into either MarkdownEditor or MarkdownPreview per view mode.
@@ -44,8 +45,12 @@ export function DocumentMain({
   );
   const editorScrollRef = useRef<HTMLDivElement>(null);
   const previewScrollRef = useRef<HTMLDivElement>(null);
-  const isSyncingRef = useRef(false);
   const [syncScroll, setSyncScroll] = useState(false);
+  const { handleEditorScroll, handlePreviewScroll } = useScrollSync({
+    enabled: syncScroll,
+    editorRef: editorScrollRef,
+    previewRef: previewScrollRef,
+  });
 
   useEffect(() => {
     if (doc && text !== doc.content) {
@@ -70,60 +75,6 @@ export function DocumentMain({
       percent * (previewEl.scrollHeight - previewEl.clientHeight);
   }, [syncScroll]);
 
-  const handleEditorScroll = () => {
-    if (!syncScroll) return;
-    if (
-      !syncScroll ||
-      isSyncingRef.current ||
-      !editorScrollRef.current ||
-      !previewScrollRef.current
-    ) {
-      return;
-    }
-
-    isSyncingRef.current = true;
-
-    const editor = editorScrollRef.current;
-    const preview = previewScrollRef.current;
-
-    const scrollRatio =
-      editor.scrollTop / (editor.scrollHeight - editor.clientHeight);
-    preview.scrollTop =
-      scrollRatio * (preview.scrollHeight - preview.clientHeight);
-
-    // Use a shorter timeout and requestAnimationFrame
-    requestAnimationFrame(() => {
-      isSyncingRef.current = false;
-    });
-  };
-
-  const handlePreviewScroll = () => {
-    if (!syncScroll) return;
-
-    if (
-      !syncScroll ||
-      isSyncingRef.current ||
-      !editorScrollRef.current ||
-      !previewScrollRef.current
-    ) {
-      return;
-    }
-
-    isSyncingRef.current = true;
-
-    const editor = editorScrollRef.current;
-    const preview = previewScrollRef.current;
-
-    const scrollRatio =
-      preview.scrollTop / (preview.scrollHeight - preview.clientHeight);
-    editor.scrollTop =
-      scrollRatio * (editor.scrollHeight - editor.clientHeight);
-
-    // Use a shorter timeout and requestAnimationFrame
-    requestAnimationFrame(() => {
-      isSyncingRef.current = false;
-    });
-  };
   if (!docId || !isReady || !ydoc || !ytext || !provider) {
     return (
       <div className="flex items-center justify-center h-screen w-full text-muted">

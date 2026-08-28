@@ -7,22 +7,32 @@ import { useAuth } from '@/context/auth';
 import { api } from './api';
 
 /**
- * Zod schema validating registration input: valid email, username (min 3
- * characters), password (min 8 characters), and optional full name.
+ * Zod schema validating registration input: valid email (max 254 chars),
+ * username (3-50 chars, letters/digits/dots/dashes/underscores), password
+ * (8-128 characters), and optional full name (max 100 chars). Mirrors the
+ * server-side RegisterUserSchema bounds so users never hit a 400.
  */
 export const RegisterSchema = z.object({
-  email: z.string().email(),
-  username: z.string().min(3),
-  password: z.string().min(8),
-  fullName: z.string().optional(),
+  email: z.string().email().max(254),
+  username: z
+    .string()
+    .min(3)
+    .max(50)
+    .regex(
+      /^[a-zA-Z0-9_.-]+$/,
+      'Only letters, digits, dots, dashes and underscores allowed',
+    ),
+  password: z.string().min(8).max(128),
+  fullName: z.string().max(100).optional(),
 });
 
 /**
- * zod schema validating login credentials (email format + required password).
+ * Zod schema validating login credentials: valid email (max 254 chars) and a
+ * password within the server-accepted length bounds.
  */
 export const LoginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+  email: z.string().email().max(254),
+  password: z.string().min(8).max(128),
 });
 
 export type RegisterSchemaType = z.infer<typeof RegisterSchema>;

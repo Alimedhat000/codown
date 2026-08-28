@@ -10,6 +10,12 @@ import { getClientInfo } from '@/utils/getClientInfo';
 import { LoginUserSchema } from '@/validations/login.schema';
 import { RegisterUserSchema } from '@/validations/register.schema';
 
+/**
+ * Fixed bcrypt hash used to equalize timing when login is attempted for an
+ * unknown email (#83): one bcrypt compare runs in both failure paths.
+ */
+const DUMMY_PASSWORD_HASH = '$2b$10$lZKU2EGQLmnz9Fi65/t3GO/coz9zBl6zMMvDyd0EOBgeU1Y28ESHG';
+
 export const registerUser = asyncErrorWrapper(async (req: Request, res: Response) => {
   const clientInfo = getClientInfo(req);
 
@@ -48,7 +54,7 @@ export const registerUser = asyncErrorWrapper(async (req: Request, res: Response
         username,
         existingField: existing.email === email ? 'email' : 'username',
       });
-      res.status(StatusCodes.CONFLICT).json({ error: 'Username or email already exists' });
+      res.status(StatusCodes.CONFLICT).json({ error: 'Registration failed' });
       return;
     }
 
@@ -112,13 +118,15 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
+      await bcrypt.compare(password, DUMMY_PASSWORD_HASH);
+
       logger.warn('Login failed - user not found', {
         action: 'LOGIN_USER_NOT_FOUND',
         ...clientInfo,
         email,
       });
 
-      res.status(StatusCodes.UNAUTHORIZED).json({ error: result.error });
+      res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email or password' });
       return;
     }
 
@@ -133,7 +141,7 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
         username: user.username,
       });
 
-      res.status(StatusCodes.UNAUTHORIZED).json({ error: result.error });
+      res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email or password' });
       return;
     }
 
@@ -176,11 +184,14 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
       tokenExpiry: '15m',
     });
 
+    // Production uses cross-site cookies, which require SameSite=None + Secure.
+    const isProduction = process.env.NODE_ENV === 'production';
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: 'none', // ✅ allow cross-site cookies
-      secure: true, // ✅ must be secure for SameSite=None
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
     });
 
     res.status(StatusCodes.OK).json({
@@ -236,8 +247,18 @@ export const logoutUser = asyncErrorWrapper(async (req: AuthenticatedRequest, re
       userId,
     });
 
-    res.clearCookie('refreshToken');
-    res.clearCookie('accessToken');
+    // Must match the attributes used when setting the cookie, otherwise
+    // browsers keep the SameSite=None; Secure cookie (prod) alive and a
+    // subsequent refresh still succeeds after logout.
+    const isProduction = process.env.NODE_ENV === 'production';
+    const clearOpts = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+      path: '/',
+    };
+    res.clearCookie('refreshToken', clearOpts);
+    res.clearCookie('accessToken', clearOpts);
     res.status(StatusCodes.OK).json({ message: 'Logged out successfully' });
   } catch (error) {
     logger.error('Logout failed - database error', {
@@ -315,13 +336,6 @@ export const refreshToken = asyncErrorWrapper(async (req: Request, res: Response
       ...clientInfo,
       userId: user.id,
       username: user.username,
-    });
-
-    res.cookie('accessToken', newAccessToken, {
-      httpOnly: true,
-      maxAge: 15 * 60 * 1000,
-      sameSite: 'none', // ✅
-      secure: true, // ✅
     });
 
     res.status(StatusCodes.OK).json({
