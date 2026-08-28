@@ -1,3 +1,5 @@
+import { isUuid, uuidToShortId } from '@/utils/short-id';
+
 /**
  * Central registry of internal route paths and href builders used by links and redirects.
  */
@@ -30,7 +32,8 @@ export const paths = {
     },
     document: {
       path: 'doc/:id',
-      getHref: (id: string) => `/app/doc/${id}`,
+      getHref: (id: string) =>
+        `/app/doc/${isUuid(id) ? uuidToShortId(id) : id}`,
     },
     share: {
       path: 'doc/share/:token',

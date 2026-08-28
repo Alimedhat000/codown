@@ -3,12 +3,11 @@ import * as Y from 'yjs';
 
 import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/prisma';
-import { slugIDtoFullID } from '@/utils/slugIDtoFullID';
 
 export const dbPersistence = new Database({
   fetch: async ({ documentName }) => {
     try {
-      const id = await slugIDtoFullID(documentName);
+      const id = documentName;
       // Fetch the Yjs document state from the database
       const record = await prisma.yjsDocumentState.findFirst({
         where: {
@@ -41,7 +40,7 @@ export const dbPersistence = new Database({
 
   store: async ({ documentName, state }) => {
     try {
-      const id = await slugIDtoFullID(documentName);
+      const id = documentName;
       const existing = await prisma.yjsDocumentState.findUnique({
         where: { documentId: id },
       });
@@ -87,7 +86,7 @@ export const dbPersistence = new Database({
             }),
           ]);
         } else {
-          logger.warn(`No Document found for ID prefix: ${documentName}`, {
+          logger.warn(`No Document found for ID: ${documentName}`, {
             action: 'DB_STORE_DOC_NOT_FOUND',
           });
         }
