@@ -20,7 +20,14 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-  const tableNames = ['collaboration_requests', 'collaborators', 'yjs_document_states', 'documents', 'users'];
+  const tableNames = [
+    'collaboration_requests',
+    'collaborators',
+    'yjs_document_states',
+    'documents',
+    'sessions',
+    'users',
+  ];
 
   try {
     await prisma.$transaction(async (tx: Prisma.TransactionClient) => {

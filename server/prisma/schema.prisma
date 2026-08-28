@@ -20,8 +20,22 @@ model User {
   Document             Document[]
   Collaborator         Collaborator[]
   CollaborationRequest CollaborationRequest[]
+  Session              Session[]
 
   @@map("users")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  jti          String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@map("sessions")
 }
 
 model Document {
