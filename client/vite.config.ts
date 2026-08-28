@@ -58,6 +58,7 @@ export default defineConfig({
         test: {
           name: 'unit',
           include: ['src/**/*.test.{ts,tsx}'],
+          exclude: ['src/hooks/__tests__/**'],
           environment: 'node',
           env: {
             VITE_APP_API_URL: 'http://localhost:4599',
@@ -89,7 +90,7 @@ export default defineConfig({
         extends: true,
         test: {
           name: 'browser-unit',
-          include: ['src/**/__tests__/*.test.{ts,tsx}'],
+          include: ['src/hooks/__tests__/**/*.test.{ts,tsx}'],
           fileParallelism: false,
           browser: browserConfig(),
         },
