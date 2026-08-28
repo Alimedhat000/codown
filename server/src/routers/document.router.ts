@@ -23,6 +23,7 @@ import { CreateDocumentSchema } from '@/validations/createDocument.schema';
 import {
   CollaboratorParamsSchema,
   IdParamsSchema,
+  ListDocumentsQuerySchema,
   RequestIdParamsSchema,
   ShareLinkQuerySchema,
 } from '@/validations/documentParams.schema';
@@ -35,7 +36,7 @@ docRouter.use(authenticate);
 docRouter.get('/share/:token', getDocByToken);
 
 docRouter.post('/', validate({ body: CreateDocumentSchema }), createDoc);
-docRouter.get('/', getDocs);
+docRouter.get('/', validate({ query: ListDocumentsQuerySchema }), getDocs);
 docRouter.get('/:id', validate({ params: IdParamsSchema }), getDoc);
 docRouter.put('/:id', validate({ params: IdParamsSchema, body: UpdateDocumentSchema }), updateDoc);
 docRouter.delete('/:id', validate({ params: IdParamsSchema }), deleteDoc);
