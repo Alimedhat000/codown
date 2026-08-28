@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
+  LuChevronLeft as ChevronLeftIcon,
+  LuChevronRight as ChevronRightIcon,
   LuFileText as FileIcon,
   LuPin as PinIcon,
+  LuSearch as SearchIcon,
   LuShare as ShareIcon,
 } from 'react-icons/lu';
 
+import { Button } from '@/components/ui/Button';
 import { Document } from '@/types/api';
 
 import NewDocumentModal from '../NewDocumentModal/new-document-modal';
@@ -33,6 +37,18 @@ type DashboardMainProps = {
   loading: boolean;
   /** State setter used to apply card-level updates and deletions. */
   setDocuments: React.Dispatch<React.SetStateAction<Document[]>>;
+  /** Current search query. */
+  search: string;
+  /** Called when search query changes. */
+  onSearchChange: (value: string) => void;
+  /** Page size. */
+  limit: number;
+  /** Current offset. */
+  offset: number;
+  /** Called when offset changes. */
+  onOffsetChange: (offset: number) => void;
+  /** Total counts returned by the server. */
+  pagination: { totalOwned: number; totalCollaborated: number } | null;
 };
 
 /**
@@ -67,6 +83,12 @@ export default function DashboardMain({
   collaboratedDocs,
   loading,
   setDocuments,
+  search,
+  onSearchChange,
+  limit,
+  offset,
+  onOffsetChange,
+  pagination,
 }: DashboardMainProps) {
   const [view, setView] = useState<'grid' | 'row'>('grid');
   const [showSkeletons, setShowSkeletons] = useState(true);
@@ -107,18 +129,44 @@ export default function DashboardMain({
     setDocuments((docs) => docs.filter((doc) => doc.id !== id));
   };
 
+  const totalOwned = pagination?.totalOwned ?? ownedDocs.length;
+  const totalCollaborated =
+    pagination?.totalCollaborated ?? collaboratedDocs.length;
+  const maxTotal = Math.max(totalOwned, totalCollaborated);
+  const canPrev = offset > 0;
+  const canNext = offset + limit < maxTotal;
+  const page = Math.floor(offset / limit) + 1;
+  const totalPages = Math.max(1, Math.ceil(maxTotal / limit));
+
   return (
     <>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-        <div className="flex items-center gap-2">
-          <DashboardViewToggle setView={setView} />
-          <SortControl
-            value={sort}
-            onChange={(val: SortValue) => setSort(val)}
-            options={sortOptions}
+      <div className="mb-6 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold">Dashboard</h1>
+          <div className="flex items-center gap-2">
+            <DashboardViewToggle setView={setView} />
+            <SortControl
+              value={sort}
+              onChange={(val: SortValue) => setSort(val)}
+              options={sortOptions}
+            />
+            <NewDocumentModal setDocuments={setDocuments} />
+          </div>
+        </div>
+        <div className="relative max-w-sm">
+          <SearchIcon
+            size={16}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            aria-hidden="true"
           />
-          <NewDocumentModal setDocuments={setDocuments} />
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search by title..."
+            aria-label="Search documents"
+            className="flex h-9 w-full rounded-md border border-input bg-transparent py-1 pl-9 pr-3 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
         </div>
       </div>
 
@@ -191,6 +239,35 @@ export default function DashboardMain({
               />
             </DocumentSection>
           )}
+          {!showSkeletons &&
+            (ownedDocs.length > 0 || collaboratedDocs.length > 0) && (
+              <div className="mt-6 flex items-center justify-between border-t pt-4">
+                <p className="text-sm text-muted-foreground">
+                  Page {page} of {totalPages} · {totalOwned} owned ·{' '}
+                  {totalCollaborated} shared
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!canPrev}
+                    onClick={() => onOffsetChange(Math.max(0, offset - limit))}
+                    aria-label="Previous page"
+                  >
+                    <ChevronLeftIcon size={16} /> Prev
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!canNext}
+                    onClick={() => onOffsetChange(offset + limit)}
+                    aria-label="Next page"
+                  >
+                    Next <ChevronRightIcon size={16} />
+                  </Button>
+                </div>
+              </div>
+            )}
         </>
       )}
     </>
