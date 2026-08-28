@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { Request, Response } from 'express';
 import asyncErrorWrapper from 'express-async-handler';
 import { StatusCodes } from 'http-status-codes';
@@ -117,6 +118,17 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
   try {
     const user = await prisma.user.findUnique({ where: { email } });
 
+    if (user && user.isActive === false) {
+      logger.warn('Login failed - user deactivated', {
+        action: 'LOGIN_USER_INACTIVE',
+        ...clientInfo,
+        userId: user.id,
+        email,
+      });
+      res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid email or password' });
+      return;
+    }
+
     if (!user) {
       await bcrypt.compare(password, DUMMY_PASSWORD_HASH);
 
@@ -157,11 +169,13 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
       }
     );
 
-    // Generate Access Token with a short expiration time
+    // Generate refresh token with jti for rotation / reuse detection
+    const jti = crypto.randomUUID();
     const refreshToken = jwt.sign(
       {
         userId: user.id,
         username: user.username,
+        jti,
       },
       process.env.JWT_REFRESH_SECRET,
       {
@@ -169,7 +183,16 @@ export const loginUser = asyncErrorWrapper(async (req: Request, res: Response) =
       }
     );
 
-    // update user with referesh token
+    // Create a new session for this device; do not overwrite other sessions
+    await prisma.session.create({
+      data: {
+        userId: user.id,
+        refreshToken,
+        jti,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
+    });
+    // Keep legacy column in sync for any external read (not used for auth)
     await prisma.user.update({
       where: { email },
       data: { refreshToken },
@@ -236,6 +259,22 @@ export const logoutUser = asyncErrorWrapper(async (req: AuthenticatedRequest, re
   }
 
   try {
+    const presented = req.cookies?.refreshToken as string | undefined;
+    if (presented) {
+      try {
+        const dec = jwt.verify(presented, process.env.JWT_REFRESH_SECRET!) as jwt.JwtPayload & { jti?: string };
+        if (dec.jti) {
+          await prisma.session.deleteMany({ where: { jti: dec.jti, userId } });
+        } else {
+          await prisma.session.deleteMany({ where: { refreshToken: presented, userId } });
+        }
+      } catch {
+        await prisma.session.deleteMany({ where: { refreshToken: presented, userId } });
+      }
+    } else {
+      // Fallback: clear all sessions for user if no token presented (e.g. legacy)
+      await prisma.session.deleteMany({ where: { userId } });
+    }
     await prisma.user.update({
       where: { id: userId },
       data: { refreshToken: null },
@@ -307,20 +346,108 @@ export const refreshToken = asyncErrorWrapper(async (req: Request, res: Response
     return;
   }
   try {
+    const payloadWithJti = payload as jwt.JwtPayload & { jti?: string };
     const user = await prisma.user.findUnique({ where: { id: payload.userId } });
 
-    if (!user || user.refreshToken !== refreshToken) {
+    if (!user) {
       logger.warn('Token refresh failed - token mismatch or user not found', {
         action: 'REFRESH_TOKEN_MISMATCH',
         ...clientInfo,
         userId: payload.userId,
-        userExists: !!user,
-        tokenMatches: user?.refreshToken === refreshToken,
+        userExists: false,
+        tokenMatches: false,
       });
-
       res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid refresh token' });
       return;
     }
+
+    // isActive enforcement — deactivated accounts cannot refresh
+    if (user.isActive === false) {
+      logger.warn('Token refresh failed - user deactivated', {
+        action: 'REFRESH_TOKEN_USER_INACTIVE',
+        ...clientInfo,
+        userId: user.id,
+      });
+      res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid refresh token' });
+      return;
+    }
+
+    // Prefer Session lookup by jti (new tokens); fallback to legacy column for old tokens
+    let session: Awaited<ReturnType<typeof prisma.session.findUnique>> | null = null;
+    if (payloadWithJti.jti) {
+      session = await prisma.session.findUnique({ where: { jti: payloadWithJti.jti } });
+
+      // Reuse detection: valid JWT for user but no matching session → token was already rotated/revoked
+      if (!session || session.refreshToken !== refreshToken || session.userId !== payload.userId) {
+        logger.warn('Token refresh failed - token reuse detected', {
+          action: 'REFRESH_TOKEN_REUSE',
+          ...clientInfo,
+          userId: payload.userId,
+          jti: payloadWithJti.jti,
+        });
+        res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid refresh token' });
+        return;
+      }
+
+      if (session.expiresAt < new Date()) {
+        logger.warn('Token refresh failed - session expired', {
+          action: 'REFRESH_TOKEN_EXPIRED',
+          ...clientInfo,
+          userId: payload.userId,
+        });
+        await prisma.session.delete({ where: { id: session.id } });
+        res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid refresh token' });
+        return;
+      }
+    } else {
+      // Legacy token without jti — fall back to single-column check
+      if (user.refreshToken !== refreshToken) {
+        logger.warn('Token refresh failed - token mismatch or user not found', {
+          action: 'REFRESH_TOKEN_MISMATCH',
+          ...clientInfo,
+          userId: payload.userId,
+          userExists: true,
+          tokenMatches: false,
+        });
+        res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Invalid refresh token' });
+        return;
+      }
+      // Migrate legacy: create a session for this token so future rotates work
+      session = await prisma.session.create({
+        data: {
+          userId: user.id,
+          refreshToken,
+          jti: crypto.randomUUID(),
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        },
+      });
+    }
+
+    // Rotate: new jti + new refresh token, update same session row
+    const newJti = crypto.randomUUID();
+    const newRefreshToken = jwt.sign(
+      {
+        userId: user.id,
+        username: user.username,
+        jti: newJti,
+      },
+      process.env.JWT_REFRESH_SECRET!,
+      { expiresIn: '24h' }
+    );
+
+    await prisma.session.update({
+      where: { id: session.id },
+      data: {
+        refreshToken: newRefreshToken,
+        jti: newJti,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
+    });
+    // Keep legacy column in sync (not used for auth, but for observability)
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: newRefreshToken },
+    });
 
     const newAccessToken = jwt.sign(
       {
@@ -336,6 +463,14 @@ export const refreshToken = asyncErrorWrapper(async (req: Request, res: Response
       ...clientInfo,
       userId: user.id,
       username: user.username,
+    });
+
+    const isProduction = process.env.NODE_ENV === 'production';
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
     });
 
     res.status(StatusCodes.OK).json({

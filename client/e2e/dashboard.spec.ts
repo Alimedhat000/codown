@@ -1,15 +1,15 @@
 import { expect, test } from '@playwright/test';
 
-import { createTestDocument, getDocumentCard, openDocumentMenu } from './utils';
+import {
+  createTestDocument,
+  getDocumentCard,
+  gotoDashboard,
+  openDocumentMenu,
+} from './utils';
 
 test.describe('Dashboard', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/app');
-
-    // Authenticated via storageState (see auth.setup.ts)
-    await expect(
-      page.getByRole('heading', { name: 'Dashboard' }),
-    ).toBeVisible();
+    await gotoDashboard(page);
   });
 
   test('should display dashboard with document list', async ({ page }) => {
