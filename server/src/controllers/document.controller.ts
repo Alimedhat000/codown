@@ -136,35 +136,68 @@ export const getDoc = asyncErrorWrapper(async (req: AuthenticatedRequest, res: R
   }
 });
 
+/**
+ * Fields returned by the dashboard list — excludes `content` (Yjs-owned,
+ * potentially large) and `YjsDocumentState`. Only metadata needed to render
+ * cards.
+ */
+const documentListSelect = {
+  id: true,
+  title: true,
+  isPublic: true,
+  shareId: true,
+  allowSelfJoin: true,
+  authorId: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
 export const getDocs = asyncErrorWrapper(async (req: AuthenticatedRequest, res: Response) => {
   const clientInfo = getClientInfo(req);
   const userId = req.user?.userId;
+  const { q, limit, offset } = req.query as unknown as { q?: string; limit: number; offset: number };
 
   logger.debug('Documents list request', {
     action: 'GET_DOCUMENTS_ATTEMPT',
     ...clientInfo,
     userId,
+    q,
+    limit,
+    offset,
   });
 
   try {
-    const ownedDocs = await prisma.document.findMany({
-      where: { authorId: userId },
-      orderBy: { updatedAt: 'desc' },
-    });
+    const titleFilter = q ? { title: { contains: q, mode: 'insensitive' as const } } : {};
 
-    const collaboratedDocs = await prisma.document.findMany({
-      where: {
-        Collaborator: {
-          some: {
-            userId,
-          },
-        },
-        NOT: {
-          authorId: userId, // exclude owned docs
-        },
-      },
-      orderBy: { updatedAt: 'desc' },
-    });
+    const ownedWhere: Prisma.DocumentWhereInput = {
+      authorId: userId,
+      ...titleFilter,
+    };
+
+    const collaboratedWhere: Prisma.DocumentWhereInput = {
+      Collaborator: { some: { userId } },
+      NOT: { authorId: userId },
+      ...titleFilter,
+    };
+
+    const [ownedDocs, collaboratedDocs, totalOwned, totalCollaborated] = await Promise.all([
+      prisma.document.findMany({
+        where: ownedWhere,
+        orderBy: { updatedAt: 'desc' },
+        select: documentListSelect,
+        take: limit,
+        skip: offset,
+      }),
+      prisma.document.findMany({
+        where: collaboratedWhere,
+        orderBy: { updatedAt: 'desc' },
+        select: documentListSelect,
+        take: limit,
+        skip: offset,
+      }),
+      prisma.document.count({ where: ownedWhere }),
+      prisma.document.count({ where: collaboratedWhere }),
+    ]);
 
     logger.debug('Documents list retrieved successfully', {
       action: 'GET_DOCUMENTS_SUCCESS',
@@ -172,11 +205,14 @@ export const getDocs = asyncErrorWrapper(async (req: AuthenticatedRequest, res: 
       userId,
       ownedCount: ownedDocs.length,
       collaboratedCount: collaboratedDocs.length,
+      totalOwned,
+      totalCollaborated,
     });
 
     res.status(StatusCodes.OK).json({
       owned: ownedDocs,
       collaborated: collaboratedDocs,
+      pagination: { limit, offset, totalOwned, totalCollaborated },
     });
   } catch (error) {
     logger.error('Documents list retrieval failed', {

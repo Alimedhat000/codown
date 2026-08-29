@@ -25,3 +25,14 @@ export const ShareLinkQuerySchema = z.object({
 });
 
 export type ShareLinkQuerySchema = z.infer<typeof ShareLinkQuerySchema>;
+
+export const ListDocumentsQuerySchema = z.object({
+  q: z.preprocess(
+    v => (typeof v === 'string' && v.trim() === '' ? undefined : v),
+    z.string().trim().min(1).max(100).optional()
+  ),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
+export type ListDocumentsQuerySchema = z.infer<typeof ListDocumentsQuerySchema>;

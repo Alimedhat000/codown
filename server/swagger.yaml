@@ -442,18 +442,71 @@ paths:
       tags:
         - Documents
       summary: Get user's documents
-      description: Retrieve all documents created by the authenticated user
+      description: Retrieve owned and collaborated documents (paginated, searchable). The list omits `content` — fetch `GET /document/{id}` for the full body.
       security:
         - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: false
+          description: Case-insensitive title filter
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+            example: meeting notes
+        - name: limit
+          in: query
+          required: false
+          description: Page size
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          description: Pagination offset
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
       responses:
         200:
           description: Documents retrieved successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Document'
+                type: object
+                properties:
+                  owned:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Document'
+                    description: Owned documents (content omitted)
+                  collaborated:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Document'
+                    description: Collaborated documents (content omitted)
+                  pagination:
+                    type: object
+                    properties:
+                      limit:
+                        type: integer
+                      offset:
+                        type: integer
+                      totalOwned:
+                        type: integer
+                      totalCollaborated:
+                        type: integer
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
         401:
           description: Unauthorized
           content:
